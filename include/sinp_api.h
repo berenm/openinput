@@ -36,14 +36,9 @@
 #error Do not include this file directly - use sinp.h
 #endif
 
-#define main sinp_main
-
 /* ********************************************************************
  * Main functions
  ******************************************************************** */
-
-// Main function - called when library is loaded (errorcode)
-sint sinp_main(int argc, char *argv[]);
 
 // Default initialization of all available devices (errorcode)
 sint sinp_init(char* window_id, uint flags);

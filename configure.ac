@@ -61,23 +61,28 @@ dnl Setup defines
 if test "x$enable_debug" = xyes; then
    AC_DEFINE([DEBUG], [1], [Internal debugging]) 
 fi
-AM_CONDITIONAL(DEBUG, test "x$enable_debug" = xyes)
 
 if test "x$enable_foo" = xyes; then
    AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
+   PLATDIRS="$PLATDIRS foo"
+   PLATLIBS="$PLATLIBS foo/libfoo.la"
 fi
-AM_CONDITIONAL(ENABLE_FOO, test "x$enable_foo" = xyes)
 
 if test "x$enable_x11" = xyes; then
    AC_DEFINE([ENABLE_X11], [1], [X11 window system])
+   PLATDIRS="$PLATDIRS x11"
+   PLATLIBS="$PLATLIBS x11/libx11.la"
 fi
-AM_CONDITIONAL(ENABLE_X11, test "x$enable_x11" = xyes)
+
+AC_SUBST(PLATDIRS)
+AC_SUBST(PLATLIBS)
 
 dnl Makefiles to be generated
 AC_CONFIG_FILES([
-	Makefile \
 	sinp.pc \
+	Makefile \
 	include/Makefile \
+	test/Makefile \
 	src/Makefile \
 	src/x11/Makefile \
 	src/foo/Makefile])

@@ -50,8 +50,8 @@ typedef signed int          sint;
 
 // Status flags
 #define SINP_STA_DEAD       0 // Uninitialized
-#define SINP_STA_ACTIVE     1 // Device generates events
-#define SINP_STA_FOCUS      2 // Generates events and locked input focus
+#define SINP_STA_ALIVE      1 // Device has been initialized
+#define SINP_STA_RUNNING    2 // Device is running
 
 /* ******************************************************************** */
 
@@ -115,6 +115,7 @@ typedef enum {
 #define SINP_ERR_NOT_IMPLEM  4 // Not implemented
 #define SINP_ERR_DEV_EXIST   5 // Device already initialized
 #define SINP_ERR_PARAM       6 // Invalid parameter
+#define SINP_ERR_DEV_RUNNING 7 // Device already enabled/running
 
 /* ******************************************************************** */
 

@@ -17,5 +17,5 @@ libtoolize --force && \
 aclocal $ACLOCAL_FLAGS && \
 autoheader && \
 autoconf && \
-automake --add-missing --force-missing --gnu
+automake --add-missing --gnu
 echo Done
