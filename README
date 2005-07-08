@@ -1,0 +1,42 @@
+libsinp
+------------------------------------------------------------------------
+
+libsinp is short for "library for simple input", and is intended as
+an easy-to-use, cross-platform input library handler. The goal is
+to provide a SDL-alike interface to input devices such as keyboards,
+mice and joysticks while keeping the dependencies for the library
+at a bare minimum.
+
+A lot of code has been ripped, abused and otherwise mangled from both
+libgii of the GGI project (http://www.ggi-project.org/) and the
+SDL project (http://www.libsdl.org/). Lots of thanks!
+
+libsinp is licensed under the GNU Lesser General Public License (LGPL).
+
+See the INSTALL file for installation instructions.
+
+The official subversion repository containing the sources and friends
+for libsinp can be obtained using the following subversion commands:
+
+	svn co https://makob.dk/svn/libsinp/trunk libsinp
+
+If you feel you deserve commit-priviligies, please send me an email at
+makob@makob.dk. Report bugs to makob@makob.dk.
+
+------------------------------------------------------------------------
+
+Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA

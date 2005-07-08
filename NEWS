@@ -1,0 +1,16 @@
+Breaking news of libsinp
+------------------------------------------------------------------------
+
+Prepend breaking news at the top of the news-list. All entries must
+follow this form:
+
+day.month.year nick -- Version x.y.z
+    * News item one
+      Continuation of first news item
+    * News item two
+    * Etc.
+
+------------------------------------------------------------------------
+
+17.06.2005 makob -- Version 0.0.1
+    * Project startup

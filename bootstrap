@@ -1,0 +1,21 @@
+#!/bin/sh
+
+echo Cleaning...
+rm -rf autom4te.cache
+rm -f config.h config.h.in config.log config.cache
+rm -f config.sub config.status config.guess
+rm -f configure
+rm -f depcomp install-sh libtool ltmain.sh missing
+rm -f mkinstalldirs acconfig.h stamp-h1
+
+export WANT_AUTOMAKE='1.6'
+export WANT_AUTOCONF_2_5=1
+
+echo Bootstrapping...
+aclocal && \
+libtoolize --force && \
+aclocal $ACLOCAL_FLAGS && \
+autoheader && \
+autoconf && \
+automake --add-missing --force-missing --gnu
+echo Done
