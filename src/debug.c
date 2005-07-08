@@ -21,6 +21,8 @@
 
 /* ******************************************************************** */
 
+// Includes
+#include "config.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include "sinp.h"
@@ -29,6 +31,7 @@
 /* ******************************************************************** */
 
 #ifdef DEBUG
+
 void debug(char* format, ...) {
   va_list args;
 

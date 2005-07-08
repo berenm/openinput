@@ -22,6 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
+#include "config.h"
 #include <stdio.h>
 #include <unistd.h>
 #include "sinp.h"

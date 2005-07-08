@@ -22,6 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
+#include "config.h"
 #include "sinp.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -49,7 +50,7 @@ static uint grabmask = 0;
 sint foo_avail() {
   debug("foo_avail");
 
-  return SINP_ERR_OK;
+  return 1;
 }
 
 /* ******************************************************************** */
@@ -96,18 +97,8 @@ sint foo_init(char *window_id, uint flags) {
 
 // Enable foo driver
 sint foo_enable(sint on) {
-  debug("foo_enable");
+  debug("foo_enable to %i", on);
   
-  // Status is now online
-  if(dev) {
-    if(on) {
-      dev->status |= SINP_STA_ACTIVE;
-    }
-    else {
-      dev->status = dev->status - (dev->status & SINP_STA_ACTIVE);
-    }
-  }
-
   return SINP_ERR_OK;
 }
 

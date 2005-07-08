@@ -38,6 +38,7 @@ typedef struct sinp_device {
   sint (*destroy)(struct sinp_device *dev);  // Shutdown device
   void (*process)();                         // Pump events into queue
   sint (*grab)(uint mask);                   // Grab input "provide" mask
+  void *private;                             // Private data
 } sinp_device;
 
 /* ******************************************************************** */
@@ -62,7 +63,7 @@ void device_pumpall();
 /* ******************************************************************** */
 
 // Debug macro
-#if defined(DEBUG_MODE) && defined(__GNC__)
+#ifdef DEBUG
 void debug(char *format, ...);
 #else
 #define debug(format, args...) ((void)0)

@@ -1,5 +1,5 @@
 /*
- * main.c : The main entry function
+ * main.c : The initialization and shutdown functions
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -22,6 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
+#include "config.h"
 #include <stdio.h>
 #include "sinp.h"
 #include "internal.h"
@@ -35,6 +36,8 @@ sint sinp_init(char *window_id, uint flags) {
   int j;
 
   debug("sinp_init");
+
+  device_boot();
 
   // Parse all devices
   i = 0;
@@ -57,9 +60,6 @@ sint sinp_init(char *window_id, uint flags) {
 
 	// Remember what it provides
 	pro |= sinp_dev_provides(i);
-
-	debug("sinp_init: device %i:'%s' initialzed and enabled",
-	      i, sinp_dev_name(i));
       }
     }
 
@@ -83,13 +83,15 @@ sint sinp_close() {
   int j;
 
   debug("sinp_close");
-  
+
   // Parse all devices
   i = 0;
   while(device_get(i) != NULL) {
 
     // Can only kill the living
-    if(sinp_dev_status(i) > SINP_STA_DEAD) {
+    if(sinp_dev_status(i) != SINP_STA_DEAD) {
+
+      debug("sinp_close: shutdown device %i", i);
 
       // Ungrab and disable
       sinp_dev_grab(i, 0);
@@ -100,24 +102,15 @@ sint sinp_close() {
 	return j;
       }
     }
+    else {
+      debug("sinp_close: device %i already down", i);
+    }
 
     // Next
     i++;
   }
 
   // Done
-  return SINP_ERR_OK;
-}
-
-/* ******************************************************************** */
-
-// The main function
-int sinp_main(int argc, char *argv[]) {
-  debug("sinp_main");
-
-  // Fill device array on library init
-  device_boot();
-
   return SINP_ERR_OK;
 }
 

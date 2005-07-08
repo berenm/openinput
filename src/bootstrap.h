@@ -32,7 +32,7 @@ typedef struct sinp_bootstrap {
   char *desc;                                // Device description
   sint provides;                             // Device provide-flag
   sint (*avail)();                           // Is platform valid?
-  sinp_device *(*create)();                   // Return device structure
+  sinp_device *(*create)();                  // Return device structure
 } sinp_bootstrap;
 
 /* ******************************************************************** */

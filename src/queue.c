@@ -22,6 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #include "sinp.h"
@@ -38,7 +39,7 @@ static struct {
 
 // Initialize queue-event system (internal)
 sint queue_init() {
-  debug("sinp: queue_init");
+  debug("queue_init");
   
   // Clear event queue
   queue.head = 0;
