@@ -46,6 +46,7 @@ static sinp_device *dev = NULL;
 static uint grabmask = 0;
 static Display *disp;
 static Window *win;
+static Screen *screen;
 
 /* ******************************************************************** */
  
@@ -106,14 +107,16 @@ sinp_device *x11_device() {
 sint x11_init(char *window_id, uint flags) {
   debug("x11_init");
 
-  //FIXME HERE
-
-
-  /*
-   * Parse the "window_id" thingie into display/window
-   *
-   * Setup some wierd X stuff
-   */
+  // Parse the window_id flags
+  disp = (Display*)device_windowid(window_id, SINP_I_CONN);
+  screen = (Screen*)device_windowid(window_id, SINP_I_SCRN);
+  win = (Window*)device_windowid(window_id, SINP_I_WINID);
+  
+  // We require conn and winid parameters
+  if(!disp || !win) {
+    debug("x11_init: conn (c) and winid (w) parameters required\n");
+    return SINP_ERR_NO_DEVICE;
+  }
 }
 
 /* ******************************************************************** */

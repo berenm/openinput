@@ -28,17 +28,17 @@
 
 // Device abstraction interface
 typedef struct sinp_device {
-  sint index;                                // Device index
-  char *name;                                // Short device name
-  char *desc;                                // Description of device
-  uint status;                               // Status-flag
-  uint provides;                             // Provide-flag
-  sint (*init)(char *window_id, uint flags); // Initialize device
-  sint (*enable)(sint on);                   // Enable/disable device
-  sint (*destroy)(struct sinp_device *dev);  // Shutdown device
-  void (*process)();                         // Pump events into queue
-  sint (*grab)(uint mask);                   // Grab input "provide" mask
-  void *private;                             // Private data
+  sint index;                                                          // Device index
+  char *name;                                                          // Short device name
+  char *desc;                                                          // Description of device
+  uint status;                                                         // Status-flag
+  uint provides;                                                       // Provide-flag
+  void *private;                                                       // Private data
+  sint (*init)(struct sinp_device *dev, char *window_id, uint flags);  // Initialize device
+  sint (*enable)(struct sinp_device *dev, sint on);                    // Enable/disable device
+  sint (*destroy)(struct sinp_device *dev);                            // Shutdown device
+  void (*process)(struct sinp_device *dev);                            // Pump events into queue
+  sint (*grab)(struct sinp_device *dec, uint mask);                    // Grab input "provide" mask
 } sinp_device;
 
 /* ******************************************************************** */
@@ -67,6 +67,7 @@ sinp_device *device_get(sint index);
 void device_set_provides(sint index, uint pro);
 void device_set_status(sint index, uint sta);
 void device_pumpall();
+uint device_windowid(char *str, char tok);
 
 /* ******************************************************************** */
 

@@ -40,10 +40,6 @@ sinp_bootstrap foo_bootstrap = {
   foo_device
 };
 
-// Globals
-static sinp_device *dev = NULL;
-static uint grabmask = 0;
-
 /* ******************************************************************** */
  
 // Check availablity of foo
@@ -57,18 +53,22 @@ sint foo_avail() {
 
 // Install foo 'device' block
 sinp_device *foo_device() {
+  sinp_device *dev;
+  foo_private *priv;
+
   debug("foo_device");
 
-  // Dummy check
-  if(dev != NULL) {
-    debug("foo_device: device struct already exists");
-    return NULL;
-  }
-
-  // Alloc
+  // Alloc device and private data
   dev = (sinp_device*)malloc(sizeof(sinp_device));
-  if(dev == NULL) {
+  priv = (foo_private*)malloc(sizeof(foo_private));
+  if((dev == NULL) || (priv == NULL)) {
     debug("foo_device: device creation failed");
+    if(dev) {
+      free(dev);
+    }
+    if(priv) {
+      free(priv);
+    }
     return NULL;
   }
 
@@ -79,6 +79,7 @@ sinp_device *foo_device() {
   dev->destroy = foo_destroy;
   dev->process = foo_process;  
   dev->grab = foo_grab;
+  dev->private = priv;
   
   // Done
   return dev;
@@ -87,8 +88,20 @@ sinp_device *foo_device() {
 /* ******************************************************************** */
 
 // Initialize foo
-sint foo_init(char *window_id, uint flags) {
+sint foo_init(sinp_device *dev, char *window_id, uint flags) {
+  uint val;
+
   debug("foo_init: window '%s', flags %i", window_id, flags);
+  
+  // Sniff the handles
+  val = device_windowid(window_id, SINP_I_CONN);
+  debug("foo_init: conn (c) paramter %i", val);
+
+  val = device_windowid(window_id, SINP_I_SCRN);
+  debug("foo_init: scrn (s) paramter %i", val);
+
+  val = device_windowid(window_id, SINP_I_WINID);
+  debug("foo_init: winid (w) paramter %i", val);
 
   return SINP_ERR_OK;
 }
@@ -96,7 +109,7 @@ sint foo_init(char *window_id, uint flags) {
 /* ******************************************************************** */
 
 // Enable foo driver
-sint foo_enable(sint on) {
+sint foo_enable(sinp_device *dev, sint on) {
   debug("foo_enable to %i", on);
   
   return SINP_ERR_OK;
@@ -107,8 +120,13 @@ sint foo_enable(sint on) {
 // Free foo device structure
 sint foo_destroy(sinp_device *dev) {
   debug("foo_destroy");
-
+  
+  // Free device
   if(dev) {
+    // Private data
+    if(dev->private) {
+      free(dev->private);
+    }
     free(dev);
     dev = NULL;
   }
@@ -119,7 +137,7 @@ sint foo_destroy(sinp_device *dev) {
 /* ******************************************************************** */
 
 // Pump events into event queue
-void foo_process() {
+void foo_process(sinp_device *dev) {
   static sinp_event ev;
 
   debug("foo_process");
@@ -140,7 +158,10 @@ void foo_process() {
 /* ******************************************************************** */
 
 // Pump events into event queue
-sint foo_grab(uint mask) {
+sint foo_grab(sinp_device *dev, uint mask) {
+  foo_private *priv;
+
+  priv = (foo_private*)dev->private;
   debug("foo_grab");
 
   // We only implement SINP_PRO_UNKNOWN
@@ -150,10 +171,10 @@ sint foo_grab(uint mask) {
 
   // Toggle
   if(mask) {
-    grabmask |= mask;
+    priv->grabmask |= mask;
   }
   else {
-    grabmask = grabmask - (grabmask & mask);
+    priv->grabmask = priv->grabmask - (priv->grabmask & mask);
   }
 
   return SINP_ERR_OK;

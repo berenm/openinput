@@ -39,7 +39,27 @@ static sint num_devices = 0;
 
 /* ******************************************************************** */
 
-// Bootstrap devices, ie. fill array with available devices (internal)
+// Register device via bootstrap (internal)
+sint device_register(sinp_bootstrap *boot) {
+  // Create the device and set basics
+  devices[num_devices] = boot->create();
+  if(devices[num_devices] != NULL) {
+    devices[num_devices]->index = num_devices;
+    devices[num_devices]->status = SINP_STA_DEAD;
+    devices[num_devices]->name = boot->name;
+    devices[num_devices]->desc = boot->desc;
+    devices[num_devices]->provides = boot->provides;
+    num_devices++;
+    return SINP_ERR_OK;
+  }
+  
+  // Failure
+  return SINP_ERR_NO_DEVICE;
+}
+
+/* ******************************************************************** */
+
+// Initialize builtin devices (internal)
 void device_boot() {
   int i;
   int j;
@@ -51,31 +71,22 @@ void device_boot() {
     return;
   }
 
-  // Clear device array
-  //  memset(devices, 0, sizeof(void*)*SINP_MAX_DEVICES);
-  
   // Fill structure array with available devices
   j = 0;
   for(i=0; bootstrap[i]; i++) {
     debug("device_boot: checking bootstrap entry %i", i, bootstrap[i]->name);
     
+    // If available, register
     if(bootstrap[i]->avail()) {
-      // Create the device and set basics
-      devices[j] = bootstrap[i]->create();
-      devices[j]->index = j;
-      devices[j]->status = SINP_STA_DEAD;
-      devices[j]->name = bootstrap[i]->name;
-      devices[j]->desc = bootstrap[i]->desc;
-      devices[j]->provides = bootstrap[i]->provides;
+      device_register(bootstrap[i]);      
 
       debug("device_boot: device '%s' (%s) added at index %i",
 	    devices[j]->name, devices[j]->desc, j);
-      j++;
     }
   }
-  num_devices = j;
   
-  debug("device_boot: %i devices compiled in and %i available", i, j);
+  debug("device_boot: %i devices compiled in and %i available",
+	i, num_devices);
 }
 
 /* ******************************************************************** */
@@ -126,8 +137,38 @@ void device_pumpall() {
   int i;
 
   for(i=0; i<num_devices; i++) {
-    devices[i]->process();
+    devices[i]->process(devices[i]);
   }
+}
+
+/* ******************************************************************** */
+
+// Parse and convert window_id string into uints
+uint device_windowid(char *str, char tok) {
+  static char *match_sp = "X:%ui ";
+  static char *match_nl = "X:%ui\n";
+  int e;
+  uint val;
+  
+  // Set token to find
+  match_sp[0] = tok;
+  match_nl[0] = tok;
+  debug("device_windowid: scan for '%s' in '%s'", match_sp, str);
+
+  // First, try space termination, then newline
+  e = sscanf(str, match_sp, val);
+  if(e != 1) {
+    e = sscanf(str, match_nl, val);
+  }
+  
+  if(e != 1) {
+    debug("device_windowid: parameter not found");
+    return 0;
+  }
+
+  debug("device_windowid: found %ui", val);
+
+  return val;
 }
 
 /* ******************************************************************** */
@@ -145,7 +186,7 @@ sint sinp_dev_init(sint index, char *window_id, uint flags) {
   }
 
   // Graceful device creation
-  e = dev->init(window_id, flags);
+  e = dev->init(dev, window_id, flags);
   if(e != SINP_ERR_OK) {
     return e;
   }
@@ -282,7 +323,7 @@ sint sinp_dev_enable(sint index, sint on) {
   }
 
   // Notify device
-  e = dev->enable(on);
+  e = dev->enable(dev, on);
 
   // Fallback if we failed
   if(e != SINP_ERR_OK) {
@@ -290,27 +331,6 @@ sint sinp_dev_enable(sint index, sint on) {
   }
 
   return e;
-}
-
-/* ******************************************************************** */
-
-// Grab and lock input-provide-mask for this device if possible (public)
-sint sinp_dev_grab(sint index, uint mask) {
-  sinp_device *dev;
-
-  debug("sinp_dev_grab");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  // We have to be alive to do this
-  if(dev->status == SINP_STA_DEAD) {
-    return SINP_ERR_DEV_DEAD;
-  }
-
-  return dev->grab(mask);
 }
 
 /* ******************************************************************** */
@@ -332,7 +352,28 @@ void sinp_dev_pump(sint index) {
     return;
   }
 
-  dev->process();
+  dev->process(dev);
+}
+
+/* ******************************************************************** */
+
+// Grab and lock input-provide-mask for this device if possible (public)
+sint sinp_dev_grab(sint index, uint mask) {
+  sinp_device *dev;
+
+  debug("sinp_dev_grab");
+
+  dev = device_get(index);
+  if(dev == NULL) {
+    return SINP_ERR_INDEX;
+  }
+
+  // We have to be alive to do this
+  if(dev->status == SINP_STA_DEAD) {
+    return SINP_ERR_DEV_DEAD;
+  }
+
+  return dev->grab(dev, mask);
 }
 
 /* ******************************************************************** */

@@ -31,11 +31,16 @@ sint foo_avail();
 sinp_device *foo_device();
 
 // Device
-sint foo_init(char *window_id, uint flags);
-sint foo_enable(sint on);
+sint foo_init(sinp_device *dev, char *window_id, uint flags);
+sint foo_enable(sinp_device *dev, sint on);
 sint foo_destroy(sinp_device *dev);
-void foo_process();
-sint foo_grab(uint mask);
+void foo_process(sinp_device *dev);
+sint foo_grab(sinp_device *dev, uint mask);
+
+// Private data
+typedef struct foo_private {
+  uint grabmask;
+} foo_private;
 
 /* ******************************************************************** */
 
