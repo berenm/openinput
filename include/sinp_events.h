@@ -30,6 +30,16 @@
 
 /* ******************************************************************** */
 
+// Keyboard virtual symbol
+typedef struct {
+  uchar scancode;       // Hardware scancode
+  sinp_key sym;         // Key symbol
+  sinp_mod mod;         // Modifier symbol
+  ushort unicode;       // Translated unicode character
+} sinp_keysym;
+
+/* ******************************************************************** */
+
 // Application visibility event
 typedef struct sinp_active_event {
   uchar type;               // SINP_ACTIVE
