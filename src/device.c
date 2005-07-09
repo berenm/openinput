@@ -25,6 +25,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "sinp.h"
 #include "internal.h"
 
@@ -145,28 +146,29 @@ void device_pumpall() {
 
 // Parse and convert window_id string into uints
 uint device_windowid(char *str, char tok) {
-  static char *match_sp = "X:%ui ";
-  static char *match_nl = "X:%ui\n";
+  char *match;
+  char *sub;
   int e;
   uint val;
   
-  // Set token to find
-  match_sp[0] = tok;
-  match_nl[0] = tok;
-  debug("device_windowid: scan for '%s' in '%s'", match_sp, str);
+  match = malloc(5);
+  memset(match, 0, 5);
 
-  // First, try space termination, then newline
-  e = sscanf(str, match_sp, val);
-  if(e != 1) {
-    e = sscanf(str, match_nl, val);
+  // Set token to find, and scan
+  match[0] = tok;
+  strcat(match, ":%u");
+  if(sub = index(str, tok)) {
+    e = sscanf(sub, match, &val);
   }
+  else {
+    e = 0;
+  }
+  free(match);
   
   if(e != 1) {
     debug("device_windowid: parameter not found");
     return 0;
   }
-
-  debug("device_windowid: found %ui", val);
 
   return val;
 }

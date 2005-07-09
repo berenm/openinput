@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
   printf("*** footest start ***\n\n");
   
   // Init sinp
-  e = sinp_init("makob", 0);
+  e = sinp_init("c:1 s:2 w:3", 0);
   printf("--- sinp_init, code %i\n\n", e);
 
   // Try to fetch an event

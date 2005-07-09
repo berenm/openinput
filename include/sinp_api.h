@@ -20,12 +20,24 @@
  */
 
 /* ********************************************************************
- * Special notes:
+ * Special notes - Return results:
  * Each function call is preceeded by a small explanation and
  * what return type one can expect (in the last paranthesis).
  * If a "(M)" is present, the function is for manual device handling,
  * and should be avoided under normal circumstances, eg. when using
  * sinp_init() which sets devices automatically.
+ *
+ * Special note - "init" call parameters:
+ * In the sinp_init(window_id, flags) and sinp_dev_init(window_id, flags)
+ * calls, the window_id parameter is a string, which uses the following
+ * convention on _all_ platforms: "c:CONN s:SCRN w:WINID"
+ * CONN is the connection handle to the server (ie. Display under X11)
+ * SCRN is the screen to use
+ * WINID is the window handle to fetch event for
+ * All parameters must be "%u"-encoded to a string (unsigned int).
+ * The delimiter between parameters is the whitespace.
+ * Not all platforms needs CONN and SCRN. They can be left out if they
+ * are not needed.
  *
  ******************************************************************** */
 

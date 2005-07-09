@@ -40,6 +40,11 @@ sinp_bootstrap foo_bootstrap = {
   foo_device
 };
 
+// Private data
+typedef struct foo_private {
+  uint grabmask;
+} foo_private;
+
 /* ******************************************************************** */
  
 // Check availablity of foo
@@ -95,13 +100,13 @@ sint foo_init(sinp_device *dev, char *window_id, uint flags) {
   
   // Sniff the handles
   val = device_windowid(window_id, SINP_I_CONN);
-  debug("foo_init: conn (c) paramter %i", val);
+  debug("foo_init: conn (c) parameter %i", val);
 
   val = device_windowid(window_id, SINP_I_SCRN);
-  debug("foo_init: scrn (s) paramter %i", val);
+  debug("foo_init: scrn (s) parameter %i", val);
 
   val = device_windowid(window_id, SINP_I_WINID);
-  debug("foo_init: winid (w) paramter %i", val);
+  debug("foo_init: winid (w) parameter %i", val);
 
   return SINP_ERR_OK;
 }

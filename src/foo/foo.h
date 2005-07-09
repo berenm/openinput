@@ -37,11 +37,6 @@ sint foo_destroy(sinp_device *dev);
 void foo_process(sinp_device *dev);
 sint foo_grab(sinp_device *dev, uint mask);
 
-// Private data
-typedef struct foo_private {
-  uint grabmask;
-} foo_private;
-
 /* ******************************************************************** */
 
 #endif
