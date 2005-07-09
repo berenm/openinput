@@ -82,7 +82,7 @@ sint queue_add(sinp_event *evt) {
     add = 0;
   }
   
-  // Insert it
+  // Insert it by COPYING!
   else {
     queue.events[queue.tail] = *evt;
     add = 1;
@@ -117,13 +117,16 @@ sint queue_cut(ushort where) {
     sint here;
 
     // Wrap around negative tail
-    if((--queue.tail) < 0) {
+    --queue.tail;
+    if(queue.tail < 0) {
       queue.tail = SINP_MAX_EVENTS-1;
     }
 
     // Shift everything backwards
     for(here=where; here!=queue.tail; here=next) {
       next = (here+1)%SINP_MAX_EVENTS;
+
+      // We use COPYING here
       queue.events[here] = queue.events[next];
     }
 
@@ -153,7 +156,8 @@ sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove) {
   while((copy < num) && (here != queue.tail)) {
     // Check mask
     if(mask & SINP_EVENT_MASK(queue.events[here].type)) {
-      // Store found event
+
+      // Transfer to user by COPYING
       evts[copy] = queue.events[here];
       copy++;
 

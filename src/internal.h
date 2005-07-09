@@ -47,8 +47,16 @@ typedef struct sinp_device {
 sint queue_init();
 sint queue_lock();
 sint queue_unlock();
-sint queue_add(sinp_event *evt);
 sint queue_cut(ushort where);
+
+/* Important notes:
+ * -> queue_add() will _copy_ the given event into the queue, ie.
+ * you can throw the memory away after the call.
+ * -> queue_peep() will _copy_ the event into the user's pointer,
+ * ie. you must allocate space for the event(s) before calling the
+ * functon
+ */
+sint queue_add(sinp_event *evt);
 sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove);
 
 /* ******************************************************************** */

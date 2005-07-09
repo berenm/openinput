@@ -120,7 +120,21 @@ sint foo_destroy(sinp_device *dev) {
 
 // Pump events into event queue
 void foo_process() {
+  static sinp_event ev;
+
   debug("foo_process");
+
+  // Since this is a test device, generate an event
+  ev.type = SINP_KEYDOWN;
+  ev.key.device = dev->index;
+  ev.key.state = 1;
+  ev.key.keysym.scancode = 65;
+  ev.key.keysym.sym = SK_FOO;
+  ev.key.keysym.mod = SM_NONE;
+  ev.key.keysym.unicode = 0;
+  
+  // Post event
+  queue_add(&ev);
 }
 
 /* ******************************************************************** */
