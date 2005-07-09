@@ -43,10 +43,16 @@ sinp_bootstrap x11_bootstrap = {
 
 // Private structure
 typedef struct x11_private {
-  uint grabmask;
   Display *disp;
   Window *win;
   Screen *screen;
+  uint grabmask;
+  sint winheight;
+  sint winwidth;
+  sint mousex;
+  sint mousey;
+  sint oldx;
+  sint oldy;
 } x11_private;
 
 /* ******************************************************************** */
@@ -61,10 +67,10 @@ sint x11_avail() {
   disp = XOpenDisplay(NULL);
   if(disp != NULL) {
     XCloseDisplay(disp);
-    return SINP_ERR_OK;
+    return TRUE;
   }
   else {
-    return SINP_ERR_NO_DEVICE;
+    return FALSE;
   }
 }
 
@@ -76,12 +82,6 @@ sinp_device *x11_device() {
   x11_private *priv;
 
   debug("x11_device");
-
-  // Dummy check
-  if(dev != NULL) {
-    debug("x11_device: device struct already exists");
-    return NULL;
-  }
 
   // Alloc
   debug("x11_device");
