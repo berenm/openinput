@@ -30,20 +30,29 @@
 // Main function
 int main(int argc, char *argv[]) {
   int e;
+  sinp_event ev;
 
   // Startup
-  printf("*** footest start\n");
+  printf("*** footest start ***\n\n");
   
   // Init sinp
   e = sinp_init("makob", 0);
-  printf("*** sinp_init, code %i\n", e);
+  printf("--- sinp_init, code %i\n\n", e);
+
+  // Try to fetch an event
+  e = sinp_events_poll(&ev);
+  printf("--- sinp_events_poll, code %i\n", e);
+  if(e > 0) {
+    printf("--- event type %i\n", ev.type);
+  }
+  printf("\n");
 
   // Close sinp
   e = sinp_close();
-  printf("*** sinp_close, code %i\n", e);
+  printf("--- sinp_close, code %i\n\n", e);
 
   // Done
-  printf("*** footest stop\n");
+  printf("*** footest stop ***\n");
   return 0;
 }
 
