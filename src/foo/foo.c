@@ -129,7 +129,7 @@ void foo_process() {
   ev.key.device = dev->index;
   ev.key.state = 1;
   ev.key.keysym.scancode = 65;
-  ev.key.keysym.sym = SK_FOO;
+  ev.key.keysym.sym = SK_A;
   ev.key.keysym.mod = SM_NONE;
   ev.key.keysym.unicode = 0;
   
