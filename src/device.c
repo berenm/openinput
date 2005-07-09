@@ -82,7 +82,7 @@ void device_boot() {
       device_register(bootstrap[i]);      
 
       debug("device_boot: device '%s' (%s) added at index %i",
-	    devices[j]->name, devices[j]->desc, j);
+	    devices[i]->name, devices[i]->desc, num_devices);
     }
   }
   

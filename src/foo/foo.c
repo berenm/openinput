@@ -51,7 +51,7 @@ typedef struct foo_private {
 sint foo_avail() {
   debug("foo_avail");
 
-  return 1;
+  return TRUE;
 }
 
 /* ******************************************************************** */

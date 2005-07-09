@@ -78,6 +78,14 @@ void debug(char *format, ...);
 #define debug(format, args...) ((void)0)
 #endif
 
+// True and false
+#ifndef TRUE
+#define TRUE 1
+#endif
+#ifndef FALSE
+#define FALSE NULL
+#endif
+
 /* ******************************************************************** */
 
 #endif

@@ -38,7 +38,7 @@ sint sinp_events_peep(sinp_event *evts, sint num) {
   sint p;
 
   queue_lock();
-  p = queue_peep(evts, num, ~event_mask, 0);
+  p = queue_peep(evts, num, ~event_mask, FALSE);
   queue_unlock();
 
   return p;
@@ -98,7 +98,7 @@ sint sinp_events_poll(sinp_event *evt) {
   device_pumpall();
 
   // Peep for 1 event with removal
-  found = queue_peep(evt, 1, ~event_mask, 1);
+  found = queue_peep(evt, TRUE, ~event_mask, TRUE);
 
   queue_unlock();
   return found;
@@ -116,7 +116,7 @@ void sinp_events_wait(sinp_event *evt) {
     // Lock, pump, read, unlock, sleep
     queue_lock();
     device_pumpall();
-    found = queue_peep(evt, 1, ~event_mask, 1);
+    found = queue_peep(evt, TRUE, ~event_mask, TRUE);
     queue_unlock();
     usleep(SINP_SLEEP);
   }
