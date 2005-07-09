@@ -21,25 +21,6 @@
 
 /* ******************************************************************** */
 
-#include "sinp.h"
-#include "internal.h"
-#include <X11/Xlib.h>
-
 /* ******************************************************************** */
- 
-// Bootstrap initialization
-sint x11_init(char *window_id) {
-  Display *disp;
-
-  // Dummy check for X11 existence
-  disp = XOpenDisplay(NULL);
-  if(disp != NULL) {
-    XCloseDisplay(disp);
-  }
-  else {
-    return SINP_ERR_NO_PLATFORM;
-   
-}
-
 
 /* ******************************************************************** */

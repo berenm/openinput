@@ -41,16 +41,17 @@ sinp_bootstrap x11_bootstrap = {
   x11_device,
 };
 
-// Globals
-static sinp_device *dev = NULL;
-static uint grabmask = 0;
-static Display *disp;
-static Window *win;
-static Screen *screen;
+// Private structure
+typedef struct x11_private {
+  uint grabmask;
+  Display *disp;
+  Window *win;
+  Screen *screen;
+} x11_private;
 
 /* ******************************************************************** */
  
-// Check availablity of X11
+// Bootstrap: Check availablity of X11
 sint x11_avail() {
   Display *disp;
 
@@ -63,15 +64,16 @@ sint x11_avail() {
     return SINP_ERR_OK;
   }
   else {
-    return SINP_ERR_NO_PLATFORM;
+    return SINP_ERR_NO_DEVICE;
   }
 }
 
 /* ******************************************************************** */
 
-// Install X11 'device' block
+// Bootstrap Install X11 'device' block
 sinp_device *x11_device() {
   sinp_device *dev;
+  x11_private *priv;
 
   debug("x11_device");
 
@@ -82,20 +84,31 @@ sinp_device *x11_device() {
   }
 
   // Alloc
-  debug("x11_device: create device");
+  debug("x11_device");
   dev = (sinp_device*)malloc(sizeof(sinp_device));
-  if(dev == NULL) {
+  priv = (x11_private*)malloc(sizeof(x11_private));
+  if((dev == NULL) || (priv == NULL)) {
     debug("x11_device: device creation failed");
+    if(dev) {
+      free(dev);
+    }
+    if(priv) {
+      free(priv);
+    }
     return NULL;
   }
 
   // Set members
-  memset(device, 0, sizeof(sinp_device));
+  memset(dev, 0, sizeof(sinp_device));
   dev->init = x11_init;
   dev->enable = x11_enable;
-  dev->destoy = x11_destroy;
+  dev->destroy = x11_destroy;
   dev->process = x11_process;  
   dev->grab = x11_grab;
+  dev->private = priv;
+
+  // Clear private
+  memset(priv, 0, sizeof(x11_private));
   
   // Done
   return dev;
@@ -104,26 +117,33 @@ sinp_device *x11_device() {
 /* ******************************************************************** */
 
 // Initialize X11
-sint x11_init(char *window_id, uint flags) {
+sint x11_init(sinp_device *dev, char *window_id, uint flags) {
+  x11_private *priv;
+
+  priv = (x11_private*)dev->private;
   debug("x11_init");
 
   // Parse the window_id flags
-  disp = (Display*)device_windowid(window_id, SINP_I_CONN);
-  screen = (Screen*)device_windowid(window_id, SINP_I_SCRN);
-  win = (Window*)device_windowid(window_id, SINP_I_WINID);
+  priv->disp = (Display*)device_windowid(window_id, SINP_I_CONN);
+  priv->screen = (Screen*)device_windowid(window_id, SINP_I_SCRN);
+  priv->win = (Window*)device_windowid(window_id, SINP_I_WINID);
   
   // We require conn and winid parameters
-  if(!disp || !win) {
+  if(!(priv->disp) || !(priv->win)) {
     debug("x11_init: conn (c) and winid (w) parameters required\n");
     return SINP_ERR_NO_DEVICE;
   }
+
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Enable X11 driver
-sint x11_enable(sint on) {
+sint x11_enable(sinp_device *dev, sint on) {
   debug("x11_enable");
+
+  return SINP_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
@@ -133,23 +153,30 @@ sint x11_destroy(sinp_device *dev) {
   debug("x11_destroy");
 
   if(dev) {
+    if(dev->private) {
+      free(dev->private);
+    }
     free(dev);
     dev = NULL;
   }
+
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Pump event into the queue
-void x11_process() {
+void x11_process(sinp_device *dev) {
   debug("x11_process");
 }
 
 /* ******************************************************************** */
 
 // Grab (lock) mouse/keyboard in window
-sint x11_grab(uint mask) {
+sint x11_grab(sinp_device *dev, uint mask) {
   debug("x11_grab");
+
+  return SINP_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
