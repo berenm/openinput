@@ -1,4 +1,3 @@
-# Test the foo driver
 noinst_PROGRAMS = \
 footest
 
@@ -9,5 +8,6 @@ footest.h
 footest_LDADD = \
 $(top_srcdir)/src/libsinp.la
 
+# Extra
 INCLUDES = \
 -I$(top_srcdir)/include

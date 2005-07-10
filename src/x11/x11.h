@@ -37,7 +37,10 @@ sint x11_destroy(sinp_device *dev);
 void x11_process(sinp_device *dev);
 sint x11_grab(sinp_device *dev, uint mask);
 
+// Misc. functions
+sint x11_error(Display *d, XErrorEvent *e);
+sint x11_fatal(Display *d);
+
 /* ******************************************************************** */
 
 #endif
-

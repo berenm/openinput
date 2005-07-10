@@ -45,6 +45,7 @@ typedef signed int          sint;
 #define SINP_PRO_KEYBOARD   2 // Keyboard input device
 #define SINP_PRO_POINTER    4 // Pointer input device (mouse)
 #define SINP_PRO_JOYSTICK   8 // Joystick input device
+#define SINP_PRO_HIDECUR   16 // Cursor of device can be hidden
 
 /* ******************************************************************** */
 

@@ -29,6 +29,7 @@ AC_ARG_ENABLE(x11,
 dnl Check for libraries and header files
 AC_CHECK_LIB(pthread, main)
 AC_PATH_X
+AC_PATH_XTRA
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_CHECK_HEADERS([limits.h locale.h malloc.h stddef.h stdlib.h string.h])

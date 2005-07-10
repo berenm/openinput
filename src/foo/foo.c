@@ -165,24 +165,29 @@ void foo_process(sinp_device *dev) {
 // Pump events into event queue
 sint foo_grab(sinp_device *dev, uint mask) {
   foo_private *priv;
+  sint ok;
 
   priv = (foo_private*)dev->private;
+  ok = FALSE;
   debug("foo_grab");
 
-  // We only implement SINP_PRO_UNKNOWN
-  if((mask != 0) || (mask != SINP_PRO_UNKNOWN)) {
-    return SINP_ERR_PARAM;
+  // Toggle
+  if(mask & SINP_PRO_UNKNOWN) {
+    priv->grabmask |= mask;
+    ok = TRUE;
+  }
+  if(!(mask & SINP_PRO_UNKNOWN)) {
+    priv->grabmask = priv->grabmask - (priv->grabmask & mask);
+    ok = TRUE;
   }
 
-  // Toggle
-  if(mask) {
-    priv->grabmask |= mask;
+  // Be nice to the user - report errors
+  if(ok) {
+    return SINP_ERR_OK;
   }
   else {
-    priv->grabmask = priv->grabmask - (priv->grabmask & mask);
+    return SINP_ERR_PARAM;
   }
-
-  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
