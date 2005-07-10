@@ -249,7 +249,7 @@ sint x11_grab(sinp_device *dev, uint mask) {
     //FIXME implement
     ok = TRUE;
   }
-  if(!(mask & SINP_PRO_HIDECUR) {
+  if(!(mask & SINP_PRO_HIDECUR)) {
     // Show
     priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_HIDECUR);
     //FIXME implement
