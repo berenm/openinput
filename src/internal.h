@@ -26,48 +26,55 @@
 
 /* ******************************************************************** */
 
-// Device abstraction interface
-typedef struct sinp_device {
-  sint index;                                                          // Device index
-  char *name;                                                          // Short device name
-  char *desc;                                                          // Description of device
-  uint status;                                                         // Status-flag
-  uint provides;                                                       // Provide-flag
-  void *private;                                                       // Private data
-  sint (*init)(struct sinp_device *dev, char *window_id, uint flags);  // Initialize device
-  sint (*enable)(struct sinp_device *dev, sint on);                    // Enable/disable device
-  sint (*destroy)(struct sinp_device *dev);                            // Shutdown device
-  void (*process)(struct sinp_device *dev);                            // Pump events into queue
-  sint (*grab)(struct sinp_device *dec, uint mask);                    // Grab input "provide" mask
-} sinp_device;
-
-/* ******************************************************************** */
-
 // Internal queue functions
 sint queue_init();
 sint queue_lock();
 sint queue_unlock();
 sint queue_cut(ushort where);
-
-/* Important notes:
- * -> queue_add() will _copy_ the given event into the queue, ie.
- * you can throw the memory away after the call.
- * -> queue_peep() will _copy_ the event into the user's pointer,
- * ie. you must allocate space for the event(s) before calling the
- * functon
- */
 sint queue_add(sinp_event *evt);
 sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove);
 
 /* ******************************************************************** */
 
-// Internal device function prototypes
-void device_boot();
+// Device abstraction interface
+typedef struct sinp_device {
+  sint index;                                                          // Device index
+  char *name;                                                          // Short device name
+  char *desc;                                                          // Description of device
+  uint provides;                                                       // Provide-flag
+  void *private;                                                       // Private data
+  sint (*init)(struct sinp_device *dev, char *window_id, uint flags);  // Initialize device
+  sint (*destroy)(struct sinp_device *dev);                            // Shutdown device
+  void (*process)(struct sinp_device *dev);                            // Pump events into queue
+  sint (*grab)(struct sinp_device *dec, uint mask);                    // Grab input focus
+  sint (*hide)(struct sinp_device *dev, sint on);                      // Hide/show cursor
+} sinp_device;
+
+// Platform bootstrap interface
+typedef struct sinp_bootstrap {
+  char *name;                                                          // Short device name
+  char *desc;                                                          // Device description
+  sint provides;                                                       // Device provide-flag
+  sint (*avail)();                                                     // Is device available?
+  struct sinp_device *(*create)();                                     // Return device structure
+} sinp_bootstrap;
+
+/* ******************************************************************** */
+
+// Device handling
+sint device_register(struct sinp_bootstrap *boot);
+void device_bootstrap();
+sint device_init(sint index, char *window_id, uint flags);
 sinp_device *device_get(sint index);
-void device_set_provides(sint index, uint pro);
-void device_set_status(sint index, uint sta);
 void device_pumpall();
 uint device_windowid(char *str, char tok);
+sint device_destroy(sint index);
+
+/* ******************************************************************** */
+
+// Internal application state
+sint appstate_init();
+sint appstate_focus(sint gain, sint state);
 
 /* ******************************************************************** */
 
@@ -85,6 +92,11 @@ void debug(char *format, ...);
 #ifndef FALSE
 #define FALSE 0
 #endif
+
+// Misc constants
+#define SINP_MAX_DEVICES 64
+#define SINP_MAX_EVENTS 128
+#define SINP_SLEEP 10
 
 /* ******************************************************************** */
 

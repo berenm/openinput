@@ -26,20 +26,28 @@
 
 /* ******************************************************************** */
 
-// Bootstrap
+// Bootstrap entries
 sint x11_avail();
 sinp_device *x11_device();
 
-// Forward defintions
+/* ******************************************************************** */
+
+// Device entries
 sint x11_init(sinp_device *dev, char *window_id, uint flags);
 sint x11_enable(sinp_device *dev, sint on);
 sint x11_destroy(sinp_device *dev);
 void x11_process(sinp_device *dev);
 sint x11_grab(sinp_device *dev, uint mask);
+sint x11_hidecursor(sinp_device *dev, sint on);
 
-// Misc. functions
+/* ******************************************************************** */
+
+// Misc local functions
+Cursor x11_mkcursor(Display *d, Window w);
 sint x11_error(Display *d, XErrorEvent *e);
 sint x11_fatal(Display *d);
+inline sint x11_pending(Display *d);
+inline void x11_dispatch(Display *d);
 
 /* ******************************************************************** */
 

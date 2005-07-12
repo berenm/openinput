@@ -23,10 +23,10 @@
 
 // Includes
 #include "config.h"
+#include "sinp.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "sinp.h"
 #include "internal.h"
 
 // Globals
@@ -40,16 +40,32 @@ static sint num_devices = 0;
 
 /* ******************************************************************** */
 
-// Register device via bootstrap (internal)
+// Register device via bootstrap
 sint device_register(sinp_bootstrap *boot) {
   // Create the device and set basics
   devices[num_devices] = boot->create();
   if(devices[num_devices] != NULL) {
+
+    // Fill trivial stuff
     devices[num_devices]->index = num_devices;
-    devices[num_devices]->status = SINP_STA_DEAD;
     devices[num_devices]->name = boot->name;
     devices[num_devices]->desc = boot->desc;
     devices[num_devices]->provides = boot->provides;
+
+    debug("device_bootstrap: device '%s' (%s) added at index %i",
+	  devices[num_devices]->name, devices[num_devices]->desc, num_devices);
+
+    // Send the discovery event since we know enough already
+    {
+      sinp_event ev;
+      ev.type = SINP_DISCOVERY;
+      ev.discover.device = num_devices;
+      ev.discover.name = boot->name;
+      ev.discover.description = boot->desc;
+      ev.discover.provides = boot->provides;     
+      queue_add(&ev);
+    }
+
     num_devices++;
     return SINP_ERR_OK;
   }
@@ -60,39 +76,77 @@ sint device_register(sinp_bootstrap *boot) {
 
 /* ******************************************************************** */
 
-// Initialize builtin devices (internal)
-void device_boot() {
+// Bootstrap devices using the bootstrap table
+void device_bootstrap() {
   int i;
   int j;
 
-  debug("device_boot");
+  debug("device_bootstrap");
 
   if(num_devices != 0) {
-    debug("device_boot: devices already initialized");
+    debug("device_bootstrap: devices already initialized");
     return;
   }
 
   // Fill structure array with available devices
   j = 0;
   for(i=0; bootstrap[i]; i++) {
-    debug("device_boot: checking bootstrap entry %i", i, bootstrap[i]->name);
+    debug("device_bootstrap: checking bootstrap entry %i", i, bootstrap[i]->name);
     
     // If available, register
     if(bootstrap[i]->avail()) {
       device_register(bootstrap[i]);      
-
-      debug("device_boot: device '%s' (%s) added at index %i",
-	    devices[i]->name, devices[i]->desc, num_devices);
     }
   }
   
-  debug("device_boot: %i devices compiled in and %i available",
+  debug("device_bootstrap: %i devices compiled in and %i available",
 	i, num_devices);
 }
 
 /* ******************************************************************** */
 
-// Return a device structure (internal)
+// Initialize all devices which have been booted
+sint device_init(sint index, char *window_id, uint flags) {
+  sinp_device *dev;
+  int e;
+
+  debug("device_init");
+
+  dev = device_get(index);
+  if(dev == NULL) {
+    return SINP_ERR_INDEX;
+  }
+
+  // Graceful device creation
+  e = dev->init(dev, window_id, flags);
+  if(e != SINP_ERR_OK) {
+    return e;
+  }
+
+  return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Destroy a device
+sint device_destroy(sint index) {
+  sinp_device *dev;
+
+  debug("device_destroy");
+
+  // Dummy check
+  dev = device_get(index);
+  if(dev == NULL) {
+    return SINP_ERR_INDEX;
+  }
+
+  // Kill device
+  return dev->destroy(dev);
+}
+
+/* ******************************************************************** */
+
+// Return a device structure
 sinp_device *device_get(sint index) {
   // Dummy check
   if((index < 0) || (index > num_devices)) {
@@ -105,35 +159,7 @@ sinp_device *device_get(sint index) {
 
 /* ******************************************************************** */
 
-// Set device provides-flag (internal)
-void device_set_provides(sint index, uint pro) {
-  sinp_device *dev;
-  
-  dev = device_get(index);
-  if(dev == NULL) {
-    return;
-  }
-
-  dev->provides = pro;
-}
-
-/* ******************************************************************** */
-
-// Set device status-flag (internal)
-void device_set_status(sint index, uint sta) {
-  sinp_device *dev;
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return;
-  }
-
-  dev->status = sta;
-}
-
-/* ******************************************************************** */
-
-// Pump events from all devices into queue (internal)
+// Pump events from all devices into queue
 void device_pumpall() {
   int i;
 
@@ -157,7 +183,7 @@ uint device_windowid(char *str, char tok) {
   // Set token to find, and scan
   match[0] = tok;
   strcat(match, ":%u");
-  if(sub = index(str, tok)) {
+  if((sub = index(str, tok))) {
     e = sscanf(sub, match, &val);
   }
   else {
@@ -171,211 +197,6 @@ uint device_windowid(char *str, char tok) {
   }
 
   return val;
-}
-
-/* ******************************************************************** */
-
-// Initialize a device (public)
-sint sinp_dev_init(sint index, char *window_id, uint flags) {
-  sinp_device *dev;
-  int e;
-
-  debug("sinp_dev_init");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  // Graceful device creation
-  e = dev->init(dev, window_id, flags);
-  if(e != SINP_ERR_OK) {
-    return e;
-  }
-
-  // Animate the dead and we're done
-  dev->status = SINP_STA_ALIVE;
-  return SINP_ERR_OK;
-}
-
-/* ******************************************************************** */
-
-// Destroy a device (public)
-sint sinp_dev_destroy(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_destroy");
-
-  // Dummy check
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  // Check that the device is up
-  if(dev->status == SINP_STA_DEAD) {
-    return SINP_ERR_DEV_DEAD;
-  }
-
-  // Kill device
-  dev->status = SINP_STA_DEAD;
-  return dev->destroy(dev);
-}
-
-/* ******************************************************************** */
-
-// Return name of a device (public)
-char *sinp_dev_name(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_name");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return NULL;
-  }
-
-  return dev->name;
-}
-
-/* ******************************************************************** */
-
-// Return description of a device (public)
-char *sinp_dev_description(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_description");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return NULL;
-  }
-
-  return dev->desc;
-}
-
-/* ******************************************************************** */
-
-// Return status-flag of a device (public)
-uint sinp_dev_status(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_status");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  return dev->status;
-}
-
-/* ******************************************************************** */
-
-// Return provides-flag of a device (public)
-uint sinp_dev_provides(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_provides");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  return dev->provides;
-}
-
-/* ******************************************************************** */
-
-// Enable a device to generate events (public)
-sint sinp_dev_enable(sint index, sint on) {
-  sinp_device *dev;
-  sint e;
-  sint old; 
-
-  debug("sinp_dev_enable");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  // Dummy checks
-  if(dev->status == SINP_STA_DEAD) {
-    debug("sinp_dev_enable: device is dead");
-    return SINP_ERR_DEV_DEAD;
-  }
-  else if(on && (dev->status == SINP_STA_RUNNING)) {
-    debug("sinp_dev_enable: device already running");
-    return SINP_ERR_DEV_RUNNING;
-  }
-  else if(!on && (dev->status == SINP_STA_ALIVE)) {
-    debug("sinp_dev_enable: device already alive");
-    return SINP_ERR_DEV_DEAD;
-  }
-
-  // Toggle the bit
-  old = dev->status;
-  if(on) {
-    dev->status = SINP_STA_RUNNING;
-  }
-  else {
-    dev->status = SINP_STA_ALIVE;
-  }
-
-  // Notify device
-  e = dev->enable(dev, on);
-
-  // Fallback if we failed
-  if(e != SINP_ERR_OK) {
-    dev->status = old;
-  }
-
-  return e;
-}
-
-/* ******************************************************************** */
-
-// Pump events from device into queue (public)
-void sinp_dev_pump(sint index) {
-  sinp_device *dev;
-
-  debug("sinp_dev_pump");
-  
-  // Make sure we exist
-  dev = device_get(index);
-  if(dev == NULL) {
-    return;
-  }
-
-  // We have to be alive to do this
-  if(dev->status == SINP_STA_DEAD) {
-    return;
-  }
-
-  dev->process(dev);
-}
-
-/* ******************************************************************** */
-
-// Grab and lock input-provide-mask for this device if possible (public)
-sint sinp_dev_grab(sint index, uint mask) {
-  sinp_device *dev;
-
-  debug("sinp_dev_grab");
-
-  dev = device_get(index);
-  if(dev == NULL) {
-    return SINP_ERR_INDEX;
-  }
-
-  // We have to be alive to do this
-  if(dev->status == SINP_STA_DEAD) {
-    return SINP_ERR_DEV_DEAD;
-  }
-
-  return dev->grab(dev, mask);
 }
 
 /* ******************************************************************** */

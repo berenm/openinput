@@ -28,7 +28,9 @@
 #error Do not include this file directly - use sinp.h
 #endif
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * Keyboard button definitions
+ ******************************************************************** */
 
 // Key definitions
 typedef enum {
@@ -284,7 +286,9 @@ typedef enum {
   SK_LAST
 } sinp_key;
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * Modifier button definitions
+ ******************************************************************** */
 
 // Modifier definitions
 typedef enum {
@@ -302,6 +306,18 @@ typedef enum {
   SM_MODE               = 0x4000,
   SM_RESERVED           = 0x8000
 } sinp_mod;
+
+/* ********************************************************************
+ * Key symbol structure
+ ******************************************************************** */
+
+// Keyboard virtual symbol
+typedef struct {
+  uchar scancode;       // Hardware scancode
+  sinp_key sym;         // Key symbol
+  sinp_mod mod;         // Modifier symbol
+  ushort unicode;       // Translated unicode character
+} sinp_keysym;
   
 /* ******************************************************************** */
 

@@ -26,18 +26,7 @@
 
 /* ******************************************************************** */
 
-// Platform bootstrap interface
-typedef struct sinp_bootstrap {
-  char *name;                                // Short device name
-  char *desc;                                // Device description
-  sint provides;                             // Device provide-flag
-  sint (*avail)();                           // Is platform valid?
-  sinp_device *(*create)();                  // Return device structure
-} sinp_bootstrap;
-
-/* ******************************************************************** */
-
-// Bootstrap forward definitions
+// Bootstrap function forward definitions
 #ifdef ENABLE_FOO
 extern sinp_bootstrap foo_bootstrap;
 #endif
@@ -47,23 +36,22 @@ extern sinp_bootstrap x11_bootstrap;
 
 /* ******************************************************************** */
 
-/*
- * Global variable for "device.c" only, placed here since all
- * devices needs to provide a bootstrap function and table entry
- */
+// Global variable for "device.c" only! All drivers must fill in an entry
 #ifdef _DEVICE_FILLER_
-
-// Bootstrap function table
 static sinp_bootstrap *bootstrap[] = {
+
+  // Begin list
 #ifdef ENABLE_FOO
   &foo_bootstrap,
 #endif
+
 #ifdef ENABLE_X11
   &x11_bootstrap,
 #endif
+
+  // Terminate list
   NULL
 };
-
 #endif
 
 /* ******************************************************************** */

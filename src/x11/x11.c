@@ -36,7 +36,7 @@
 sinp_bootstrap x11_bootstrap = {
   "x11",
   "X11 Window system",
-  SINP_PRO_KEYBOARD | SINP_PRO_POINTER | SINP_PRO_HIDECUR,
+  SINP_PRO_KEYBOARD | SINP_PRO_MOUSE,
   x11_avail,
   x11_device,
 };
@@ -105,7 +105,6 @@ sinp_device *x11_device() {
   // Set members
   memset(dev, 0, sizeof(sinp_device));
   dev->init = x11_init;
-  dev->enable = x11_enable;
   dev->destroy = x11_destroy;
   dev->process = x11_process;  
   dev->grab = x11_grab;
@@ -135,7 +134,8 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
     return SINP_ERR_NO_DEVICE;
   }
 
-  // Setup a null-cursor here
+  // Setup remaining private members
+  priv->cursor = x11_mkcursor(priv->disp, priv->win);
 
   // Install error handlers
   XSetErrorHandler(x11_error);
@@ -177,12 +177,24 @@ sint x11_enable(sinp_device *dev, sint on) {
 
 // Clear X11 'device' block
 sint x11_destroy(sinp_device *dev) {
+  x11_private *priv;
+
   debug("x11_destroy");
 
+  
+
   if(dev) {
-    if(dev->private) {
-      free(dev->private);
+    priv = (x11_private*)dev->private;
+
+    // Private members
+    if(priv) {
+      if(priv->cursor) {
+	XFreeCursor(priv->disp, priv->cursor);
+      }
+      free(priv);
     }
+
+    // Device struct
     free(dev);
     dev = NULL;
   }
@@ -194,9 +206,15 @@ sint x11_destroy(sinp_device *dev) {
 
 // Pump event into the queue
 void x11_process(sinp_device *dev) {
+  x11_private *priv;
+
+  priv = (x11_private*)dev->private;
   debug("x11_process");
 
-  //FIXME HERE do processing!!!
+  // Process all pending events
+  while(x11_pending(priv->disp)) {
+    x11_dispatch(priv->disp);
+  }
 }
 
 /* ******************************************************************** */
@@ -226,33 +244,19 @@ sint x11_grab(sinp_device *dev, uint mask) {
   }
   
   // Pointer
-  if(mask & SINP_PRO_POINTER) {
+  if(mask & SINP_PRO_MOUSE) {
     // Grab on
-    priv->grabmask |= SINP_PRO_POINTER;
+    priv->grabmask |= SINP_PRO_MOUSE;
     XGrabPointer(priv->disp, priv->win, TRUE,
 		 ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
 		 GrabModeAsync, GrabModeAsync,
 		 priv->win, None, CurrentTime);
     ok = TRUE;
   }
-  if(!(mask & SINP_PRO_POINTER)) {
+  if(!(mask & SINP_PRO_MOUSE)) {
     // Grab off
-    priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_POINTER);
+    priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_MOUSE);
     XUngrabPointer(priv->disp, CurrentTime);
-    ok = TRUE;
-  }
-
-  // Cursor
-  if(mask & SINP_PRO_HIDECUR) {
-    // Hide
-    priv->grabmask |= SINP_PRO_HIDECUR;
-    //FIXME implement
-    ok = TRUE;
-  }
-  if(!(mask & SINP_PRO_HIDECUR)) {
-    // Show
-    priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_HIDECUR);
-    //FIXME implement
     ok = TRUE;
   }
 
@@ -263,6 +267,28 @@ sint x11_grab(sinp_device *dev, uint mask) {
   else {
     return SINP_ERR_NOT_IMPLEM;
   }
+}
+
+/* ******************************************************************** */
+
+// Show/hide mouse cursor
+sint x11_hidecursor(sinp_device *dev, sint on) {
+  x11_private *priv;
+
+  debug("x11_hidecursor");
+  priv = (x11_private*)dev->private;
+
+  // Hide - set blank cursor
+  if(on) {
+    XDefineCursor(priv->disp, priv->win, priv->cursor);
+  }
+
+  // Show - set default cursor
+  else {
+    XDefineCursor(priv->disp, priv->win, None);
+  }
+
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -281,6 +307,23 @@ sint x11_fatal(Display *d) {
   debug("x11_fatal: fatal I/O error");
 
   return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Make 'empty' mouse cursor
+Cursor x11_mkcursor(Display *d, Window w) {
+  char bitmap[] = {0};
+  Pixmap pixmap;
+  XColor color;
+  Cursor cursor;
+  
+  pixmap = XCreateBitmapFromData(d, w, bitmap, 1, 1);
+  cursor = XCreatePixmapCursor(d, pixmap, pixmap,
+			       &color, &color, 0, 0);
+  XFreePixmap(d, pixmap);
+
+  return cursor;
 }
 
 /* ******************************************************************** */

@@ -84,6 +84,7 @@ sinp_device *foo_device() {
   dev->destroy = foo_destroy;
   dev->process = foo_process;  
   dev->grab = foo_grab;
+  dev->hide = foo_hidecursor;
   dev->private = priv;
   
   // Done
@@ -188,6 +189,15 @@ sint foo_grab(sinp_device *dev, uint mask) {
   else {
     return SINP_ERR_PARAM;
   }
+}
+
+/* ******************************************************************** */
+
+// Show/hide pointer cursor
+sint foo_hidecursor(sinp_device *dev, sint on) {
+  debug("foo_hidecursor: status %i", on);
+  
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */

@@ -31,48 +31,29 @@
 
 // Initialize default devices
 sint sinp_init(char *window_id, uint flags) {
-  int pro;
   int i;
-  int j;
+  int e;
 
   debug("sinp_init");
 
-  device_boot();
+  // Bootstrap all devices
+  device_bootstrap();
 
   // Parse all devices
   i = 0;
-  pro = 0;
+  e = 0;
   while(device_get(i) != NULL) {
 
-    // Can only raise the dead
-    if(sinp_dev_status(i) == SINP_STA_DEAD) {
-     
-      // We only need one of each type (provider)
-      if(!(sinp_dev_provides(i) & pro)) {
-
-	// Initialize device
-	if((j = sinp_dev_init(i, window_id, flags)) != SINP_ERR_OK) {
-	  return j;
-	}
-
-	// Enable device
-	sinp_dev_enable(i, 1);
-
-	// Remember what it provides
-	pro |= sinp_dev_provides(i);
-      }
+    // Initialize device
+    if(device_init(i, window_id, flags) != SINP_ERR_OK) {
+      // Error initializing, count
+      e++;
     }
 
-    // Next
     i++;
   }
-
-  // Initialize queue
-  if((j = queue_init()) != SINP_ERR_OK) {
-    return j;
-  }
-
-  return SINP_ERR_OK;
+  
+  return e;
 }
 
 /* ******************************************************************** */
@@ -80,38 +61,25 @@ sint sinp_init(char *window_id, uint flags) {
 // Shutdown sinp
 sint sinp_close() {
   int i;
-  int j;
+  int e;
 
   debug("sinp_close");
 
   // Parse all devices
   i = 0;
+  e = 0;
   while(device_get(i) != NULL) {
 
-    // Can only kill the living
-    if(sinp_dev_status(i) != SINP_STA_DEAD) {
-
-      debug("sinp_close: shutdown device %i", i);
-
-      // Ungrab and disable
-      sinp_dev_grab(i, 0);
-      sinp_dev_enable(i, 0);
-
-      // Destroy it
-      if((j = sinp_dev_destroy(i)) != SINP_ERR_OK) {
-	return j;
-      }
-    }
-    else {
-      debug("sinp_close: device %i already down", i);
+    // Destroy it
+    if(device_destroy(i) != SINP_ERR_OK) {
+      e++;
     }
 
-    // Next
     i++;
   }
 
   // Done
-  return SINP_ERR_OK;
+  return e;
 }
 
 /* ******************************************************************** */

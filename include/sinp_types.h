@@ -28,7 +28,9 @@
 #error Do not include this file directly - use sinp.h
 #endif
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * Basic numeric types
+ ******************************************************************** */
 
 // Basic integer types
 typedef unsigned char       uchar;
@@ -38,40 +40,25 @@ typedef signed short        sshort;
 typedef unsigned int        uint;
 typedef signed int          sint;
 
-/* ******************************************************************** */
-
-// Device provide flags
-#define SINP_PRO_UNKNOWN    1 // Unknown/test type device
-#define SINP_PRO_KEYBOARD   2 // Keyboard input device
-#define SINP_PRO_POINTER    4 // Pointer input device (mouse)
-#define SINP_PRO_JOYSTICK   8 // Joystick input device
-#define SINP_PRO_HIDECUR   16 // Cursor of device can be hidden
-
-/* ******************************************************************** */
-
-// Status flags
-#define SINP_STA_DEAD       0 // Uninitialized
-#define SINP_STA_ALIVE      1 // Device has been initialized
-#define SINP_STA_RUNNING    2 // Device is running
-
-/* ******************************************************************** */
+/* ********************************************************************
+ * Event types and masks
+ ******************************************************************** */
 
 // Event types
 typedef enum {
-  SINP_NOEVENT              = 0, // No event
-  SINP_KEYUP                = 1, // Key released
-  SINP_KEYDOWN              = 2, // Key pressed
-  SINP_MOUSEMOVE            = 3, // Mouse motion
-  SINP_MOUSEBUTTONUP        = 4, // Button pressed
-  SINP_MOUSEBUTTONDOWN      = 5, // Button released
-  SINP_ACTIVE               = 6, // App. focus gain/loss
-  SINP_RESIZE               = 7, // App. window resize
-  SINP_EXPOSE               = 8, // App. needs redraw
-  SINP_QUIT                 = 9  // Quit requested
+  SINP_NOEVENT              = 0,  // No event
+  SINP_KEYUP                = 1,  // Key released
+  SINP_KEYDOWN              = 2,  // Key pressed
+  SINP_MOUSEMOVE            = 3,  // Mouse motion
+  SINP_MOUSEBUTTONUP        = 4,  // Button pressed
+  SINP_MOUSEBUTTONDOWN      = 5,  // Button released
+  SINP_ACTIVE               = 6,  // App. focus gain/loss
+  SINP_RESIZE               = 7,  // App. window resize
+  SINP_EXPOSE               = 8,  // App. needs redraw
+  SINP_QUIT                 = 9,  // Quit requested
+  SINP_DISCOVERY            = 10  // Device driver available
 } sinp_type;
   
-/* ******************************************************************** */
-
 // Event masks
 #define SINP_EVENT_MASK(x) (1<<(x))
 #define SINP_MASK_ALL 0xffffffff
@@ -90,7 +77,20 @@ typedef enum {
   SINP_MASK_QUIT            = SINP_EVENT_MASK(SINP_QUIT)
 } sinp_event_masks;
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * Various defines for the library, eg. mouse buttons and error codes
+ ******************************************************************** */
+
+// Init string parameters for window_id
+#define SINP_I_CONN        'c' // Server connection handle
+#define SINP_I_SCRN        's' // Screen handle
+#define SINP_I_WINID       'w' // Window handle
+
+// Device provide flags
+#define SINP_PRO_UNKNOWN    1 // Unknown/test type device
+#define SINP_PRO_KEYBOARD   2 // Keyboard input device
+#define SINP_PRO_MOUSE      4 // Pointer input device (mouse)
+#define SINP_PRO_JOYSTICK   8 // Joystick input device
 
 // Mouse buttons
 #define SINP_BUTTON_LEFT    1
@@ -99,24 +99,18 @@ typedef enum {
 #define SINP_WHEEL_UP       4
 #define SINP_WHEEL_DOWN     5
 
-/* ******************************************************************** */
-
 // Application activation
 #define SINP_FOCUS_MOUSE    1
 #define SINP_FOCUS_INPUT    2
 #define SINP_FOCUS_ACTIVE   3
 
-/* ******************************************************************** */
-
 // Error codes
 #define SINP_ERR_OK          0 // All ok
 #define SINP_ERR_NO_DEVICE   1 // Wrong device
 #define SINP_ERR_INDEX       2 // Index query out of bounds
-#define SINP_ERR_DEV_DEAD    3 // Device was dead
 #define SINP_ERR_NOT_IMPLEM  4 // Not implemented
 #define SINP_ERR_DEV_EXIST   5 // Device already initialized
 #define SINP_ERR_PARAM       6 // Invalid parameter
-#define SINP_ERR_DEV_RUNNING 7 // Device already enabled/running
 
 /* ******************************************************************** */
 

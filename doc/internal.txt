@@ -1,0 +1,125 @@
+--------------------------------------------------------------------
+-- Notes on the internal API
+--------------------------------------------------------------------
+
+* Ownership of event variables:
+
+queue_add() will COPY the given event into the queue, ie.  you can
+throw the memory away after the call.
+
+queue_peep() will COPY the event into the user's pointer, ie. you
+must allocate space for the event(s) before calling the functon.
+
+--------------------------------------------------------------------
+
+* Boot process:
+
+The following describes the basic flow in the boot process.
+
+sinp_init()
+	// Stage 1: Initialize the state managers
+	queue_init();
+	appstate_init();
+	keyboard_init();
+	mouse_init();
+
+	// Stage 2: Bootstrap devices
+	device_bootstrap()
+		bootstrap->avail(); ***
+		bootstrap->create(); ***
+		queue_add(sinp_discovery_event);
+
+	// State 3: Initialize devices
+	device_init();
+		device->init(); ***
+
+	// Boot completed
+
+You, as a device driver hacker, needs only implement the functions
+marked by ***. All other steps are handled automatically by the
+bootstrap process. Also, in order for device_bootstrap() to use your
+driver, you'll need to hook into the boostrap-table - please see
+the 'bootstrap.h' file for information (it's dead simple!).
+
+--------------------------------------------------------------------
+
+* 'bootstrap' structure:
+
+The bootstrap-structure provides some basic information about a device
+whether or not the device is physically able to run on the given
+platform. All implementations of bootstrap-structures are linked
+together in the bootstrap-table, which is used in the 2nd boot stage.
+See the 'bootstrap.h' file for examples. The members of the bootstrap
+structure are:
+
+char *name;
+  Device short name, eg. 'x11' or 'linuxsignal'.
+
+char *desc;
+  Device long description, eg. 'X11 Window system'.
+
+sint provides;
+  A bitmask of SINP_PRO_* bits that describes what the device
+  provides.
+
+sint (*avail)();
+  Function pointer to the function that checks whether the device is
+  present on the system (ie. can be initialized and used). The return
+  result is either true (1) or false (0).
+
+sinp_device *(*create)();
+  Function pointer that returns the 'device' structure. This function
+  is only called when the avail()-function has returned true. The
+  function should ONLY setup the device-structure. Any further
+  initialization should be done in the device->init() function.
+
+--------------------------------------------------------------------
+
+* 'device' structure:
+
+The device-structure functions as the abstraction interface for all
+devices whether they represent X11 keyboards, mice or Windows message
+handlers. The members of the structure are used for the following:
+
+sint index
+  Device index number - should not be used.
+
+char *name;
+  Device short name. Same as the bootstrap 'name'.
+
+char *desc;
+  Device long description. Same as the bootstrap 'desc'.
+
+uint provides;
+  Provide bitmask. Same as the bootstrap 'provides'.
+
+void *private;
+  Pointer for private data. If the device needs global
+  persistent data, use this pointer, as regular global variables are a
+  very bad idea in order to ensure reuse of the same driver (more
+  keyboards of same type).
+
+sint (*init)(struct sinp_device *dev, char *window_id, uint flags);
+  Function pointer for the device initialization. Called by sinp_init()
+  in the second boot stage.
+
+sint (*destroy)(struct sinp_device *dev);
+  Close the device. Should free any private data.
+
+void (*process)(struct sinp_device *dev);
+  Do the event processing. This typically consists of a
+  while(pending){dispatch} loop, where the dispatcher feeds events into
+  the queue and/or uses the keyboard/mouse/app-state functions.
+
+sint (*grab)(struct sinp_device *dec, uint mask);
+  Grabs input focus.
+
+sint (*hide)(struct sinp_device *dev, sint on);
+  Hides cursors.
+
+You will need only to implement the functions. The properties 'index',
+'name', 'desc' and 'provides' gets set by the device_bootstrap()
+function just after the bootstrap->device() call. The settings are,
+of course, copied from the bootstrap structure.
+
+--------------------------------------------------------------------

@@ -1,5 +1,5 @@
 /*
- * sinp_events.h : Structures for event types
+ * sinp_events.h : Event structure types
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -28,17 +28,18 @@
 #error Do not include this file directly - use sinp.h
 #endif
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * Special event structures
+ ******************************************************************** */
 
-// Keyboard virtual symbol
-typedef struct {
-  uchar scancode;       // Hardware scancode
-  sinp_key sym;         // Key symbol
-  sinp_mod mod;         // Modifier symbol
-  ushort unicode;       // Translated unicode character
-} sinp_keysym;
-
-/* ******************************************************************** */
+// Device discovery event
+typedef struct sinp_discovery_event {
+  uchar type;               // SINP_DISCOVERY
+  uchar device;             // Device index
+  char *name;               // Short name
+  char *description;        // Long description
+  uint provides;            // Provide mask
+} sinp_discovery_event;
 
 // Application visibility event
 typedef struct sinp_active_event {
@@ -47,8 +48,6 @@ typedef struct sinp_active_event {
   uint state;               // Mask of focus state
 } sinp_active_event;
 
-/* ******************************************************************** */
-
 // Keyboard event
 typedef struct sinp_keyboard_event {
   uchar type;               // SINP_KEYUP or SINP_KEYDOWN
@@ -56,8 +55,6 @@ typedef struct sinp_keyboard_event {
   uchar state;              // Key is 0:up 1:down
   sinp_keysym keysym;       // Key symbol
 } sinp_keyboard_event;
-
-/* ******************************************************************** */
 
 // Mouse move event
 typedef struct sinp_mousemove_event {
@@ -70,8 +67,6 @@ typedef struct sinp_mousemove_event {
   sshort urel;              // Relative y movement
 } sinp_mousemove_event;
 
-/* ******************************************************************** */
-
 // Mouse button event
 typedef struct sinp_mousebutton_event {
   uchar type;               // SINP_MOUSEBUTTONUP or SINP_MOUSEBUTTONDOWN
@@ -82,8 +77,6 @@ typedef struct sinp_mousebutton_event {
   ushort y;                 // Absolute y coordinate at event time
 } sinp_mousebutton_event;
 
-/* ******************************************************************** */
-
 // Application window resize event
 typedef struct sinp_resize_event {
   uchar type;               // SINP_RESIZE
@@ -91,21 +84,19 @@ typedef struct sinp_resize_event {
   uint height;              // New window height
 } sinp_resize_event;
 
-/* ******************************************************************** */
-
 // Application window needs redraw
 typedef struct sinp_expose_event {
   uchar type;               // SINP_EXPOSE
 } sinp_expose_event;
-
-/* ******************************************************************** */
 
 // Quit event
 typedef struct sinp_quit {
   uchar type;               // SINP_QUIT
 } sinp_quit_event;
 
-/* ******************************************************************** */
+/* ********************************************************************
+ * The generic (united) event structure
+ ******************************************************************** */
 
 // The united event structure
 typedef union {
@@ -117,6 +108,7 @@ typedef union {
   sinp_resize_event resize;
   sinp_expose_event expose;
   sinp_quit_event quit;
+  sinp_discovery_event discover;
 } sinp_event;
 
 /* ******************************************************************** */

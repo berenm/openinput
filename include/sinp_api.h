@@ -19,27 +19,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/* ********************************************************************
- * Special notes - Return results:
- * Each function call is preceeded by a small explanation and
- * what return type one can expect (in the last paranthesis).
- * If a "(M)" is present, the function is for manual device handling,
- * and should be avoided under normal circumstances, eg. when using
- * sinp_init() which sets devices automatically.
- *
- * Special note - "init" call parameters:
- * In the sinp_init(window_id, flags) and sinp_dev_init(window_id, flags)
- * calls, the window_id parameter is a string, which uses the following
- * convention on _all_ platforms: "c:CONN s:SCRN w:WINID"
- * CONN is the connection handle to the server (ie. Display under X11)
- * SCRN is the screen to use
- * WINID is the window handle to fetch event for
- * All parameters must be "%u"-encoded to a string (unsigned int).
- * The delimiter between parameters is the whitespace.
- * Not all platforms needs CONN and SCRN. They can be left out if they
- * are not needed.
- *
- ******************************************************************** */
+/* ******************************************************************** */
 
 #ifndef _SINP_API_H_
 #define _SINP_API_H_
@@ -52,44 +32,11 @@
  * Main functions
  ******************************************************************** */
 
-// Default initialization of all available devices (errorcode)
+// Default initialization of all available devices (num_failed)
 sint sinp_init(char* window_id, uint flags);
 
-// Shutdown library (errorcode)
+// Shutdown all available devices (num_failed)
 sint sinp_close();
-
-
-/* ********************************************************************
- * Generic low-level device function
- ******************************************************************** */
-
-// Return read-only name of a device (string)
-char *sinp_dev_name(sint index);
-
-// Return read-only name of device (string)
-char *sinp_dev_description(sint index);
-
-// Return read-only provide bitmask of device (bitmask)
-uint  sinp_dev_provides(sint index);
-
-// Return read-only status bitmask of device (bitmask)
-uint  sinp_dev_status(sint index);
-
-// Device initialization function (M) (errorcode)
-sint  sinp_dev_init(sint index, char *window_id, uint flags);
-
-// Shutdown a device (M) (errorcode)
-sint  sinp_dev_destroy(sint index);
-
-// Make device listen for events (M) (errorcode)
-sint  sinp_dev_enable(sint index, sint on);
-
-// Grab/ungrab input via "provide bitmask" for this device (errorcode)
-sint  sinp_dev_grab(sint index, uint mask);
-
-// Make device pump events into queue (n/a)
-void  sinp_dev_pump(sint index);
-
 
 /* ********************************************************************
  * Event functions

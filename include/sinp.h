@@ -28,19 +28,9 @@
 extern "C" {
 #endif
 
-/* ******************************************************************** */
-
-// Misc constants
-#define SINP_MAX_DEVICES    64 // Max supported devices
-#define SINP_MAX_EVENTS    128 // Max events in queue
-#define SINP_SLEEP          10 // Milliseconds to sleep when waiting
-
-// Init parameters for window_id
-#define SINP_I_CONN        'c' // Server connection handle
-#define SINP_I_SCRN        's' // Screen handle
-#define SINP_I_WINID       'w' // Window handle
-
-/* ******************************************************************** */
+/* ********************************************************************
+ * Include api
+ ******************************************************************** */
 
 #include "sinp_types.h"
 #include "sinp_keys.h"
