@@ -8,7 +8,7 @@ Section: libs
 Package: libsinp-dev
 Section: libdevel
 Architecture: any
-Depends: libsinpBROKEN (= ${Source-Version})
+Depends: libsinp (= ${Source-Version})
 Description: input library
  input library
 
