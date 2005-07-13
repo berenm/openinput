@@ -1,0 +1,21 @@
+Loose ends
+----------
+
+appstate_height/width needs implementation
+- fix it under appstate_init()
+
+function-pointer safety checking
+- under device_bootstrap - check for must-implement functions
+- under call for optional functions (warp/hide/grab/winsize)
+- document must-implement/optional
+
+x11 event dispatcher
+- key/modifier/mouse translator
+
+keyboard state manager
+
+extensive x11 testing
+
+action-binding system
+
+threading?

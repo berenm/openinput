@@ -26,10 +26,15 @@
 
 /* ******************************************************************** */
 
+// Special functions
+inline sint sinp_runstate();
+
+/* ******************************************************************** */
+
 // Internal queue functions
 sint queue_init();
-sint queue_lock();
-sint queue_unlock();
+inline sint queue_lock();
+inline sint queue_unlock();
 sint queue_cut(ushort where);
 sint queue_add(sinp_event *evt);
 sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove);
@@ -46,8 +51,10 @@ typedef struct sinp_device {
   sint (*init)(struct sinp_device *dev, char *window_id, uint flags);  // Initialize device
   sint (*destroy)(struct sinp_device *dev);                            // Shutdown device
   void (*process)(struct sinp_device *dev);                            // Pump events into queue
-  sint (*grab)(struct sinp_device *dec, uint mask);                    // Grab input focus
+  sint (*grab)(struct sinp_device *dec, sint on);                      // Grab input focus
   sint (*hide)(struct sinp_device *dev, sint on);                      // Hide/show cursor
+  sint (*warp)(struct sinp_device *dev, sint x, sint y);               // Warp mouse cursor
+  sint (*winsize)(struct sinp_device *dev, sint *x, sint *y);          // Query for window size
 } sinp_device;
 
 // Platform bootstrap interface
@@ -66,15 +73,24 @@ sint device_register(struct sinp_bootstrap *boot);
 void device_bootstrap();
 sint device_init(sint index, char *window_id, uint flags);
 sinp_device *device_get(sint index);
-void device_pumpall();
+inline void device_pumpall();
 uint device_windowid(char *str, char tok);
 sint device_destroy(sint index);
 
 /* ******************************************************************** */
 
-// Internal application state
+// Application state
 sint appstate_init();
-sint appstate_focus(sint gain, sint state);
+void appstate_focus(sint gain, sint state, sint post);
+inline sint appstate_width();
+inline sint appstate_height();
+
+/* ******************************************************************** */
+
+// Mouse state
+sint mouse_init();
+void mouse_move(sint x, sint y, sint relative, sint postdev);
+void mouse_button(sint btn, sint state, sint postdev);
 
 /* ******************************************************************** */
 

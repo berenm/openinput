@@ -1,5 +1,5 @@
 /*
- * main.c : The initialization and shutdown functions
+ * keyboard.c : Keyboard state interface
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -24,82 +24,13 @@
 // Includes
 #include "config.h"
 #include <stdio.h>
+#include <string.h>
 #include "sinp.h"
 #include "internal.h"
 
 // Globals
-static sint sinp_running;
 
 /* ******************************************************************** */
 
-// Initialize default devices (public)
-sint sinp_init(char *window_id, uint flags) {
-  int i;
-  int e;
-
-  debug("sinp_init");
-
-  // Initialize queue
-  sinp_running = FALSE;
-  queue_init();
-
-  // Bootstrap all devices
-  device_bootstrap();
-
-  // Parse all devices
-  i = 0;
-  e = 0;
-  while(device_get(i) != NULL) {
-
-    // Initialize device
-    if(device_init(i, window_id, flags) != SINP_ERR_OK) {
-      // Error initializing, count
-      e++;
-    }
-
-    i++;
-  }
-
-  // Initialize state managers
-  appstate_init();
-  mouse_init();
-  // keyboard_init();
-    
-  return e;
-}
-
-/* ******************************************************************** */
-
-// Shutdown sinp (public)
-sint sinp_close() {
-  int i;
-  int e;
-
-  debug("sinp_close");
-  sinp_running = FALSE;
-
-  // Parse all devices
-  i = 0;
-  e = 0;
-  while(device_get(i) != NULL) {
-
-    // Destroy it
-    if(device_destroy(i) != SINP_ERR_OK) {
-      e++;
-    }
-
-    i++;
-  }
-
-  // Done
-  return e;
-}
-
-/* ******************************************************************** */
-
-// Return library running state
-inline sint sinp_runstate() {
-  return sinp_running;
-}
 
 /* ******************************************************************** */

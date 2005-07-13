@@ -17,11 +17,9 @@ must allocate space for the event(s) before calling the functon.
 The following describes the basic flow in the boot process.
 
 sinp_init()
-	// Stage 1: Initialize the state managers
+	// Stage 1: Initialize the queue
+	sinp_running = FALSE;
 	queue_init();
-	appstate_init();
-	keyboard_init();
-	mouse_init();
 
 	// Stage 2: Bootstrap devices
 	device_bootstrap()
@@ -33,13 +31,24 @@ sinp_init()
 	device_init();
 		device->init(); ***
 
-	// Boot completed
+	// Stage 4: Initialize state managers
+	appstate_init();
+	keyboard_init();
+	mouse_init();
+
+	// Stage 5: Enter running state
+	sinp_running = TRUE;
 
 You, as a device driver hacker, needs only implement the functions
 marked by ***. All other steps are handled automatically by the
 bootstrap process. Also, in order for device_bootstrap() to use your
 driver, you'll need to hook into the boostrap-table - please see
 the 'bootstrap.h' file for information (it's dead simple!).
+
+Important: Do NOT dispatch events before the sinp_running flag has
+been set! Devices may (if multithreaded) begin to run before the
+state managers have initialized. You can, however, use the queue
+if you really have to (like sending discovery events).
 
 --------------------------------------------------------------------
 
@@ -99,27 +108,62 @@ void *private;
   very bad idea in order to ensure reuse of the same driver (more
   keyboards of same type).
 
-sint (*init)(struct sinp_device *dev, char *window_id, uint flags);
+sint (*init)(sinp_device *dev, char *window_id, uint flags);
   Function pointer for the device initialization. Called by sinp_init()
   in the second boot stage.
 
-sint (*destroy)(struct sinp_device *dev);
+sint (*destroy)(sinp_device *dev);
   Close the device. Should free any private data.
 
-void (*process)(struct sinp_device *dev);
+void (*process)(sinp_device *dev);
   Do the event processing. This typically consists of a
   while(pending){dispatch} loop, where the dispatcher feeds events into
   the queue and/or uses the keyboard/mouse/app-state functions.
 
-sint (*grab)(struct sinp_device *dec, uint mask);
-  Grabs input focus.
+sint (*grab)(sinp_device *dec, sint on);
+  Grabs input and pointer focus.
 
-sint (*hide)(struct sinp_device *dev, sint on);
-  Hides cursors.
+sint (*hide)(sinp_device *dev, sint on);
+  Hides cursor.
+
+sint (*warp)(sinp_device *dev, sint x, sint y);
+  Warp (move) the mouse cursor to the given coordinates.
+
+sint (*winsize)(sinp_device *dev, sint *x, sint *y);
+  Function should fill 'x' and 'y' with the current window
+  geometry, ie. width and height in pixels.
 
 You will need only to implement the functions. The properties 'index',
 'name', 'desc' and 'provides' gets set by the device_bootstrap()
 function just after the bootstrap->device() call. The settings are,
 of course, copied from the bootstrap structure.
+
+--------------------------------------------------------------------
+
+* Required and optional device functions
+
+The following functions (function pointers) MUST be implemented:
+  init()
+  destroy()
+  process()
+  
+The following functions are OPTIONAL, and should be set to NULL
+if they are not implemented:
+  grab()
+  hide()
+  warp()
+  winsize()
+
+--------------------------------------------------------------------
+
+* Keyboard and mouse state managers
+
+In order to keep the number of arguments down in the internal
+state update functions, the "postdev" argument is encoded as:
+0  : no event gets posted.
+!0 : event gets posted with "postdev" as the sending device index.
+
+Some functions use the 'default device', eg. when warping the
+pointer and for window size/focus managment.
 
 --------------------------------------------------------------------

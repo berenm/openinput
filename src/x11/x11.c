@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include "internal.h"
 #include "bootstrap.h"
@@ -36,7 +37,7 @@
 sinp_bootstrap x11_bootstrap = {
   "x11",
   "X11 Window system",
-  SINP_PRO_KEYBOARD | SINP_PRO_MOUSE,
+  SINP_PRO_KEYBOARD | SINP_PRO_MOUSE | SINP_PRO_WINDOW,
   x11_avail,
   x11_device,
 };
@@ -47,7 +48,6 @@ typedef struct x11_private {
   Window win;
   Screen *screen;
   Cursor cursor;
-  uint grabmask;
   sint winheight;
   sint winwidth;
   sint mousex;
@@ -108,6 +108,7 @@ sinp_device *x11_device() {
   dev->destroy = x11_destroy;
   dev->process = x11_process;  
   dev->grab = x11_grab;
+  dev->warp = x11_warp;
   dev->private = priv;
   
   // Done
@@ -141,34 +142,13 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
   XSetErrorHandler(x11_error);
   XSetIOErrorHandler(x11_fatal);
 
-  return SINP_ERR_OK;
-}
+  // Start receiving events
+  XSelectInput(priv->disp, priv->win, FocusChangeMask | KeyPressMask |
+	       KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
+	       KeymapStateMask | ButtonPressMask | ButtonReleaseMask |
+	       PointerMotionMask);
 
-/* ******************************************************************** */
-
-// Enable X11 driver
-sint x11_enable(sinp_device *dev, sint on) {
-  long mask;
-  x11_private *priv;
-
-  debug("x11_enable");
-
-  // Turn on fetching
-  if(on) { 
-    // Select all usefull inputs
-    mask = FocusChangeMask | KeyPressMask | KeyReleaseMask |
-      PropertyChangeMask | StructureNotifyMask | KeymapStateMask |
-      ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
-  }
-  else {
-    // Select no inputs
-    mask = NoEventMask;
-  }
-
-  debug("x11_enable: set mask %u", mask);
-  
-  priv = (x11_private*)dev->private;
-  XSelectInput(priv->disp, priv->win, mask);
+  //FIXME flush and send!
 
   return SINP_ERR_OK;
 }
@@ -180,8 +160,6 @@ sint x11_destroy(sinp_device *dev) {
   x11_private *priv;
 
   debug("x11_destroy");
-
-  
 
   if(dev) {
     priv = (x11_private*)dev->private;
@@ -212,7 +190,7 @@ void x11_process(sinp_device *dev) {
   debug("x11_process");
 
   // Process all pending events
-  while(x11_pending(priv->disp)) {
+  while(sinp_runstate() && x11_pending(priv->disp)) {
     x11_dispatch(priv->disp);
   }
 }
@@ -220,53 +198,36 @@ void x11_process(sinp_device *dev) {
 /* ******************************************************************** */
 
 // Grab (lock) mouse/keyboard in window
-sint x11_grab(sinp_device *dev, uint mask) {
+sint x11_grab(sinp_device *dev, sint on) {
   x11_private *priv;
-  sint ok;
+  int i;
 
   priv = (x11_private*)dev->private;
-  ok = FALSE;
   debug("x11_grab");
 
-  // Keyboard
-  if(mask & SINP_PRO_KEYBOARD) {
-    // Grab on
-    priv->grabmask |= SINP_PRO_KEYBOARD;
+  if(on) {
     XGrabKeyboard(priv->disp, priv->win, TRUE,
 		  GrabModeAsync, GrabModeAsync, CurrentTime);
-    ok = TRUE;
-  }
-  if(!(mask & SINP_PRO_KEYBOARD)) {
-    // Grab off
-    priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_KEYBOARD);
-    XUngrabKeyboard(priv->disp, CurrentTime);
-    ok = TRUE;
-  }
-  
-  // Pointer
-  if(mask & SINP_PRO_MOUSE) {
-    // Grab on
-    priv->grabmask |= SINP_PRO_MOUSE;
-    XGrabPointer(priv->disp, priv->win, TRUE,
-		 ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-		 GrabModeAsync, GrabModeAsync,
-		 priv->win, None, CurrentTime);
-    ok = TRUE;
-  }
-  if(!(mask & SINP_PRO_MOUSE)) {
-    // Grab off
-    priv->grabmask = priv->grabmask - (priv->grabmask & SINP_PRO_MOUSE);
-    XUngrabPointer(priv->disp, CurrentTime);
-    ok = TRUE;
-  }
-
-  // Report errors
-  if(ok) {
-    return SINP_ERR_OK;
+    
+    // Wait for succesfull grabbing of mouse 
+    while(1) {
+      i = XGrabPointer(priv->disp, priv->win, TRUE,
+		       ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+		       GrabModeAsync, GrabModeAsync,
+		       priv->win, None, CurrentTime);
+      if(i == GrabSuccess) {
+	break;
+      }
+      usleep(SINP_SLEEP);
+    }
   }
   else {
-    return SINP_ERR_NOT_IMPLEM;
+    // Simply ungrab both
+    XUngrabKeyboard(priv->disp, CurrentTime);
+    XUngrabPointer(priv->disp, CurrentTime);
   }
+
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -287,6 +248,21 @@ sint x11_hidecursor(sinp_device *dev, sint on) {
   else {
     XDefineCursor(priv->disp, priv->win, None);
   }
+
+  return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Warp mouse
+sint x11_warp(sinp_device *dev, sint x, sint y) {
+  x11_private *priv;
+
+  priv = (x11_private*)dev->private;
+
+  // Simply go to warp speed
+  XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
+  XSync(priv->disp, False);
 
   return SINP_ERR_OK;
 }

@@ -42,9 +42,17 @@ static sint num_devices = 0;
 
 // Register device via bootstrap
 sint device_register(sinp_bootstrap *boot) {
+
   // Create the device and set basics
   devices[num_devices] = boot->create();
   if(devices[num_devices] != NULL) {
+
+    // Check required functions
+    if(!devices[num_devices]->init ||
+       !devices[num_devices]->destroy ||
+       !devices[num_devices]->process) {
+      return SINP_ERR_NOT_IMPLEM;
+    }
 
     // Fill trivial stuff
     devices[num_devices]->index = num_devices;
@@ -55,7 +63,7 @@ sint device_register(sinp_bootstrap *boot) {
     debug("device_bootstrap: device '%s' (%s) added at index %i",
 	  devices[num_devices]->name, devices[num_devices]->desc, num_devices);
 
-    // Send the discovery event since we know enough already
+    // Send the discovery event
     {
       sinp_event ev;
       ev.type = SINP_DISCOVERY;
@@ -94,8 +102,11 @@ void device_bootstrap() {
     debug("device_bootstrap: checking bootstrap entry %i", i, bootstrap[i]->name);
     
     // If available, register
-    if(bootstrap[i]->avail()) {
-      device_register(bootstrap[i]);      
+    if(bootstrap[i] && bootstrap[i]->avail && bootstrap[i]->create &&
+       bootstrap[i]->name && bootstrap[i]->desc) {
+      if(bootstrap[i]->avail()) {
+	device_register(bootstrap[i]);      
+      }
     }
   }
   
@@ -160,7 +171,7 @@ sinp_device *device_get(sint index) {
 /* ******************************************************************** */
 
 // Pump events from all devices into queue
-void device_pumpall() {
+inline void device_pumpall() {
   int i;
 
   for(i=0; i<num_devices; i++) {

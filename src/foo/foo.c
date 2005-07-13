@@ -85,6 +85,7 @@ sinp_device *foo_device() {
   dev->process = foo_process;  
   dev->grab = foo_grab;
   dev->hide = foo_hidecursor;
+  dev->warp = foo_warp;
   dev->private = priv;
   
   // Done
@@ -148,6 +149,11 @@ void foo_process(sinp_device *dev) {
 
   debug("foo_process");
 
+  if(!sinp_runstate()) {
+    debug("foo_process: sinp_running false");
+    return;
+  }
+
   // Since this is a test device, generate an event
   ev.type = SINP_KEYDOWN;
   ev.key.device = dev->index;
@@ -196,6 +202,15 @@ sint foo_grab(sinp_device *dev, uint mask) {
 // Show/hide pointer cursor
 sint foo_hidecursor(sinp_device *dev, sint on) {
   debug("foo_hidecursor: status %i", on);
+  
+  return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Warp pointer
+sint foo_warp(sinp_device *dev, sint x, sint y) {
+  debug("foo_warp: warp pointer to %i,%i", x, y);
   
   return SINP_ERR_OK;
 }

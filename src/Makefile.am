@@ -18,7 +18,9 @@ main.c \
 queue.c \
 debug.c \
 device.c \
-events.c
+events.c \
+appstate.c \
+mouse.c 
 
 INCLUDES = \
 -I$(top_srcdir) \

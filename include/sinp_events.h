@@ -63,8 +63,8 @@ typedef struct sinp_mousemove_event {
   uchar state;              // Button states
   ushort x;                 // Absolute x coordinate
   ushort y;                 // Absolute y coordinate
-  sshort xrel;              // Relative x movement
-  sshort urel;              // Relative y movement
+  sshort relx;              // Relative x movement
+  sshort rely;              // Relative y movement
 } sinp_mousemove_event;
 
 // Mouse button event
@@ -72,7 +72,7 @@ typedef struct sinp_mousebutton_event {
   uchar type;               // SINP_MOUSEBUTTONUP or SINP_MOUSEBUTTONDOWN
   uchar device;             // Device index
   uchar button;             // Mouse button index
-  uchar state;              // Button was 0:released 1:pressed
+  uchar state;              // Button states
   ushort x;                 // Absolute x coordinate at event time
   ushort y;                 // Absolute y coordinate at event time
 } sinp_mousebutton_event;

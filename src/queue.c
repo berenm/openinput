@@ -55,7 +55,7 @@ sint queue_init() {
 /* ******************************************************************** */
 
 // Lock queue (internal)
-sint queue_lock() {
+inline sint queue_lock() {
   //FIXME: Implement this
   return SINP_ERR_NOT_IMPLEM;
 }
@@ -63,7 +63,7 @@ sint queue_lock() {
 /* ******************************************************************** */
 
 // Unlock queue (internal)
-sint queue_unlock() {
+inline sint queue_unlock() {
   //FIXME: Implement this
   return SINP_ERR_NOT_IMPLEM;
 }

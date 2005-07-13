@@ -2,6 +2,14 @@
 -- Notes on the public API
 --------------------------------------------------------------------
 
+* Functions
+
+All public functions are prefixed by "sinp_", for example:
+    sinp_init();
+    sinp_event_poll();
+
+--------------------------------------------------------------------
+
 * Return results:
 
 Each function call is preceeded by a small explanation and what return

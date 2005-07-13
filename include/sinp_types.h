@@ -46,71 +46,91 @@ typedef signed int          sint;
 
 // Event types
 typedef enum {
-  SINP_NOEVENT              = 0,  // No event
-  SINP_KEYUP                = 1,  // Key released
-  SINP_KEYDOWN              = 2,  // Key pressed
-  SINP_MOUSEMOVE            = 3,  // Mouse motion
-  SINP_MOUSEBUTTONUP        = 4,  // Button pressed
-  SINP_MOUSEBUTTONDOWN      = 5,  // Button released
-  SINP_ACTIVE               = 6,  // App. focus gain/loss
-  SINP_RESIZE               = 7,  // App. window resize
-  SINP_EXPOSE               = 8,  // App. needs redraw
-  SINP_QUIT                 = 9,  // Quit requested
-  SINP_DISCOVERY            = 10  // Device driver available
+  SINP_NOEVENT                    = 0,  // No event
+  SINP_KEYUP                      = 1,  // Key released
+  SINP_KEYDOWN                    = 2,  // Key pressed
+  SINP_MOUSEMOVE                  = 3,  // Mouse motion
+  SINP_MOUSEBUTTONUP              = 4,  // Button pressed
+  SINP_MOUSEBUTTONDOWN            = 5,  // Button released
+  SINP_ACTIVE                     = 6,  // App. focus gain/loss
+  SINP_RESIZE                     = 7,  // App. window resize
+  SINP_EXPOSE                     = 8,  // App. needs redraw
+  SINP_QUIT                       = 9,  // Quit requested
+  SINP_DISCOVERY                  = 10  // Device driver available
 } sinp_type;
   
 // Event masks
 #define SINP_EVENT_MASK(x) (1<<(x))
 #define SINP_MASK_ALL 0xffffffff
+#define SINP_MASK_KEYUP           SINP_EVENT_MASK(SINP_KEYUP)
+#define SINP_MASK_KEYDOWN         SINP_EVENT_MASK(SINP_KEYDOWN)
+#define SINP_MASK_MOUSEMOVE       SINP_EVENT_MASK(SINP_MOUSEMOVE)
+#define SINP_MASK_MOUSEBUTTONUP   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP)
+#define SINP_MASK_MOUSEBUTTONDOWN SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN)
+#define SINP_MASK_MOUSE           (SINP_EVENT_MASK(SINP_MOUSEMOVE) | \
+				   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP) | \
+				   SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN))
+#define SINP_MASK_RESIZE          SINP_EVENT_MASK(SINP_RESIZE)
+#define SINP_MASK_EXPOSE          SINP_EVENT_MASK(SINP_EXPOSE)
+#define SINP_MASK_ACTIVE          SINP_EVENT_MASK(SINP_ACTIVE)
+#define SINP_MASK_QUIT            SINP_EVENT_MASK(SINP_QUIT)
+
+/* ********************************************************************
+ * Alternate boolean definition
+ ******************************************************************** */
+
+// On/off/query 
 typedef enum {
-  SINP_MASK_KEYUP           = SINP_EVENT_MASK(SINP_KEYUP),
-  SINP_MASK_KEYDOWN         = SINP_EVENT_MASK(SINP_KEYDOWN),
-  SINP_MASK_MOUSEMOVE       = SINP_EVENT_MASK(SINP_MOUSEMOVE),
-  SINP_MASK_MOUSEBUTTONUP   = SINP_EVENT_MASK(SINP_MOUSEBUTTONUP),
-  SINP_MASK_MOUSEBUTTONDOWN = SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN),
-  SINP_MASK_MOUSE           = (SINP_EVENT_MASK(SINP_MOUSEMOVE) |
-			       SINP_EVENT_MASK(SINP_MOUSEBUTTONUP) |
-			       SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN)),
-  SINP_MASK_RESIZE          = SINP_EVENT_MASK(SINP_RESIZE),
-  SINP_MASK_EXPOSE          = SINP_EVENT_MASK(SINP_EXPOSE),
-  SINP_MASK_ACTIVE          = SINP_EVENT_MASK(SINP_ACTIVE),
-  SINP_MASK_QUIT            = SINP_EVENT_MASK(SINP_QUIT)
-} sinp_event_masks;
+  SINP_ENABLE,                    // True/enable
+  SINP_DISABLE,                   // False/disable
+  SINP_QUERY                      // Don't change, return current
+} sinp_bool;
+
+/* ********************************************************************
+ * Mouse buttons
+ ******************************************************************** */
+
+// The buttons
+#define SINP_BUTTON_LEFT          1
+#define SINP_BUTTON_MIDDLE        2
+#define SINP_BUTTON_RIGHT         3
+#define SINP_WHEEL_UP             4
+#define SINP_WHEEL_DOWN           5
+
+// Masks for buttons
+#define SINP_BUTTON_MASK(x) (1<<(x))
+#define SINP_BUTTON_LEFTMASK      SINP_BUTTON_MASK(SINP_BUTTON_LEFT)
+#define SINP_BUTTON_MIDMASK       SINP_BUTTON_MASK(SINP_BUTTON_MIDDLE)
+#define SINP_BUTTON_RIGHTMASK     SINP_BUTTON_MASK(SINP_BUTTON_RIGHT)
 
 /* ********************************************************************
  * Various defines for the library, eg. mouse buttons and error codes
  ******************************************************************** */
 
 // Init string parameters for window_id
-#define SINP_I_CONN        'c' // Server connection handle
-#define SINP_I_SCRN        's' // Screen handle
-#define SINP_I_WINID       'w' // Window handle
+#define SINP_I_CONN              'c' // Server connection handle
+#define SINP_I_SCRN              's' // Screen handle
+#define SINP_I_WINID             'w' // Window handle
 
 // Device provide flags
-#define SINP_PRO_UNKNOWN    1 // Unknown/test type device
-#define SINP_PRO_KEYBOARD   2 // Keyboard input device
-#define SINP_PRO_MOUSE      4 // Pointer input device (mouse)
-#define SINP_PRO_JOYSTICK   8 // Joystick input device
-
-// Mouse buttons
-#define SINP_BUTTON_LEFT    1
-#define SINP_BUTTON_MIDDLE  2
-#define SINP_BUTTON_RIGHT   3
-#define SINP_WHEEL_UP       4
-#define SINP_WHEEL_DOWN     5
+#define SINP_PRO_UNKNOWN          1 // Unknown/test type device
+#define SINP_PRO_KEYBOARD         2 // Keyboard input device
+#define SINP_PRO_MOUSE            4 // Pointer input device (mouse)
+#define SINP_PRO_JOYSTICK         8 // Joystick input device
+#define SINP_PRO_WINDOW          16 // Window stuff (move/state/size)
 
 // Application activation
-#define SINP_FOCUS_MOUSE    1
-#define SINP_FOCUS_INPUT    2
-#define SINP_FOCUS_ACTIVE   3
+#define SINP_FOCUS_MOUSE          1 // Window has mouse focus
+#define SINP_FOCUS_INPUT          2 // Window has keyboard (input) focus
+#define SINP_FOCUS_VISIBLE        4 // Window is visible
 
 // Error codes
-#define SINP_ERR_OK          0 // All ok
-#define SINP_ERR_NO_DEVICE   1 // Wrong device
-#define SINP_ERR_INDEX       2 // Index query out of bounds
-#define SINP_ERR_NOT_IMPLEM  4 // Not implemented
-#define SINP_ERR_DEV_EXIST   5 // Device already initialized
-#define SINP_ERR_PARAM       6 // Invalid parameter
+#define SINP_ERR_OK               0 // All ok
+#define SINP_ERR_NO_DEVICE        1 // Wrong device
+#define SINP_ERR_INDEX            2 // Index query out of bounds
+#define SINP_ERR_NOT_IMPLEM       4 // Not implemented
+#define SINP_ERR_DEV_EXIST        5 // Device already initialized
+#define SINP_ERR_PARAM            6 // Invalid parameter
 
 /* ******************************************************************** */
 
