@@ -1,0 +1,20 @@
+Source: libsinp
+Priority: optional
+Maintainer: Kresten Kjeldgaard <gathond@laptop.gathond.dk>
+Build-Depends: debhelper (>= 4.0.0), autotools-dev
+Standards-Version: 3.6.1
+Section: libs
+
+Package: libsinp-dev
+Section: libdevel
+Architecture: any
+Depends: libsinpBROKEN (= ${Source-Version})
+Description: input library
+ input library
+
+Package: libsinp
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: input library
+ input library
