@@ -6,10 +6,7 @@ correct/shorten variable types
 - event_type -> uchar
 - x,y,width,height,deltas -> sshort
 - masks -> uint
-- document types
-
-x11 event dispatcher
-- key/modifier/mouse translator
+- document the types and common variables
 
 extensive x11 testing
 - wait
@@ -20,8 +17,18 @@ extensive x11 testing
 - etc.
 
 action-binding system
+- event based
+- state manager
 
 threading
 - is it really needed?
-- probably not
 
+joystick support
+- event based
+- state manager
+
+other-wierd-kind-of-input-device-support
+
+automake/autoconf issues
+- src/x11/Makefile.am:11: variable `X_LIBS_EXTRA' not defined
+- what version should be used?

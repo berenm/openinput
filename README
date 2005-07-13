@@ -7,9 +7,13 @@ to provide a SDL-alike interface to input devices such as keyboards,
 mice and joysticks while keeping the dependencies for the library
 at a bare minimum.
 
-A lot of code has been ripped, abused and otherwise mangled from both
-libgii of the GGI project (http://www.ggi-project.org/) and the
-SDL project (http://www.libsdl.org/). Lots of thanks!
+A lot of code has been ripped, abused and otherwise mangled and
+mingled from the SDL project (http://www.libsdl.org/), and you
+should know that
+
+       Without the EXCELLENT piece of software SDL is
+       libsinp would simply never have existed!
+       Thank you so much and keep up the good work!
 
 libsinp is licensed under the GNU Lesser General Public License (LGPL).
 
