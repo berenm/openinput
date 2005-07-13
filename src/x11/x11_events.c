@@ -43,7 +43,7 @@ inline sint x11_pending(Display *d) {
     return TRUE;
   }
 
-  // Bruteforce-attack the X server to make it take (thanks SDL!)
+  // Bruteforce-attack the X server to make it talk (thanks SDL!)
   {
     static struct timeval time;
     int fd;
@@ -67,7 +67,7 @@ inline sint x11_pending(Display *d) {
 /* ******************************************************************** */
 
 // Dispatch a pending X11 event into the sinp event queue
-inline void x11_dispatch(Display *d) {
+inline void x11_dispatch(sinp_device *dev, Display *d) {
   XEvent xev;
   
   // Fetch the event
@@ -75,97 +75,103 @@ inline void x11_dispatch(Display *d) {
   
   // Handle
   switch(xev.type) {
+  
     
     // Mouse enters/leaves window
   case EnterNotify:
   case LeaveNotify:
-    {
-      debug("x11_dispatch: enternotify / leavenotify");
-
-      // We're not interested in grab mode events
-      if((xev.xcrossing.mode != NotifyGrab) &&
-	 (xev.xcrossing.mode != NotifyUngrab)) {
-	
-	// If grab is off, mouse either left or entered window
-	if(1) {
-	  //FIXME here
-	}
+    debug("x11_dispatch: enter/leave_notify");
+    
+    // We're not interested in grab mode events
+    if((xev.xcrossing.mode != NotifyGrab) &&
+       (xev.xcrossing.mode != NotifyUngrab)) {
+      
+      // Move if grabbed, otherwise change focus
+      if(sinp_app_grab(SINP_QUERY) == SINP_ENABLE) {
+	mouse_move(xev.xcrossing.x, xev.xcrossing.y, FALSE, dev->index);
+      }
+      else {
+	appstate_focus(SINP_FOCUS_MOUSE,
+		       xev.type == EnterNotify,
+		       dev->index);
       }
     }
     break;
+    
 
-    // Input focus gained
-  case FocusIn: {
-    debug("x11_dispatch: focusin");
-  }
+    // Input focus gained/lost
+  case FocusIn:
+  case FocusOut:
+    debug("x11_dispatch: focus_in/out");
+    appstate_focus(SINP_FOCUS_INPUT,
+		   xev.type == FocusIn,
+		   dev->index);
     break;
 
-    // Input focus lost
-  case FocusOut: {
-    debug("x11_dispatch: focusout");
-  }
-    break;
-
+    
     // Generated on EnterWindow and FocusIn
-  case KeymapNotify: {
-    debug("x11_dispatch: keymapnotify");
-  }
+  case KeymapNotify:
+    debug("x11_dispatch: keymap_notify");
+    //FIXME handle full reset of keystate/modstate
     break;
+
 
     // Mouse motion
-  case MotionNotify: {
-    debug("x11_dispatch: motionnotify");
-  }
+  case MotionNotify:
+    debug("x11_dispatch: motion_notify");
+    //FIXME handle relative mouse movement
+    mouse_move(xev.xmotion.x, xev.xmotion.y, FALSE, dev->index);
     break;
+
 
     // Mouse button pressed
-  case ButtonPress: {
-    debug("x11_dispatch: buttonpress");
-  }
+  case ButtonPress:
+  case ButtonRelease:
+    debug("x11_dispatch: button_press/release");
+    mouse_button(xev.xbutton.button,
+		 xev.type == ButtonPress,
+		 dev->index);
     break;
 
-    // Mouse button released
-  case ButtonRelease: {
-    debug("x11_dispatch: buttonrelease");
-  }
-    break;
 
     // Keyboard pressed
-  case KeyPress: {
-    debug("x11_dispatch: keypress");
-  }
+  case KeyPress:
+  case KeyRelease:
+    debug("x11_dispatch: key_press/release");
     break;
 
-    // Keyboard released
-  case KeyRelease: {
-    debug("x11_dispatch: keyrelease");
-  }
-    break;
 
     // Window gets iconified
-  case UnmapNotify: {
-    debug("x11_dispatch: unmapnotify");
-  }
+  case UnmapNotify:
+    debug("x11_dispatch: unmap_notify");
+    appstate_focus(FALSE, SINP_FOCUS_INPUT | SINP_FOCUS_VISIBLE, dev->index);
     break;
 
     // Window gets restored (uniconified)
-  case MapNotify: {
-    debug("x11_dispatch: mapnotify");
-  }
+  case MapNotify:
+    appstate_focus(TRUE, SINP_FOCUS_VISIBLE, dev->index);
     break;
+
 
     // Window was resized or moved
-  case ConfigureNotify: {
-    debug("x11_dispatch: configurenotify");
-  }
+  case ConfigureNotify:
+    debug("x11_dispatch: configure_notify");
+    appstate_resize(xev.xconfigure.width, xev.xconfigure.height, dev->index);		    
     break;
     
-    // We should quit -- or other messages
-  case ClientMessage: {
-    debug("x11_dispatch: clientmessage");
-  }
-    break;
 
+    // We should quit -- or other messages
+  case ClientMessage:
+    debug("x11_dispatch: client_message");
+    // Window manager close window
+    if((xev.xclient.format == 32) &&
+       (xev.xclient.data.l[0] == ((x11_private*)dev->private)->wm_delete_window)) {
+      sinp_event ev;
+      ev.type = SINP_QUIT;
+      queue_add(&ev);
+    }    
+    break;
+    
     // Redraw required
   case Expose: {
     debug("x11_dispatch: expose");

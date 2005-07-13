@@ -42,20 +42,6 @@ sinp_bootstrap x11_bootstrap = {
   x11_device,
 };
 
-// Private structure
-typedef struct x11_private {
-  Display *disp;
-  Window win;
-  Screen *screen;
-  Cursor cursor;
-  sint winheight;
-  sint winwidth;
-  sint mousex;
-  sint mousey;
-  sint oldx;
-  sint oldy;
-} x11_private;
-
 /* ******************************************************************** */
  
 // Bootstrap: Check availablity of X11
@@ -149,6 +135,10 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
 	       KeymapStateMask | ButtonPressMask | ButtonReleaseMask |
 	       PointerMotionMask);
 
+  // Get "close window" window manager protocol atom
+  priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
+  XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);
+  
   //FIXME flush and send!
 
   return SINP_ERR_OK;
@@ -188,11 +178,10 @@ void x11_process(sinp_device *dev) {
   x11_private *priv;
 
   priv = (x11_private*)dev->private;
-  debug("x11_process");
 
   // Process all pending events
   while(sinp_runstate() && x11_pending(priv->disp)) {
-    x11_dispatch(priv->disp);
+    x11_dispatch(dev, priv->disp);
   }
 }
 
@@ -204,7 +193,7 @@ sint x11_grab(sinp_device *dev, sint on) {
   int i;
 
   priv = (x11_private*)dev->private;
-  debug("x11_grab");
+  debug("x11_grab: state:%i", on);
 
   if(on) {
     XGrabKeyboard(priv->disp, priv->win, TRUE,
@@ -237,7 +226,7 @@ sint x11_grab(sinp_device *dev, sint on) {
 sint x11_hidecursor(sinp_device *dev, sint on) {
   x11_private *priv;
 
-  debug("x11_hidecursor");
+  debug("x11_hidecursor: state:%i", on);
   priv = (x11_private*)dev->private;
 
   // Hide - set blank cursor
@@ -275,13 +264,14 @@ sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
   x11_private *priv;
   XWindowAttributes attr;
 
-  debug("x11_windsize");
   priv = (x11_private*)dev->private;
   
   XGetWindowAttributes(priv->disp, priv->win, &attr);
 
   *w = attr.width;
   *h = attr.height;
+
+  debug("x11_windsize: width:%i height:%i", *w, *h);
   
   return SINP_ERR_OK;
 }

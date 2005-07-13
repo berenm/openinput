@@ -85,6 +85,7 @@ sint appstate_init();
 void appstate_focus(sint gain, sint state, uchar post);
 inline sint appstate_width();
 inline sint appstate_height();
+void appstate_resize(sint w, sint h, uchar postdev);
 
 /* ******************************************************************** */
 

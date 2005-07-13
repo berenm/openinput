@@ -68,6 +68,8 @@ sint keyboard_init() {
     return SINP_ERR_NO_DEVICE;
   }
 
+  debug("keyboard_init: keyboard device is '%s'", keydev->name);
+
   // Disable key-repeat
   sinp_key_repeat(0, 0);
 

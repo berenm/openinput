@@ -47,8 +47,19 @@ Cursor x11_mkcursor(Display *d, Window w);
 sint x11_error(Display *d, XErrorEvent *e);
 sint x11_fatal(Display *d);
 inline sint x11_pending(Display *d);
-inline void x11_dispatch(Display *d);
+inline void x11_dispatch(sinp_device *dev, Display *d);
 sint x11_winsize(sinp_device *dev, sint *w, sint *h);
+
+/* ******************************************************************** */
+
+// Private data structure
+typedef struct x11_private {
+  Display *disp;
+  Window win;
+  Screen *screen;
+  Cursor cursor;
+  Atom wm_delete_window;
+} x11_private;
 
 /* ******************************************************************** */
 

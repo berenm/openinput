@@ -12,8 +12,6 @@ x11 event dispatcher
 
 extensive x11 testing
 
-key-repeat handling
-
 action-binding system
 
 threading?

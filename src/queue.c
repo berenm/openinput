@@ -88,6 +88,9 @@ sint queue_add(sinp_event *evt) {
     add = 1;
     // SDL does some special windowmanager event handling here
 
+    debug("queue_add: type %i added at position %i",
+	  evt->type, queue.tail);
+
     queue.tail = tail;
   }
 
