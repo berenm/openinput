@@ -268,8 +268,8 @@ typedef enum {
   SK_LALT		= 308,
   SK_RMETA		= 309,
   SK_LMETA		= 310,
-  SK_RSUPER		= 311, // Left Windows key
-  SK_LSUPER		= 312, // Right Windows key
+  SK_RWINDOWS    	= 311,
+  SK_LWINDOWS		= 312,
   SK_ALTGR		= 313,
   SK_COMPOSE		= 314, // Multi-key compose key
   
@@ -278,7 +278,7 @@ typedef enum {
   SK_PRINT		= 316,
   SK_SYSREQ		= 317,
   SK_BREAK		= 318,
-  SK_MENU		= 319,
+  SK_MENU		= 319, // Windows "menu" key
   SK_POWER		= 320, // Power Macintosh power key
   SK_EURO		= 321, // Some european keyboards
   SK_UNDO		= 322, // Atari keyboard has Undo
@@ -314,7 +314,6 @@ typedef struct {
   uchar scancode;       // Hardware scancode
   sinp_key sym;         // Key symbol
   uint mod;             // Modifier symbol
-  ushort unicode;       // Translated unicode character
 } sinp_keysym;
   
 /* ******************************************************************** */

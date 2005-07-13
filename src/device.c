@@ -55,13 +55,13 @@ sint device_register(sinp_bootstrap *boot) {
     }
 
     // Fill trivial stuff
-    devices[num_devices]->index = num_devices;
+    devices[num_devices]->index = num_devices+1;
     devices[num_devices]->name = boot->name;
     devices[num_devices]->desc = boot->desc;
     devices[num_devices]->provides = boot->provides;
 
     debug("device_bootstrap: device '%s' (%s) added at index %i",
-	  devices[num_devices]->name, devices[num_devices]->desc, num_devices);
+	  devices[num_devices]->name, devices[num_devices]->desc, num_devices+1);
 
     // Send the discovery event
     {
@@ -160,12 +160,11 @@ sint device_destroy(sint index) {
 // Return a device structure
 sinp_device *device_get(sint index) {
   // Dummy check
-  if((index < 0) || (index > num_devices)) {
-    debug("device_get: error, index %i does not exist", index);
+  if((index < 1) || (index > num_devices)) {
     return NULL;
   }
   
-  return devices[index];
+  return devices[index-1];
 }
 
 /* ******************************************************************** */

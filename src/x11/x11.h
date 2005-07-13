@@ -39,6 +39,7 @@ void x11_process(sinp_device *dev);
 sint x11_grab(sinp_device *dev, sint on);
 sint x11_hidecursor(sinp_device *dev, sint on);
 sint x11_warp(sinp_device *dev, sint x, sint y);
+sint x11_winsize(sinp_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 
@@ -48,7 +49,12 @@ sint x11_error(Display *d, XErrorEvent *e);
 sint x11_fatal(Display *d);
 inline sint x11_pending(Display *d);
 inline void x11_dispatch(sinp_device *dev, Display *d);
-sint x11_winsize(sinp_device *dev, sint *w, sint *h);
+inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
+				  KeyCode kc, sinp_keysym *keysym);
+
+void x11_initkeymap();
+void x11_keystate(sinp_device *dev, Display *d, char *keyvector);
+void x11_modmasks(Display *d, sinp_device *dev);
 
 /* ******************************************************************** */
 
@@ -59,6 +65,12 @@ typedef struct x11_private {
   Screen *screen;
   Cursor cursor;
   Atom wm_delete_window;
+  uint mask_lmeta;
+  uint mask_rmeta;
+  uint mask_lalt;
+  uint mask_ralt;
+  uint mask_num;
+  uint mask_altgr;
 } x11_private;
 
 /* ******************************************************************** */

@@ -49,8 +49,8 @@ sint sinp_init(char *window_id, uint flags) {
   device_bootstrap();
 
   // Parse all devices
-  i = 0;
   e = 0;
+  i = 1;
   while(device_get(i) != NULL) {
 
     // Initialize device
@@ -84,8 +84,8 @@ sint sinp_close() {
   sinp_running = FALSE;
 
   // Parse all devices
-  i = 0;
   e = 0;
+  i = 1;
   while(device_get(i) != NULL) {
 
     // Destroy it

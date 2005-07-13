@@ -261,8 +261,8 @@ sint keyboard_fillnames(char **kn) {
   kn[SK_LALT] =         "alt_left";
   kn[SK_RMETA] =        "meta_right";
   kn[SK_LMETA] =        "meta_left";
-  kn[SK_RSUPER] =       "windows_right";
-  kn[SK_LSUPER] =       "windows_left";
+  kn[SK_RWINDOWS] =     "windows_right";
+  kn[SK_LWINDOWS] =     "windows_left";
   kn[SK_ALTGR] =        "altgr";
   kn[SK_COMPOSE] =      "compose";
   

@@ -50,7 +50,7 @@ sint appstate_init() {
   cursor = TRUE;
 
   // Find default/first window device
-  i = 0;
+  i = 1;
   while((windowdev = device_get(i)) != NULL) {
     if((windowdev->provides & SINP_PRO_WINDOW) == SINP_PRO_WINDOW) {
       break;
@@ -179,8 +179,7 @@ sinp_bool sinp_app_cursor(sinp_bool q) {
   // Set cursor mode on all devices
   {
     sinp_device *dev;
-    int i = 0;
-
+    int i = 1;
     while((dev = device_get(i)) != NULL) {
       // Hide is an optional function
       if(dev->hide) {
@@ -223,8 +222,7 @@ sint sinp_app_grab(sinp_bool q) {
   // Set cursor mode on all devices
   {
     sinp_device *dev;
-    int i = 0;
-
+    int i = 1;
     while((dev = device_get(i)) != NULL) {
       // Grab is an optional function
       if(dev->grab) {      

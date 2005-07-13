@@ -52,10 +52,10 @@ sint keyboard_init() {
   // Clear tables
   memset(keystate, FALSE, sizeof(keystate)/sizeof(keystate[0]));
   memset(keynames, 0, sizeof(keynames)/sizeof(keynames[0]));
-  modstate = 0;
+  modstate = SM_NONE;
 
   // Find default/first mouse device
-  i = 0;
+  i = 1;
   while((keydev = device_get(i)) != NULL) {
     if((keydev->provides & SINP_PRO_KEYBOARD) == SINP_PRO_KEYBOARD) {
       break;
@@ -83,7 +83,7 @@ sint keyboard_init() {
 
 // Update keyboard/modifier state (internal)
 void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
-  sinp_type type;  
+  sinp_type type;
   sinp_event ev;
   uint newmod;
   uchar repeat;
@@ -283,6 +283,13 @@ void keyboard_dorepeat() {
       queue_add(&keyboard_keyrep.ev);
     }
   }
+}
+
+/* ******************************************************************** */
+
+// Set modifier mask
+void keyboard_setmodifier(uint newmod) {
+  modstate = newmod;
 }
 
 /* ******************************************************************** */

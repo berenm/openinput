@@ -44,7 +44,7 @@ void test(Display *d, Window w, uint scrn) {
   // Try to fetch an event
   while(1) {
     sinp_events_wait(&ev);
-    printf("--- event type %i\n", ev.type);
+    printf("--- event type %i\n\n", ev.type);
 
     // Quit
     if(ev.type == SINP_QUIT) {

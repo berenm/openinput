@@ -101,6 +101,7 @@ sint keyboard_init();
 sint keyboard_fillnames(char **kn);
 void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev);
 void keyboard_dorepeat();
+void keyboard_setmodifier(uint newmod);
 
 /* ******************************************************************** */
 

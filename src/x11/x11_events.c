@@ -138,6 +138,23 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
   case KeyPress:
   case KeyRelease:
     debug("x11_dispatch: key_press/release");
+    {
+      sinp_keysym keysym;
+      x11_private *priv;
+      
+      priv = (x11_private*)dev->private;
+
+      x11_translate(priv->disp,
+		    &xev.xkey,
+		    xev.xkey.keycode,
+		    &keysym);
+
+      keyboard_update(&keysym,
+		      xev.type == KeyPress,
+		      dev->index);
+
+      //FIXME: SDL does repeating-key elimination on KeyRelease
+    }
     break;
 
 
@@ -146,6 +163,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     debug("x11_dispatch: unmap_notify");
     appstate_focus(FALSE, SINP_FOCUS_INPUT | SINP_FOCUS_VISIBLE, dev->index);
     break;
+
 
     // Window gets restored (uniconified)
   case MapNotify:
@@ -171,11 +189,22 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
       queue_add(&ev);
     }    
     break;
+
     
     // Redraw required
-  case Expose: {
+  case Expose:
     debug("x11_dispatch: expose");
-  }
+    {
+      sinp_event ev;
+      ev.type = SINP_EXPOSE;
+      queue_add(&ev);
+    }
+    break;
+    
+    
+    // Unhandled event
+  default:
+    debug("x11_dispatch: unhandled event type %i", xev.type);
     break;
   }
 }

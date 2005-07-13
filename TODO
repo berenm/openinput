@@ -1,17 +1,25 @@
-Loose ends
-----------
+Loose ends and suggestions for improvements
+-------------------------------------------
 
 correct/shorten variable types
 - device-index -> uchar
 - event_type -> uchar
 - x,y,width,height,deltas -> sshort
 - masks -> uint
+- document types
 
 x11 event dispatcher
 - key/modifier/mouse translator
 
 extensive x11 testing
+- wait
+- poll
+- grab
+- hide
+- warp
+- etc.
 
 action-binding system
 
-threading?
+threading
+- is it really needed?

@@ -50,7 +50,7 @@ sint mouse_init() {
   button = 0;
 
   // Find default/first mouse device
-  i = 0;
+  i = 1;
   while((mousedev = device_get(i)) != NULL) {
     if((mousedev->provides & SINP_PRO_MOUSE) == SINP_PRO_MOUSE) {
       break;

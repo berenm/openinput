@@ -122,13 +122,16 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
     return SINP_ERR_NO_DEVICE;
   }
 
-  // Setup remaining private members
-  priv->cursor = x11_mkcursor(priv->disp, priv->win);
-
   // Install error handlers
   XSetErrorHandler(x11_error);
   XSetIOErrorHandler(x11_fatal);
 
+  // Initialize blank-cursor, keymapper table, modifier mask and key state
+  priv->cursor = x11_mkcursor(priv->disp, priv->win);
+  x11_initkeymap();
+  x11_modmasks(priv->disp, dev);
+  x11_keystate(dev, priv->disp, NULL);
+  
   // Start receiving events
   XSelectInput(priv->disp, priv->win, FocusChangeMask | KeyPressMask |
 	       KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
@@ -137,9 +140,7 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
 
   // Get "close window" window manager protocol atom
   priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);
-  
-  //FIXME flush and send!
+  XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);  
 
   return SINP_ERR_OK;
 }
@@ -271,7 +272,7 @@ sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
   *w = attr.width;
   *h = attr.height;
 
-  debug("x11_windsize: width:%i height:%i", *w, *h);
+  debug("x11_winsize: width:%i height:%i", *w, *h);
   
   return SINP_ERR_OK;
 }
