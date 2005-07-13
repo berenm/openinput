@@ -24,6 +24,8 @@
 // Includes
 #include "config.h"
 #include <stdio.h>
+#include <time.h>
+#include <sys/time.h>
 #include "sinp.h"
 #include "internal.h"
 
@@ -63,7 +65,10 @@ sint sinp_init(char *window_id, uint flags) {
   // Initialize state managers
   appstate_init();
   mouse_init();
-  // keyboard_init();
+  keyboard_init();
+
+  // Set running flag
+  sinp_running = TRUE;
     
   return e;
 }
@@ -97,9 +102,22 @@ sint sinp_close() {
 
 /* ******************************************************************** */
 
-// Return library running state
+// Return library running state (internal)
 inline sint sinp_runstate() {
   return sinp_running;
+}
+
+/* ******************************************************************** */
+
+// Return current system ticks (internal)
+inline uint sinp_getticks() {
+  struct timeval now;
+  uint ticks;
+
+  // We do this the POSIX way
+  gettimeofday(&now, NULL);
+  ticks = now.tv_sec*1000 + now.tv_usec/1000;
+  return ticks;
 }
 
 /* ******************************************************************** */

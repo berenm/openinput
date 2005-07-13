@@ -20,7 +20,9 @@ debug.c \
 device.c \
 events.c \
 appstate.c \
-mouse.c 
+mouse.c \
+keyboard.c \
+keynames.c
 
 INCLUDES = \
 -I$(top_srcdir) \

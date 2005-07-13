@@ -69,11 +69,17 @@ uint sinp_events_getmask();
  * Keyboard functions
  ******************************************************************** */
 
-void  sinp_key_keyrepeat();
-void  sinp_key_getstate();
-void  sinp_key_modstate();
-void  sinp_key_getname();
+// Send events for down-state keys (errorcode)
+sint sinp_key_repeat(sint delay, sint interval);
 
+// Get key state table and set num to number of elements (pointer)
+uchar *sinp_key_keystate(sint *num);
+
+// Return modifier mask (modifier_mask)
+uint sinp_key_modstate();
+
+// Get name of key (string)
+char *sinp_key_getname(sinp_key key);
 
 /* ********************************************************************
  * Mouse functions

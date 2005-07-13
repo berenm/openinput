@@ -71,8 +71,8 @@ sint mouse_init() {
 
 /* ******************************************************************** */
 
-// Update mouse motion
-void mouse_move(sint x, sint y, sint relative, sint postdev) {
+// Update mouse motion (internal)
+void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   sint nx;
   sint ny;
   sint rx;
@@ -138,7 +138,7 @@ void mouse_move(sint x, sint y, sint relative, sint postdev) {
 /* ******************************************************************** */
 
 // Update mouse button
-void mouse_button(sint btn, sint state, sint postdev) {
+void mouse_button(sint btn, sint state, uchar postdev) {
   sint newbutton;
   uchar type;
 
@@ -249,8 +249,13 @@ sint sinp_mouse_warp(sint x, sint y) {
   }
 
   // Warp default mouse device - driver must generate motion event!
-  else {
+  else if(mousedev->warp) {
     e = mousedev->warp(mousedev, x, y);
+  }
+
+  // No default device to perform the warp!
+  else {
+    e = SINP_ERR_NO_DEVICE;
   }
 
   return e;

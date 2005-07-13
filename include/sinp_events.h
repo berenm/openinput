@@ -44,6 +44,7 @@ typedef struct sinp_discovery_event {
 // Application visibility event
 typedef struct sinp_active_event {
   uchar type;               // SINP_ACTIVE
+  uchar device;             // Device index
   uchar gain;               // Focus was 0:lost 1:gained
   uint state;               // Mask of focus state
 } sinp_active_event;
@@ -80,6 +81,7 @@ typedef struct sinp_mousebutton_event {
 // Application window resize event
 typedef struct sinp_resize_event {
   uchar type;               // SINP_RESIZE
+  uchar device;             // Device index
   uint width;               // New window width
   uint height;              // New window height
 } sinp_resize_event;

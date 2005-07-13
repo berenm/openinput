@@ -48,6 +48,7 @@ sint x11_error(Display *d, XErrorEvent *e);
 sint x11_fatal(Display *d);
 inline sint x11_pending(Display *d);
 inline void x11_dispatch(Display *d);
+sint x11_winsize(sinp_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 

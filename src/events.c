@@ -83,7 +83,13 @@ sint sinp_events_add(sinp_event *evts, sint num) {
 // Explictly pump events into the queue (public)
 void sinp_events_pump() {
   queue_lock();
+
+  // Pump devices
   device_pumpall();
+
+  // Handle keyboard repeats
+  keyboard_dorepeat();
+  
   queue_unlock();  
 }
 
@@ -93,14 +99,11 @@ void sinp_events_pump() {
 sint sinp_events_poll(sinp_event *evt) {
   int found;
 
-  queue_lock();
-
-  device_pumpall();
+  sinp_events_pump();
 
   // Peep for 1 event with removal
   found = queue_peep(evt, TRUE, ~event_mask, TRUE);
 
-  queue_unlock();
   return found;
 }
 
@@ -113,11 +116,10 @@ void sinp_events_wait(sinp_event *evt) {
   // Wait until an event occurs
   found = 0;
   while(!found) {
-    // Lock, pump, read, unlock, sleep
-    queue_lock();
-    device_pumpall();
+    // Pump and read
+    sinp_events_pump();
+
     found = queue_peep(evt, TRUE, ~event_mask, TRUE);
-    queue_unlock();
     usleep(SINP_SLEEP);
   }
 }

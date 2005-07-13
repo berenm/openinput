@@ -28,6 +28,7 @@
 
 // Special functions
 inline sint sinp_runstate();
+inline uint sinp_getticks();
 
 /* ******************************************************************** */
 
@@ -54,7 +55,7 @@ typedef struct sinp_device {
   sint (*grab)(struct sinp_device *dec, sint on);                      // Grab input focus
   sint (*hide)(struct sinp_device *dev, sint on);                      // Hide/show cursor
   sint (*warp)(struct sinp_device *dev, sint x, sint y);               // Warp mouse cursor
-  sint (*winsize)(struct sinp_device *dev, sint *x, sint *y);          // Query for window size
+  sint (*winsize)(struct sinp_device *dev, sint *w, sint *h);          // Query for window size
 } sinp_device;
 
 // Platform bootstrap interface
@@ -81,7 +82,7 @@ sint device_destroy(sint index);
 
 // Application state
 sint appstate_init();
-void appstate_focus(sint gain, sint state, sint post);
+void appstate_focus(sint gain, sint state, uchar post);
 inline sint appstate_width();
 inline sint appstate_height();
 
@@ -89,8 +90,16 @@ inline sint appstate_height();
 
 // Mouse state
 sint mouse_init();
-void mouse_move(sint x, sint y, sint relative, sint postdev);
-void mouse_button(sint btn, sint state, sint postdev);
+void mouse_move(sint x, sint y, sint relative, uchar postdev);
+void mouse_button(sint btn, sint state, uchar postdev);
+
+/* ******************************************************************** */
+
+// Keyboard state
+sint keyboard_init();
+sint keyboard_fillnames(char **kn);
+void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev);
+void keyboard_dorepeat();
 
 /* ******************************************************************** */
 

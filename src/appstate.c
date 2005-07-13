@@ -64,9 +64,13 @@ sint appstate_init() {
   }
 
   // Get window metrics
-  //FIXME
-  win_width = 0;
-  win_height = 0;
+  if(windowdev->winsize) {
+    windowdev->winsize(windowdev, &win_width, &win_height);
+  }
+  else {
+    // No winsize function, very bad
+    return SINP_ERR_NOT_IMPLEM;
+  }
 
   debug("appstate_init: window device is '%s'", windowdev->name);
 
@@ -77,7 +81,7 @@ sint appstate_init() {
 /* ******************************************************************** */
 
 // Set focus state (internal)
-void appstate_focus(sint gain, sint state, sint post) {
+void appstate_focus(sint gain, sint state, uchar postdev) {
   sint newfocus;
 
   // Loose or gain
@@ -98,9 +102,10 @@ void appstate_focus(sint gain, sint state, sint post) {
   focus = newfocus;
 
   // Postal services
-  if(post) {
+  if(postdev) {
     sinp_event ev;
     ev.type = SINP_ACTIVE;
+    ev.active.device = postdev;
     ev.active.gain = gain & TRUE;
     ev.active.state = state;
     queue_add(&ev);
@@ -109,14 +114,33 @@ void appstate_focus(sint gain, sint state, sint post) {
 
 /* ******************************************************************** */
 
-// Return window width
+// Update window size changes
+void appstate_resize(sint w, sint h, uchar postdev) {
+  // Store state
+  win_width = w;
+  win_height = h;
+
+  // Postal services
+  if(postdev) {
+    sinp_event ev;
+    ev.type = SINP_RESIZE;
+    ev.resize.device = postdev;
+    ev.resize.width = w;
+    ev.resize.height = h;
+    queue_add(&ev);
+  }
+}
+
+/* ******************************************************************** */
+   
+// Return window width (internal)
 inline sint appstate_width() {
   return win_width;
 }
 
 /* ******************************************************************** */
 
-// Return window height
+// Return window height (internal)
 inline sint appstate_height() {
   return win_height;
 }
@@ -158,7 +182,10 @@ sinp_bool sinp_app_cursor(sinp_bool q) {
     int i = 0;
 
     while((dev = device_get(i)) != NULL) {
-      dev->hide(dev, hide);
+      // Hide is an optional function
+      if(dev->hide) {
+	dev->hide(dev, hide);
+      }
       i++;
     }
   }
@@ -199,7 +226,10 @@ sint sinp_app_grab(sinp_bool q) {
     int i = 0;
 
     while((dev = device_get(i)) != NULL) {
-      dev->grab(dev, eat);
+      // Grab is an optional function
+      if(dev->grab) {      
+	dev->grab(dev, eat);
+      }
       i++;
     }
   }

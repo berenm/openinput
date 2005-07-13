@@ -268,9 +268,9 @@ typedef enum {
   SK_LALT		= 308,
   SK_RMETA		= 309,
   SK_LMETA		= 310,
-  SK_LSUPER		= 311, // Left Windows key
-  SK_RSUPER		= 312, // Right Windows key
-  SK_MODE		= 313, // Alt-Gr key
+  SK_RSUPER		= 311, // Left Windows key
+  SK_LSUPER		= 312, // Right Windows key
+  SK_ALTGR		= 313,
   SK_COMPOSE		= 314, // Multi-key compose key
   
   // Miscellaneous function keys
@@ -291,21 +291,19 @@ typedef enum {
  ******************************************************************** */
 
 // Modifier definitions
-typedef enum {
-  SM_NONE               = 0x0000,
-  SM_LSHIFT             = 0x0001,
-  SM_RSHIFT             = 0x0002,
-  SM_LCTRL              = 0x0040,
-  SM_RCTRL              = 0x0080,
-  SM_LALT               = 0x0100,
-  SM_RALT               = 0x0200,
-  SM_LMETA              = 0x0400,
-  SM_RMETA              = 0x0800,
-  SM_NUM                = 0x1000,
-  SM_CAPS               = 0x2000,
-  SM_MODE               = 0x4000,
-  SM_RESERVED           = 0x8000
-} sinp_mod;
+#define SM_NONE         0x0000
+#define SM_LSHIFT       0x0001
+#define SM_RSHIFT       0x0002
+#define SM_LCTRL        0x0040
+#define SM_RCTRL        0x0080
+#define SM_LALT         0x0100
+#define SM_RALT         0x0200
+#define SM_LMETA        0x0400
+#define SM_RMETA        0x0800
+#define SM_NUMLOCK      0x1000
+#define SM_CAPSLOCK     0x2000
+#define SM_ALTGR        0x4000
+#define SM_RESERVED     0x8000
 
 /* ********************************************************************
  * Key symbol structure
@@ -315,7 +313,7 @@ typedef enum {
 typedef struct {
   uchar scancode;       // Hardware scancode
   sinp_key sym;         // Key symbol
-  sinp_mod mod;         // Modifier symbol
+  uint mod;             // Modifier symbol
   ushort unicode;       // Translated unicode character
 } sinp_keysym;
   

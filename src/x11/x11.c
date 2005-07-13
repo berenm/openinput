@@ -99,17 +99,18 @@ sinp_device *x11_device() {
     return NULL;
   }
 
-  // Clear private
+  // Clear structures
+  memset(dev, 0, sizeof(sinp_device));
   memset(priv, 0, sizeof(x11_private));
 
   // Set members
-  memset(dev, 0, sizeof(sinp_device));
+  dev->private = priv;
   dev->init = x11_init;
   dev->destroy = x11_destroy;
   dev->process = x11_process;  
   dev->grab = x11_grab;
   dev->warp = x11_warp;
-  dev->private = priv;
+  dev->winsize = x11_winsize;
   
   // Done
   return dev;
@@ -264,6 +265,24 @@ sint x11_warp(sinp_device *dev, sint x, sint y) {
   XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
   XSync(priv->disp, False);
 
+  return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Get window sizes
+sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
+  x11_private *priv;
+  XWindowAttributes attr;
+
+  debug("x11_windsize");
+  priv = (x11_private*)dev->private;
+  
+  XGetWindowAttributes(priv->disp, priv->win, &attr);
+
+  *w = attr.width;
+  *h = attr.height;
+  
   return SINP_ERR_OK;
 }
 
