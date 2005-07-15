@@ -1,3 +1,10 @@
+libsinp (0.0.0.svn20-2) unstable; urgency=low
+
+  * Added Build dependencies and generally cleaned up in lintian errors.
+  * Added -dbg package to the build
+
+ -- Kresten Kjeldgaard <gathond@laptop.gathond.dk>  Fri, 15 Jul 2005 14:37:19 +0200
+
 libsinp (0.0.0.svn20-1) unstable; urgency=low
 
   * Initial release Closes: #nnnn  (nnnn is the bug number of your ITP)
