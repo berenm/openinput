@@ -1,5 +1,5 @@
 /*
- * bootstrap.h : Header for platform bootstrap functions
+ * unixsignal.h : UNIX signal handler (intr, sigsev, etc.)
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -21,45 +21,23 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_BOOTSTRAP_H_
-#define _SINP_BOOTSTRAP_H_
+#ifndef _SINP_UNIXSIGNAL_H_
+#define _SINP_UNIXSIGNAL_H_
 
 /* ******************************************************************** */
 
-// Bootstrap function forward definitions
-#ifdef ENABLE_FOO
-extern sinp_bootstrap foo_bootstrap;
-#endif
-#ifdef ENABLE_X11
-extern sinp_bootstrap x11_bootstrap;
-#endif
-#ifdef ENABLE_UNIXSIGNAL
-extern sinp_bootstrap unixsignal_bootstrap;
-#endif
+// Bootstrap
+sint unixsignal_avail();
+sinp_device *unixsignal_device();
 
-/* ******************************************************************** */
+// Device
+sint unixsignal_init(sinp_device *dev, char *window_id, uint flags);
+sint unixsignal_enable(sinp_device *dev, sint on);
+sint unixsignal_destroy(sinp_device *dev);
+void unixsignal_process(sinp_device *dev);
 
-// Global variable for "device.c" only! All drivers must fill in an entry
-#ifdef _DEVICE_FILLER_
-static sinp_bootstrap *bootstrap[] = {
-
-  // Begin list
-#ifdef ENABLE_FOO
-  &foo_bootstrap,
-#endif
-
-#ifdef ENABLE_X11
-  &x11_bootstrap,
-#endif
-
-#ifdef ENABLE_UNIXSIGNAL
-  &unixsignal_bootstrap,
-#endif
-
-  // Terminate list
-  NULL
-};
-#endif
+// Handler
+void unixsignal_handler(int signum);
 
 /* ******************************************************************** */
 

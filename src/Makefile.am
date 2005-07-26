@@ -1,6 +1,7 @@
 DIST_SUBDIRS = \
 foo \
-x11
+x11 \
+unixsignal
 
 SUBDIRS = @PLATDIRS@
 
