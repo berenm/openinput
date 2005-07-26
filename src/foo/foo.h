@@ -32,10 +32,12 @@ sinp_device *foo_device();
 
 // Device
 sint foo_init(sinp_device *dev, char *window_id, uint flags);
-sint foo_enable(sinp_device *dev, sint on);
 sint foo_destroy(sinp_device *dev);
 void foo_process(sinp_device *dev);
-sint foo_grab(sinp_device *dev, uint mask);
+sint foo_grab(sinp_device *dev, sint on);
+sint foo_hidecursor(sinp_device *dev, sint on);
+sint foo_warp(sinp_device *dev, sint x, sint y);
+sint foo_winsize(sinp_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 

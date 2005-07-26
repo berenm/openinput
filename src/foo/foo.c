@@ -42,7 +42,10 @@ sinp_bootstrap foo_bootstrap = {
 
 // Private data
 typedef struct foo_private {
-  uint grabmask;
+  sint grabstatus;
+  sint cursorstatus;
+  sint x;
+  sint y;
 } foo_private;
 
 /* ******************************************************************** */
@@ -77,15 +80,18 @@ sinp_device *foo_device() {
     return NULL;
   }
 
-  // Set members
+  // Clear structures
   memset(dev, 0, sizeof(sinp_device));
+  memset(priv, 0, sizeof(foo_private));
+
+  // Set members
   dev->init = foo_init;
-  dev->enable = foo_enable;
   dev->destroy = foo_destroy;
   dev->process = foo_process;  
   dev->grab = foo_grab;
   dev->hide = foo_hidecursor;
   dev->warp = foo_warp;
+  dev->winsize = foo_winsize;
   dev->private = priv;
   
   // Done
@@ -97,6 +103,7 @@ sinp_device *foo_device() {
 // Initialize foo
 sint foo_init(sinp_device *dev, char *window_id, uint flags) {
   uint val;
+  foo_private *priv;
 
   debug("foo_init: window '%s', flags %i", window_id, flags);
   
@@ -110,15 +117,13 @@ sint foo_init(sinp_device *dev, char *window_id, uint flags) {
   val = device_windowid(window_id, SINP_I_WINID);
   debug("foo_init: winid (w) parameter %i", val);
 
-  return SINP_ERR_OK;
-}
+  // Set some stupid private values
+  priv = (foo_private*)dev->private;
+  priv->grabstatus = FALSE;
+  priv->cursorstatus = FALSE;
+  priv->x = 0;
+  priv->y = 0;
 
-/* ******************************************************************** */
-
-// Enable foo driver
-sint foo_enable(sinp_device *dev, sint on) {
-  debug("foo_enable to %i", on);
-  
   return SINP_ERR_OK;
 }
 
@@ -161,7 +166,6 @@ void foo_process(sinp_device *dev) {
   ev.key.keysym.scancode = 65;
   ev.key.keysym.sym = SK_A;
   ev.key.keysym.mod = SM_NONE;
-  ev.key.keysym.unicode = 0;
   
   // Post event
   queue_add(&ev);
@@ -170,38 +174,23 @@ void foo_process(sinp_device *dev) {
 /* ******************************************************************** */
 
 // Pump events into event queue
-sint foo_grab(sinp_device *dev, uint mask) {
+sint foo_grab(sinp_device *dev, sint on) {
   foo_private *priv;
-  sint ok;
-
   priv = (foo_private*)dev->private;
-  ok = FALSE;
-  debug("foo_grab");
+  debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
+  priv->grabstatus = on;
 
-  // Toggle
-  if(mask & SINP_PRO_UNKNOWN) {
-    priv->grabmask |= mask;
-    ok = TRUE;
-  }
-  if(!(mask & SINP_PRO_UNKNOWN)) {
-    priv->grabmask = priv->grabmask - (priv->grabmask & mask);
-    ok = TRUE;
-  }
-
-  // Be nice to the user - report errors
-  if(ok) {
-    return SINP_ERR_OK;
-  }
-  else {
-    return SINP_ERR_PARAM;
-  }
+  return SINP_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Show/hide pointer cursor
 sint foo_hidecursor(sinp_device *dev, sint on) {
-  debug("foo_hidecursor: status %i", on);
+  foo_private *priv;
+  priv = (foo_private*)dev->private;
+  debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
+  priv->cursorstatus = on;
   
   return SINP_ERR_OK;
 }
@@ -210,8 +199,27 @@ sint foo_hidecursor(sinp_device *dev, sint on) {
 
 // Warp pointer
 sint foo_warp(sinp_device *dev, sint x, sint y) {
-  debug("foo_warp: warp pointer to %i,%i", x, y);
-  
+  foo_private *priv;
+  priv = (foo_private*)dev->private;
+  debug("foo_warp: warp pointer to %i, %i", x, y);
+  priv->x = x;
+  priv->y = y;
+
+  return SINP_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+// Window size notifier
+sint foo_winsize(sinp_device *dev, sint *w, sint *h) {
+  foo_private *priv;
+  priv = (foo_private*)dev->private;
+  debug("foo_winsize");
+
+  // Just for fun, return the mouse position
+  *w = priv->x;
+  *h = priv->y;
+
   return SINP_ERR_OK;
 }
 
