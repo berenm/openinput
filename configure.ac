@@ -20,11 +20,14 @@ AC_ARG_ENABLE(debug,
 
 dnl Platforms
 AC_ARG_ENABLE(foo,
-   AS_HELP_STRING([--enable-foo], [enable debugging input system (default=yes)]),
-   [], enble_foo=yes)
+   AS_HELP_STRING([--enable-foo], [enable the foo debug input system (default=no)]),
+   [], enble_foo=no)
 AC_ARG_ENABLE(x11,
    AS_HELP_STRING([--enable-x11], [enable X11 window system input (default=yes)]),
    [], enable_x11=yes)
+AC_ARG_ENABLE(unixsignal,
+   AS_HELP_STRING([--enable-unixsignal], [enable UNIX signal handler (default=yes)]),
+   [], enable_unixsignal=yes)
 
 dnl Check for libraries and header files
 AC_CHECK_LIB(pthread, main)
@@ -32,7 +35,7 @@ AC_PATH_X
 AC_PATH_XTRA
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h locale.h malloc.h stddef.h stdlib.h string.h])
+AC_CHECK_HEADERS([limits.h locale.h malloc.h stddef.h stdlib.h string.h signal.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -67,16 +70,25 @@ if test "x$enable_foo" = xyes; then
    AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
    PLATDIRS="$PLATDIRS foo"
    PLATLIBS="$PLATLIBS foo/libfoo.la"
+   TESTPRGS="$TESTPRGS footest"
 fi
 
 if test "x$enable_x11" = xyes; then
    AC_DEFINE([ENABLE_X11], [1], [X11 window system])
    PLATDIRS="$PLATDIRS x11"
    PLATLIBS="$PLATLIBS x11/libx11.la"
+   TESTPRGS="$TESTPRGS x11test"
+fi
+
+if test "x$enable_unixsignal" = xyes; then
+   AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
+   PLATDIRS="$PLATDIRS unixsignal"
+   PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
 fi
 
 AC_SUBST(PLATDIRS)
 AC_SUBST(PLATLIBS)
+AC_SUBST(TESTPRGS)
 
 dnl Makefiles to be generated
 AC_CONFIG_FILES([
@@ -86,6 +98,7 @@ AC_CONFIG_FILES([
 	test/Makefile \
 	src/Makefile \
 	src/x11/Makefile \
+	src/unixsignal/Makefile \
 	src/foo/Makefile])
 
 dnl Finish

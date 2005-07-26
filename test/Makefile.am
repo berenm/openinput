@@ -1,6 +1,8 @@
-noinst_PROGRAMS = \
+EXTRA_PROGRAMS = \
 footest \
 x11test
+
+noinst_PROGRAMS = @TESTPRGS@
 
 footest_SOURCES = \
 footest.c \
