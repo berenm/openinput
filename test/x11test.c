@@ -28,11 +28,38 @@
 
 /* ******************************************************************** */
 
+// Bit toggler
+void toggle(int *i) {
+  if(*i) {
+    *i = 0;
+  }
+  else {
+    *i = 1;    
+  }
+}
+
+/* ******************************************************************** */
+
+// Show some help
+void help() {
+  printf("--- x11test help\n");
+  printf("h => show this test\n");
+  printf("g => toggle grab\n");
+  printf("c => toggle cursor\n");
+  printf("w => warp to 10,10\n");
+  printf("q => quit\n");
+  printf("\n");
+}
+
+/* ******************************************************************** */
+
 // The libsinp test
 void test(Display *d, Window w, uint scrn) {
   int e;
   sinp_event ev;
   char csw[100];
+  int sgrab;
+  int scursor;
 
   // Init sinp
   sprintf(csw, "c:%u s:%u w:%u", (uint)d, (uint)scrn, (uint)w);
@@ -41,14 +68,105 @@ void test(Display *d, Window w, uint scrn) {
   e = sinp_init(csw, 0);
   printf("--- sinp_init, code %i\n\n", e);
 
+  // States
+  sgrab = 0;
+  scursor = 0;
+
+  // Print something
+  help();
+
   // Try to fetch an event
-  while(1) {
+  e = 1;
+  while(e) {
     sinp_events_wait(&ev);
-    printf("--- event type %i\n\n", ev.type);
 
     // Quit
     if(ev.type == SINP_QUIT) {
-      break;
+      e = 0;
+    }
+
+    // Mouse button up
+    else if((ev.type == SINP_MOUSEBUTTONUP) ||
+	    (ev.type == SINP_MOUSEBUTTONDOWN)) {
+      printf("--- mouse button state %i at position %i,%i\n",
+	     ev.button.state, ev.button.x, ev.button.y);
+    }
+    
+    // Mouse move
+    else if(ev.type == SINP_MOUSEMOVE) {
+      printf("--- mouse move  abs:%i,%i \t rel:%i,%i\n",
+	     ev.move.x, ev.move.y,
+	     ev.move.relx, ev.move.rely);
+    }
+
+    // Key down
+    else if(ev.type == SINP_KEYDOWN) {
+      printf("--- key release -> %i:'%s'\n", ev.key.keysym.sym,
+	     sinp_key_getname(ev.key.keysym.sym));
+    }
+    
+    // Key up
+    else if(ev.type == SINP_KEYUP) {
+      printf("--- key release -> %i:'%s'\n", ev.key.keysym.sym,
+	     sinp_key_getname(ev.key.keysym.sym));
+
+      switch(ev.key.keysym.sym) {
+      case SK_H:
+	// Help
+	help();
+	break;
+
+      case SK_G:
+	// Grab
+	toggle(&sgrab);
+	sinp_app_grab(sgrab);
+	break;
+
+      case SK_C:
+	// Cursor
+	toggle(&scursor);
+	sinp_app_cursor(scursor);
+	break;
+	
+      case SK_W:
+	// Warp
+	sinp_mouse_warp(10, 10);
+	break;
+
+      case SK_Q:
+	// Quit
+	e = 0;
+	break;
+
+      default:
+	// Other
+	break;
+      }
+    }
+
+    // Other event
+    else {
+      switch(ev.type) {
+      case SINP_ACTIVE:
+	printf("--- active event\n");
+	break;
+
+      case SINP_RESIZE:
+	printf("--- resize event\n");
+	break;
+
+      case SINP_EXPOSE:
+	printf("--- expose event\n");
+	break;
+
+      case SINP_DISCOVERY:
+	printf("--- discovery event\n");
+	break;
+
+      default:
+	printf("--- unhandled event type %i\n", ev.type);
+	break;
+      }
     }
   }
 
