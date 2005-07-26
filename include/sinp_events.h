@@ -92,7 +92,7 @@ typedef struct sinp_expose_event {
 } sinp_expose_event;
 
 // Quit event
-typedef struct sinp_quit {
+typedef struct sinp_quit_event {
   uchar type;               // SINP_QUIT
 } sinp_quit_event;
 
