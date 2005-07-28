@@ -9,18 +9,11 @@ correct/shorten variable types
 - document the types and common variables
 
 extensive x11 testing
-- wait
-- poll
-- grab
-- warp
 - cursor hide/show
-- etc.
-- fullscreen aux window whack-hack needed? (ogre fullscreen bug)
 
 ogre integration
-- fullscreen bug (bug reported by discipline at ogre forums)
-- windows mode?
 - write small howto (the glxwindowinterface)
+- speed optimization? poll/wait is slow?
 
 action-binding system
 - event based
@@ -34,6 +27,9 @@ joystick support
 - state manager
 
 other-wierd-kind-of-input-device-support
+- tablets
+- touchscreen
+- 3d pointer devices
 
 automake/autoconf issues
 - src/x11/Makefile.am:11: variable `X_LIBS_EXTRA' not defined
