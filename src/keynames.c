@@ -37,7 +37,7 @@ sint keyboard_fillnames(char **kn) {
   kn[SK_CLEAR] =        "clear";
   kn[SK_RETURN] =       "return";
   kn[SK_PAUSE] =        "pause";
-  kn[SK_ESCAPE] =       "escape";
+  kn[SK_ESC] =          "escape";
   kn[SK_SPACE] =        "space";
   kn[SK_EXCLAIM] =      "exclaim";
   kn[SK_QUOTEDBL] =     "dblquote";

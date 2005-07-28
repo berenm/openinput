@@ -43,7 +43,7 @@ typedef enum {
   SK_CLEAR		= 12,
   SK_RETURN		= 13,
   SK_PAUSE		= 19,
-  SK_ESCAPE		= 27,
+  SK_ESC	        = 27,
   SK_SPACE		= 32,
   SK_EXCLAIM		= 33,
   SK_QUOTEDBL		= 34,

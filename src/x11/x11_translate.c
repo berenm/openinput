@@ -62,7 +62,7 @@ void x11_initkeymap() {
   x11_miscmap[XK_Clear & 0xFF]        = SK_CLEAR;
   x11_miscmap[XK_Return & 0xFF]       = SK_RETURN;
   x11_miscmap[XK_Pause & 0xFF]        = SK_PAUSE;
-  x11_miscmap[XK_Escape & 0xFF]       = SK_ESCAPE;
+  x11_miscmap[XK_Escape & 0xFF]       = SK_ESC;
   x11_miscmap[XK_Delete & 0xFF]       = SK_DELETE;
   
   x11_miscmap[XK_KP_0 & 0xFF]         = SK_N_0;
