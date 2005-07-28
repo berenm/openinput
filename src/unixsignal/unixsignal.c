@@ -133,6 +133,9 @@ void unixsignal_process(sinp_device *dev) {
     return;
   }
 
+  // Don't forget to clear the flag
+  pendingsignal = FALSE;
+
   // A signal, send quit event
   ev.type = SINP_QUIT;
   queue_add(&ev);
