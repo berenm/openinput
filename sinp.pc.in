@@ -6,5 +6,5 @@ includedir=@includedir@
 Name: libsinp
 Description: Simple input handler library.
 Version: @VERSION@
-Libs: -L${libdir}
+Libs: -L${libdir} -lsinp
 Cflags: -I${includedir}/@PACKAGE@
