@@ -71,10 +71,11 @@ sint provides;
   A bitmask of SINP_PRO_* bits that describes what the device
   provides.
 
-sint (*avail)();
+sint (*avail)(unsigned int flags);
   Function pointer to the function that checks whether the device is
   present on the system (ie. can be initialized and used). The return
-  result is either true (1) or false (0).
+  result is either true (1) or false (0). The flags paramater is the
+  same as delivered to device->init functions (ie. user-supplied).
 
 sinp_device *(*create)();
   Function pointer that returns the 'device' structure. This function

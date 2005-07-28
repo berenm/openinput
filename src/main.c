@@ -46,7 +46,7 @@ sint sinp_init(char *window_id, uint flags) {
   queue_init();
 
   // Bootstrap all devices
-  device_bootstrap();
+  device_bootstrap(flags);
 
   // Parse all devices
   e = 0;

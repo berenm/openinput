@@ -12,6 +12,12 @@ ogre integration
 - write small howto (the glxwindowinterface)
 - speed optimization? poll/wait is slow?
 
+x11
+- handle repeating keys correctly
+
+queue
+- handle repeating keys correctly
+
 action-binding system
 - event based
 - state manager

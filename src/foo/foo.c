@@ -51,7 +51,7 @@ typedef struct foo_private {
 /* ******************************************************************** */
  
 // Check availablity of foo
-sint foo_avail() {
+sint foo_avail(uint flags) {
   debug("foo_avail");
 
   return TRUE;

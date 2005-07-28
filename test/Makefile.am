@@ -2,21 +2,21 @@ EXTRA_PROGRAMS = \
 footest \
 x11test
 
-noinst_PROGRAMS = @TESTPRGS@
+noinst_PROGRAMS = \
+keynametest \
+@TESTPRGS@
 
 footest_SOURCES = \
-footest.c \
-footest.h
-
-footest_LDADD = \
-$(top_srcdir)/src/libsinp.la
+footest.c
 
 x11test_SOURCES = \
 x11test.c
 
-x11test_LDADD = \
+keynametest_SOURCES = \
+keynametest.c
+
+LDADD = \
 $(top_srcdir)/src/libsinp.la
 
-# Extra
 INCLUDES = \
 -I$(top_srcdir)/include

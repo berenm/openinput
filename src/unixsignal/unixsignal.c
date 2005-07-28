@@ -47,7 +47,7 @@ static int pendingsignal;
 /* ******************************************************************** */
  
 // Check availablity of UNIX ;)
-sint unixsignal_avail() {
+sint unixsignal_avail(uint flags) {
   debug("unixsignal_avail");
 
   return TRUE;

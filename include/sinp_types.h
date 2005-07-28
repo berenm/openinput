@@ -124,6 +124,9 @@ typedef enum {
 #define SINP_FOCUS_INPUT          2 // Window has keyboard (input) focus
 #define SINP_FOCUS_VISIBLE        4 // Window is visible
 
+// Initialization flags for sinp_init
+#define SINP_FLAG_NOWINDOW        1 // Do not hook into window
+
 // Error codes
 #define SINP_ERR_OK               0 // All ok
 #define SINP_ERR_NO_DEVICE        1 // Wrong device

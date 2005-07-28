@@ -85,7 +85,7 @@ sint device_register(sinp_bootstrap *boot) {
 /* ******************************************************************** */
 
 // Bootstrap devices using the bootstrap table
-void device_bootstrap() {
+void device_bootstrap(uint flags) {
   int i;
   int j;
 
@@ -104,7 +104,7 @@ void device_bootstrap() {
     // If available, register
     if(bootstrap[i] && bootstrap[i]->avail && bootstrap[i]->create &&
        bootstrap[i]->name && bootstrap[i]->desc) {
-      if(bootstrap[i]->avail()) {
+      if(bootstrap[i]->avail(flags)) {
 	device_register(bootstrap[i]);      
       }
     }

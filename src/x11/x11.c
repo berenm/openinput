@@ -45,10 +45,15 @@ sinp_bootstrap x11_bootstrap = {
 /* ******************************************************************** */
  
 // Bootstrap: Check availablity of X11
-sint x11_avail() {
+sint x11_avail(uint flags) {
   Display *disp;
 
   debug("x11_avail");
+
+  // Check flags
+  if(flags & SINP_FLAG_NOWINDOW) {
+    return FALSE;
+  }
 
   // Check for X11 existence
   disp = XOpenDisplay(NULL);

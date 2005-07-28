@@ -24,6 +24,7 @@
 // Includes
 #include "config.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "sinp.h"
 #include "internal.h"
@@ -31,8 +32,10 @@
 // Globals
 static sinp_device *keydev;
 static uchar keystate[SK_LAST];
-static char *keynames[SK_LAST];
 static uint modstate;
+
+// Conversion key->name
+static char *keynames[SK_LAST];
 
 // Key repeat
 struct {
@@ -54,6 +57,12 @@ sint keyboard_init() {
   memset(keynames, 0, sizeof(keynames)/sizeof(keynames[0]));
   modstate = SM_NONE;
 
+  // Disable key-repeat
+  sinp_key_repeat(0, 0);
+
+  // Fill keyboard names
+  keyboard_fillnames(keynames);
+
   // Find default/first mouse device
   i = 1;
   while((keydev = device_get(i)) != NULL) {
@@ -69,12 +78,6 @@ sint keyboard_init() {
   }
 
   debug("keyboard_init: keyboard device is '%s'", keydev->name);
-
-  // Disable key-repeat
-  sinp_key_repeat(0, 0);
-
-  // Fill keyboard names
-  keyboard_fillnames(keynames);
 
   return SINP_ERR_OK;
 }
@@ -316,11 +319,121 @@ char *sinp_key_getname(sinp_key key) {
   char *name;
 
   name = NULL;
+
   if(key < SK_LAST) {
     name = keynames[key];
   }
 
   return name;
+}
+
+/* ******************************************************************** */
+
+// Byte-for-byte keycode-keyname check (internal)
+inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last) {
+  sinp_key k;
+
+  for(k=first; k<=last; k++) {
+    if(strcmp(name, sinp_key_getname(k)) == 0) {
+      return k;
+    }
+  }
+  return SK_UNKNOWN;
+}
+
+/* ******************************************************************** */
+
+// Return key for name (public)
+sinp_key sinp_key_getkey(char *name) {
+  int i;
+  sinp_key k;
+
+  // Dummies
+  if(!name) {
+    return SK_UNKNOWN;
+  }
+  if((strlen(name) < 1) || (strlen(name) > SINP_MAX_KEYLENGTH)) {
+    return SK_UNKNOWN;
+  }
+  if(strcmp(name, "unknown") == 0) {
+    return SK_UNKNOWN;
+  }
+
+  // Just to be sure...
+  k = SK_UNKNOWN;
+
+  // Letter or digit
+  if(strlen(name) == 1) {
+    if((name[0] >= 'a') && (name[0] <= 'z')) {
+      return SK_A + (name[0]-'a');
+    }
+    if((name[0] >= '0') && (name[0] <= '9')) {
+      return SK_0 + (name[0]-'0');
+    }
+
+    return SK_UNKNOWN;
+  }
+
+  // Function keys (only these and 'f' starts with 'f')
+  if(name[0] == 'f') {
+    i = atoi(name+1);
+    if((i>=1) && (i<=15)) {
+      return SK_F1 + i - 1;
+    }
+    
+    return SK_UNKNOWN;
+  }
+
+  // International
+  if(strncmp(name, "int", 3) == 0) {
+    i = atoi(name+3);
+    if((i>=0) && (i<=95)) {
+      return SK_INT_0 + i;
+    }
+    
+    return SK_UNKNOWN;
+  }
+
+  // Numeric keypad non-numbers (num_period -> num_equals)
+  if((k = keyboard_scangetkey(name, SK_N_PERIOD, SK_N_EQUALS)) != SK_UNKNOWN) {
+    return k;
+  }
+
+  // Numeric keypad numbers
+  if(strncmp(name, "num_", 4) == 0) {
+    i = atoi(name+4);
+    if((i>=0) && (i<=9)) {
+      return SK_N_0 + i;
+    }
+  }
+
+  // Backspace -> Slash
+  if((k = keyboard_scangetkey(name, SK_BACKSPACE, SK_SLASH)) != SK_UNKNOWN) {
+    return k;
+  }
+
+  // Colon -> Backquote
+  if((k = keyboard_scangetkey(name, SK_COLON, SK_BACKQUOTE)) != SK_UNKNOWN) {
+    return k;
+  }
+
+  // Delete
+  if(strcmp(name, "delete") == 0) {
+    return SK_DELETE;
+  }
+
+  // Up -> pagedown
+  if((k = keyboard_scangetkey(name, SK_UP, SK_PAGEDOWN)) != SK_UNKNOWN) {
+    return k;
+  }
+
+  // Numlock -> undo
+  if((k = keyboard_scangetkey(name, SK_NUMLOCK, SK_UNDO)) != SK_UNKNOWN) {
+    return k;
+  }
+
+  // No more keys left
+  return SK_UNKNOWN;
 }
 
 /* ******************************************************************** */

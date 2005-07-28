@@ -81,6 +81,9 @@ uint sinp_key_modstate();
 // Get name of key (string)
 char *sinp_key_getname(sinp_key key);
 
+// Get key code given name (string)
+sinp_key sinp_key_getkey(char *name);
+
 /* ********************************************************************
  * Mouse functions
  ******************************************************************** */

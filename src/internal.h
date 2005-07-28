@@ -63,7 +63,7 @@ typedef struct sinp_bootstrap {
   char *name;                                                          // Short device name
   char *desc;                                                          // Device description
   sint provides;                                                       // Device provide-flag
-  sint (*avail)();                                                     // Is device available?
+  sint (*avail)(uint flags);                                           // Is device available?
   struct sinp_device *(*create)();                                     // Return device structure
 } sinp_bootstrap;
 
@@ -71,7 +71,7 @@ typedef struct sinp_bootstrap {
 
 // Device handling
 sint device_register(struct sinp_bootstrap *boot);
-void device_bootstrap();
+void device_bootstrap(uint flags);
 sint device_init(sint index, char *window_id, uint flags);
 sinp_device *device_get(sint index);
 inline void device_pumpall();
@@ -102,6 +102,7 @@ sint keyboard_fillnames(char **kn);
 void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev);
 void keyboard_dorepeat();
 void keyboard_setmodifier(uint newmod);
+inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last);
 
 /* ******************************************************************** */
 
@@ -124,6 +125,7 @@ void debug(char *format, ...);
 #define SINP_MAX_DEVICES 64
 #define SINP_MAX_EVENTS 128
 #define SINP_SLEEP 10
+#define SINP_MAX_KEYLENGTH 20
 
 /* ******************************************************************** */
 

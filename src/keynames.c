@@ -30,6 +30,12 @@
 
 // Fill keyboard names
 sint keyboard_fillnames(char **kn) {
+  int i;
+
+  // Fill all with the unknown key
+  for(i=SK_FIRST; i<SK_LAST; i++) {
+    kn[i] = "unknown";
+  }
 
   // Regulars
   kn[SK_BACKSPACE] =    "backspace";
@@ -98,7 +104,7 @@ sint keyboard_fillnames(char **kn) {
   kn[SK_T] =            "t";
   kn[SK_U] =            "u";
   kn[SK_V] =            "v";
-  kn[SK_W] =            "x";
+  kn[SK_W] =            "w";
   kn[SK_X] =            "x";
   kn[SK_Y] =            "y";
   kn[SK_Z] =            "z";
