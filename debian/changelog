@@ -1,3 +1,9 @@
+libsinp (0.0.0.svn42-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Fri, 29 Jul 2005 01:52:04 +0200
+
 libsinp (0.0.0.svn29-3) unstable; urgency=low
 
   * Added running bootstrap to the debian/rules file, as well as new upstream
