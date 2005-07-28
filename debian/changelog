@@ -1,3 +1,10 @@
+libsinp (0.0.0.svn29-3) unstable; urgency=low
+
+  * Added running bootstrap to the debian/rules file, as well as new upstream
+    version
+
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Thu, 28 Jul 2005 23:55:11 +0200
+
 libsinp (0.0.0.svn20-2) unstable; urgency=low
 
   * Added Build dependencies and generally cleaned up in lintian errors.
