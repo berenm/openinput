@@ -95,6 +95,7 @@ sinp_device *x11_device() {
   dev->destroy = x11_destroy;
   dev->process = x11_process;  
   dev->grab = x11_grab;
+  dev->hide = x11_hidecursor;
   dev->warp = x11_warp;
   dev->winsize = x11_winsize;
   
@@ -304,16 +305,29 @@ sint x11_fatal(Display *d) {
 
 // Make 'empty' mouse cursor
 Cursor x11_mkcursor(Display *d, Window w) {
-  char bitmap[] = {0};
   Pixmap pixmap;
   XColor color;
+  Colormap colmap;
   Cursor cursor;
   
-  pixmap = XCreateBitmapFromData(d, w, bitmap, 1, 1);
+  // Make 1x1 pixmap
+  pixmap = XCreatePixmap(d, DefaultRootWindow(d), 1, 1, 1);
+  
+  // Get the color black
+  colmap = XCreateColormap(d, DefaultScreen(d),
+			   DefaultVisual(d, DefaultScreen(d)),
+			   AllocNone);
+  XParseColor(d, colmap, "black", &color);
+  
+  // Create the cursor
   cursor = XCreatePixmapCursor(d, pixmap, pixmap,
-			       &color, &color, 0, 0);
-  XFreePixmap(d, pixmap);
+			 &color, &color, 1, 1);
 
+  // Free and sync
+  XFreePixmap(d, pixmap);
+  XFreeColormap(d, colmap);
+  XSync(d, False);
+  
   return cursor;
 }
 

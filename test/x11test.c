@@ -69,8 +69,8 @@ void test(Display *d, Window w, uint scrn) {
   printf("--- sinp_init, code %i\n\n", e);
 
   // States
-  sgrab = 0;
-  scursor = 0;
+  sgrab = 1;
+  scursor = 1;
 
   // Print something
   help();
@@ -101,7 +101,7 @@ void test(Display *d, Window w, uint scrn) {
 
     // Key down
     else if(ev.type == SINP_KEYDOWN) {
-      printf("--- key release -> %i:'%s'\n", ev.key.keysym.sym,
+      printf("--- key pressed -> %i:'%s'\n", ev.key.keysym.sym,
 	     sinp_key_getname(ev.key.keysym.sym));
     }
     
@@ -120,17 +120,24 @@ void test(Display *d, Window w, uint scrn) {
 	// Grab
 	toggle(&sgrab);
 	sinp_app_grab(sgrab);
+	printf("*** grab state %i\n", sgrab);
 	break;
 
       case SK_C:
 	// Cursor
 	toggle(&scursor);
-	sinp_app_cursor(scursor);
+	if(scursor) {
+	  sinp_app_cursor(SINP_ENABLE);
+	} else {
+	  sinp_app_cursor(SINP_DISABLE);
+	}
+	printf("*** cursor state %i\n", scursor);
 	break;
 	
       case SK_W:
 	// Warp
 	sinp_mouse_warp(10, 10);
+     	printf("*** warped\n");
 	break;
 
       case SK_Q:

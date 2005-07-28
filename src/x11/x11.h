@@ -51,7 +51,6 @@ inline sint x11_pending(Display *d);
 inline void x11_dispatch(sinp_device *dev, Display *d);
 inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
 				  KeyCode kc, sinp_keysym *keysym);
-
 void x11_initkeymap();
 void x11_keystate(sinp_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, sinp_device *dev);
@@ -62,7 +61,7 @@ void x11_modmasks(Display *d, sinp_device *dev);
 typedef struct x11_private {
   Display *disp;         // Display
   Window win;            // Window we hook into
-  Screen *screen;        // Screen (unused)
+  Screen *screen;        // Screen (unused at the moment)
   Cursor cursor;         // The invisible cursor
   Atom wm_delete_window; // Close-window protocol atom
   uint mask_lmeta;       // Variable mask for key

@@ -8,9 +8,6 @@ correct/shorten variable types
 - masks -> uint
 - document the types and common variables
 
-extensive x11 testing
-- cursor hide/show
-
 ogre integration
 - write small howto (the glxwindowinterface)
 - speed optimization? poll/wait is slow?

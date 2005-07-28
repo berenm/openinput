@@ -157,7 +157,7 @@ sint sinp_app_focus() {
 // Show/hide cursor (public)
 sinp_bool sinp_app_cursor(sinp_bool q) {
   int hide;
-  
+
   switch(q) {
   case SINP_ENABLE:
     hide = FALSE;
