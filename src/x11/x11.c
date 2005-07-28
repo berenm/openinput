@@ -197,6 +197,11 @@ sint x11_grab(sinp_device *dev, sint on) {
   debug("x11_grab: state:%i", on);
 
   if(on) {
+    // Raise window and focus it
+    XRaiseWindow(priv->disp, priv->win);
+    XSetInputFocus(priv->disp, priv->win, RevertToParent, CurrentTime);
+
+    // Grab input
     XGrabKeyboard(priv->disp, priv->win, TRUE,
 		  GrabModeAsync, GrabModeAsync, CurrentTime);
     

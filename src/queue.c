@@ -101,6 +101,7 @@ sint queue_add(sinp_event *evt) {
 
 // Cut out an event from the queue (internal)
 sint queue_cut(ushort where) {
+
   // Cut head
   if(where == queue.head) {
     // Simply increase head

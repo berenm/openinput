@@ -60,17 +60,17 @@ void x11_modmasks(Display *d, sinp_device *dev);
 
 // Private data structure
 typedef struct x11_private {
-  Display *disp;
-  Window win;
-  Screen *screen;
-  Cursor cursor;
-  Atom wm_delete_window;
-  uint mask_lmeta;
-  uint mask_rmeta;
-  uint mask_lalt;
-  uint mask_ralt;
-  uint mask_num;
-  uint mask_altgr;
+  Display *disp;         // Display
+  Window win;            // Window we hook into
+  Screen *screen;        // Screen (unused)
+  Cursor cursor;         // The invisible cursor
+  Atom wm_delete_window; // Close-window protocol atom
+  uint mask_lmeta;       // Variable mask for key
+  uint mask_rmeta;       // Variable mask for key
+  uint mask_lalt;        // Variable mask for key
+  uint mask_ralt;        // Variable mask for key
+  uint mask_num;         // Variable mask for key
+  uint mask_altgr;       // Variable mask for key
 } x11_private;
 
 /* ******************************************************************** */

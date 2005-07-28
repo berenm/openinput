@@ -102,7 +102,7 @@ sint sinp_events_poll(sinp_event *evt) {
   sinp_events_pump();
 
   // Peep for 1 event with removal
-  found = queue_peep(evt, TRUE, ~event_mask, TRUE);
+  found = queue_peep(evt, 1, ~event_mask, TRUE);
 
   return found;
 }
@@ -119,7 +119,7 @@ void sinp_events_wait(sinp_event *evt) {
     // Pump and read
     sinp_events_pump();
 
-    found = queue_peep(evt, TRUE, ~event_mask, TRUE);
+    found = queue_peep(evt, 1, ~event_mask, TRUE);
     usleep(SINP_SLEEP);
   }
 }
