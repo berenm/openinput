@@ -134,6 +134,7 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
 
   // Initialize blank-cursor, keymapper table, modifier mask and key state
   priv->cursor = x11_mkcursor(priv->disp, priv->win);
+  priv->relative = 0;
   x11_initkeymap();
   x11_modmasks(priv->disp, dev);
   x11_keystate(dev, priv->disp, NULL);
@@ -142,7 +143,7 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
   XSelectInput(priv->disp, priv->win, FocusChangeMask | KeyPressMask |
 	       KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
 	       KeymapStateMask | ButtonPressMask | ButtonReleaseMask |
-	       PointerMotionMask);
+	       PointerMotionMask | EnterWindowMask | LeaveWindowMask );
 
   // Get "close window" window manager protocol atom
   priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
@@ -222,11 +223,17 @@ sint x11_grab(sinp_device *dev, sint on) {
       }
       usleep(SINP_SLEEP);
     }
+
+    // Set flag for possible relative mouse
+    priv->relative |= SX11_GRAB;
   }
   else {
     // Simply ungrab both
     XUngrabKeyboard(priv->disp, CurrentTime);
     XUngrabPointer(priv->disp, CurrentTime);
+
+    // Fix relative mouse motion
+    priv->relative &= ~SX11_GRAB;
   }
 
   return SINP_ERR_OK;
@@ -244,11 +251,13 @@ sint x11_hidecursor(sinp_device *dev, sint on) {
   // Hide - set blank cursor
   if(on) {
     XDefineCursor(priv->disp, priv->win, priv->cursor);
+    priv->relative |= SX11_HIDE;
   }
 
   // Show - set default cursor
   else {
     XDefineCursor(priv->disp, priv->win, None);
+    priv->relative &= ~SX11_HIDE;
   }
 
   return SINP_ERR_OK;
@@ -282,6 +291,8 @@ sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
 
   *w = attr.width;
   *h = attr.height;
+  priv->width = *w;
+  priv->height = *h;
 
   debug("x11_winsize: width:%i height:%i", *w, *h);
   

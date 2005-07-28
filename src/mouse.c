@@ -83,7 +83,7 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   ry = y;
   if(relative) {
     x = crd_x + x;
-    y = crd_y = y;
+    y = crd_y + y;
   }
 
   // Check absolute position of mouse wrt. window size
@@ -116,8 +116,8 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   // Ok, everything calculated - set global state
   crd_x = nx;
   crd_y = ny;
-  rel_x = rx;
-  rel_y = ry;
+  rel_x += rx;
+  rel_y += ry;
 
   //FIXME some platforms may need manual pushing of cursor
   

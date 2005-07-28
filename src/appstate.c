@@ -185,6 +185,14 @@ sinp_bool sinp_app_cursor(sinp_bool q) {
       if(dev->hide) {
 	dev->hide(dev, hide);
       }
+
+      // When unhiding, warp the mouse due to fudge
+      if(!hide && dev->warp) {
+	sint x;
+	sint y;
+	sinp_mouse_absolute(&x, &y);
+	dev->warp(dev, x, y);
+      }
       i++;
     }
   }

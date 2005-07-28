@@ -33,6 +33,63 @@
 
 /* ******************************************************************** */
 
+// Relative mouse motion (grabbed and hidden)
+inline void x11_relative_mouse(sinp_device *dev, XEvent *xev) {
+  x11_private *priv;
+  int deltax;
+  int deltay;
+  int i;
+
+  priv = (x11_private*)dev->private;
+
+  // Calculate motion and store current positon
+  deltax = xev->xmotion.x - priv->lastx;
+  deltay = xev->xmotion.y - priv->lasty;
+  priv->lastx = xev->xmotion.x;
+  priv->lasty = xev->xmotion.y;
+
+  // Post it
+  mouse_move(deltax, deltay, TRUE, dev->index);
+
+  // Only warp mouse if we're near the edge of the window
+  if((xev->xmotion.x < SX11_FUDGE) ||
+     (xev->xmotion.x > (priv->width - SX11_FUDGE)) ||
+     (xev->xmotion.y < SX11_FUDGE) ||
+     (xev->xmotion.y > (priv->height - SX11_FUDGE))) {
+
+    // Apply the SDL optimization: Events may have accumulated
+    while(XCheckTypedEvent(priv->disp, MotionNotify, xev)) {
+      // Treat as normal movement like above
+      deltax = xev->xmotion.x - priv->lastx;
+      deltay = xev->xmotion.y - priv->lasty;
+      priv->lastx = xev->xmotion.x;
+      priv->lasty = xev->xmotion.y;
+
+      // Post it
+      mouse_move(deltax, deltay, TRUE, dev->index);
+    }
+
+    // Center (warp) mouse
+    priv->lastx = priv->width / 2;
+    priv->lasty = priv->height / 2;
+    XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0,
+		 priv->lastx, priv->lasty);
+
+    // Remove warp-generated motion events
+    for ( i=0; i<10; ++i ) {
+      XMaskEvent(priv->disp, PointerMotionMask, xev);
+      if((xev->xmotion.x > (priv->lastx - SX11_FUDGE)) &&
+	 (xev->xmotion.x < (priv->lastx + SX11_FUDGE)) &&
+	 (xev->xmotion.y > (priv->lasty - SX11_FUDGE)) &&
+	 (xev->xmotion.y < (priv->lasty + SX11_FUDGE))) {
+	break;
+      }
+    }
+  }
+}
+
+/* ******************************************************************** */
+
 // Check for pending events without going into a long-time blocking call
 inline sint x11_pending(Display *d) {
   // Flush to pump the X pipeline
@@ -112,15 +169,21 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Generated on EnterWindow and FocusIn
   case KeymapNotify:
     debug("x11_dispatch: keymap_notify");
-    //FIXME handle full reset of keystate/modstate
+    // Do a full reset of keystate/modstates
+    x11_keystate(dev, d, xev.xkeymap.key_vector);
     break;
-
 
     // Mouse motion
   case MotionNotify:
     debug("x11_dispatch: motion_notify");
-    //FIXME handle relative mouse movement
-    mouse_move(xev.xmotion.x, xev.xmotion.y, FALSE, dev->index);
+    // Mouse grabbed and hidden, using relative motion
+    if(((x11_private*)dev->private)->relative == (SX11_GRAB | SX11_HIDE)) {
+      x11_relative_mouse(dev, &xev);
+    }
+    else {
+      mouse_move(xev.xmotion.x, xev.xmotion.y, FALSE, dev->index);
+    }
+
     break;
 
 
@@ -175,6 +238,8 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
   case ConfigureNotify:
     debug("x11_dispatch: configure_notify");
     appstate_resize(xev.xconfigure.width, xev.xconfigure.height, dev->index);		    
+    ((x11_private*)dev->private)->width = xev.xconfigure.width;
+    ((x11_private*)dev->private)->height = xev.xconfigure.height;
     break;
     
 

@@ -12,7 +12,6 @@ libsinp_la_DEPENDENCIES = @PLATLIBS@
 libsinp_la_LIBADD = @PLATLIBS@
 
 libsinp_la_SOURCES = \
-device.h \
 bootstrap.h \
 internal.h \
 main.c \

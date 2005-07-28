@@ -47,6 +47,7 @@ void help() {
   printf("g => toggle grab\n");
   printf("c => toggle cursor\n");
   printf("w => warp to 10,10\n");
+  printf("m => print mouse state\n");
   printf("q => quit\n");
   printf("\n");
 }
@@ -134,6 +135,17 @@ void test(Display *d, Window w, uint scrn) {
 	printf("*** cursor state %i\n", scursor);
 	break;
 	
+      case SK_M:
+	// Print mouse state
+	{
+	  int x,y;
+	  sinp_mouse_absolute(&x, &y);
+	  printf("*** mouse absolute: %i,%i\n", x, y);
+	  sinp_mouse_relative(&x, &y);
+	  printf("*** mouse relative: %i,%i\n", x, y);
+	}
+	break;
+
       case SK_W:
 	// Warp
 	sinp_mouse_warp(10, 10);

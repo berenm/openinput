@@ -54,6 +54,7 @@ inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
 void x11_initkeymap();
 void x11_keystate(sinp_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, sinp_device *dev);
+inline void x11_relative_mouse(sinp_device *dev, XEvent *xev);
 
 /* ******************************************************************** */
 
@@ -70,7 +71,21 @@ typedef struct x11_private {
   uint mask_ralt;        // Variable mask for key
   uint mask_num;         // Variable mask for key
   uint mask_altgr;       // Variable mask for key
+  uchar relative;        // Relative mouse motion
+  int lastx;             // Last mouse x positon
+  int lasty;             // Last mouse y position
+  int width;             // Window width
+  int height;            // Window height
 } x11_private;
+
+/* ******************************************************************** */
+
+// Grabbed/hidden state - used in private->relative
+#define SX11_GRAB 1
+#define SX11_HIDE 2
+
+// The SDL fudge factor optimization
+#define SX11_FUDGE 8
 
 /* ******************************************************************** */
 
