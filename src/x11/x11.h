@@ -55,6 +55,7 @@ void x11_initkeymap();
 void x11_keystate(sinp_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, sinp_device *dev);
 inline void x11_relative_mouse(sinp_device *dev, XEvent *xev);
+inline schar x11_keyrepeat(Display *d, XEvent *evt);
 
 /* ******************************************************************** */
 
@@ -86,6 +87,9 @@ typedef struct x11_private {
 
 // The SDL fudge factor optimization
 #define SX11_FUDGE 8
+
+// Repeat key threshold
+#define SX11_REP_THRESHOLD 2
 
 /* ******************************************************************** */
 

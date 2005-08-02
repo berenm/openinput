@@ -218,16 +218,19 @@ inline void action_process(sinp_event *evt) {
 
     i = evt->button.button;
 
-    // Mouse wheel is discrete only on the down-click
-    if((((i == SP_WHEEL_UP) && (action_mouse[i] != 0)) ||
-	((i == SP_WHEEL_DOWN) && (action_mouse[i] != 0))) &&
-       (evt->type == SINP_MOUSEBUTTONDOWN)) {
+    // Mouse wheel is discrete
+    if(((i == SP_WHEEL_UP) && (action_mouse[i] != 0)) ||
+       ((i == SP_WHEEL_DOWN) && (action_mouse[i] != 0))) {
 
-      act.action.device = evt->button.device;
-      act.action.actionid = action_mouse[i];
-      act.action.state = TRUE;
+      // Only trigger on the down-event
+      if(evt->type == SINP_MOUSEBUTTONDOWN) {
 
-      debug("action_process: %u (mouse wheel)", act.action.actionid);
+	act.action.device = evt->button.device;
+	act.action.actionid = action_mouse[i];
+	act.action.state = TRUE;
+	
+	debug("action_process: %u (mouse wheel)", act.action.actionid);
+      }
     }
 
     // Standard trigger check

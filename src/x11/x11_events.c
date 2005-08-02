@@ -123,6 +123,32 @@ inline sint x11_pending(Display *d) {
 
 /* ******************************************************************** */
 
+// Cancel repeated keys (lifted from SDL who lifted it from GGI - thanks!)
+inline schar x11_keyrepeat(Display *d, XEvent *evt) {
+  XEvent pev;
+  schar rep;
+
+  rep = FALSE;
+
+  if(XPending(d)) {
+    XPeekEvent(d, &pev);
+
+    // Same key down within threshold
+    if((pev.type == KeyPress) &&
+       (pev.xkey.keycode == evt->xkey.keycode) &&
+       ((pev.xkey.time - evt->xkey.time) < SX11_REP_THRESHOLD)) {
+
+      debug("x11_keyrepeat: repeating key detected");
+      rep = 1;
+      XNextEvent(d, &pev);
+    }
+  }
+  
+  return(rep);
+}
+
+/* ******************************************************************** */
+
 // Dispatch a pending X11 event into the sinp event queue
 inline void x11_dispatch(sinp_device *dev, Display *d) {
   XEvent xev;
@@ -137,7 +163,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Mouse enters/leaves window
   case EnterNotify:
   case LeaveNotify:
-    debug("x11_dispatch: enter/leave_notify");
+    debug("x11_dispatch: enter/leave_notify (in/down:%i)", xev.type == EnterNotify);
     
     // We're not interested in grab mode events
     if((xev.xcrossing.mode != NotifyGrab) &&
@@ -159,7 +185,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Input focus gained/lost
   case FocusIn:
   case FocusOut:
-    debug("x11_dispatch: focus_in/out");
+    debug("x11_dispatch: focus_in/out (in/down:%i)", xev.type == FocusIn);
     appstate_focus(SINP_FOCUS_INPUT,
 		   xev.type == FocusIn,
 		   dev->index);
@@ -190,7 +216,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Mouse button pressed
   case ButtonPress:
   case ButtonRelease:
-    debug("x11_dispatch: button_press/release");
+    debug("x11_dispatch: button_press/release (in/down:%i)", xev.type == ButtonPress);
     mouse_button(xev.xbutton.button,
 		 xev.type == ButtonPress,
 		 dev->index);
@@ -200,23 +226,25 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Keyboard pressed
   case KeyPress:
   case KeyRelease:
-    debug("x11_dispatch: key_press/release");
+    debug("x11_dispatch: key_press/release (in/down:%i)", xev.type == KeyPress);
     {
       sinp_keysym keysym;
       x11_private *priv;
       
       priv = (x11_private*)dev->private;
 
-      x11_translate(priv->disp,
-		    &xev.xkey,
-		    xev.xkey.keycode,
-		    &keysym);
-
-      keyboard_update(&keysym,
-		      xev.type == KeyPress,
-		      dev->index);
-
-      //FIXME: SDL does repeating-key elimination on KeyRelease
+      // Do not post repeated keys
+      if(!x11_keyrepeat(priv->disp, &xev)) {
+	
+	// Decode key and send it to the state manager
+	x11_translate(priv->disp,
+		      &xev.xkey,
+		      xev.xkey.keycode,
+		      &keysym);
+	keyboard_update(&keysym,
+			xev.type == KeyPress,
+			dev->index);
+      }
     }
     break;
 
@@ -230,6 +258,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
 
     // Window gets restored (uniconified)
   case MapNotify:
+    debug("x11_dispatch: map_notify");
     appstate_focus(TRUE, SINP_FOCUS_VISIBLE, dev->index);
     break;
 

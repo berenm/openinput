@@ -121,6 +121,15 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
       keysym->mod = newmod;
       break;
 
+    case SK_SCROLLOCK:
+      // Locks are special
+      newmod ^= SM_SCROLLOCK;
+      if(!(newmod & SM_SCROLLOCK)) {
+	state = FALSE;
+      }
+      keysym->mod = newmod;
+      break;
+
     case SK_RSHIFT:
       newmod |= SM_RSHIFT;
       break;
@@ -169,7 +178,8 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
       
     case SK_NUMLOCK:
     case SK_CAPSLOCK:
-      // Locks only send 'down' events, so bail out
+    case SK_SCROLLOCK:
+      // Only send down-events on num and capslock
       return;
 
     case SK_RSHIFT:

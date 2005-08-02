@@ -29,3 +29,20 @@ delimiter between parameters is the whitespace.  Not all platforms
 needs CONN and SCRN. They can be left out if they are not needed.
 
 --------------------------------------------------------------------
+
+* Peculiar keys
+
+The three "lock" buttons on your keyboard: CapsLock, NumLock and
+ScrollLock are special as they typically control small LEDs found on
+many keyboards. Because of this, events are generated only on
+key-presses. Each key-press generates (in turn) either an SINP_KEYDOWN
+or an SINP_KEYUP event. For example:
+
+press NumLock -> send SINP_KEYDOWN -> release NumLock -> nothing ->
+press Numlock -> send SINP_KEYUP -> release NumLock -> nothing
+
+And so on... You can always use the sinp_key_getstate() or
+sinp_key_modstate() functions to determine whether the lock-keys are
+up or down.
+
+--------------------------------------------------------------------

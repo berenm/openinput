@@ -303,7 +303,7 @@ typedef enum {
 #define SM_NUMLOCK      0x1000
 #define SM_CAPSLOCK     0x2000
 #define SM_ALTGR        0x4000
-#define SM_RESERVED     0x8000
+#define SM_SCROLLOCK    0x8000
 
 /* ********************************************************************
  * Key symbol structure

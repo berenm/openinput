@@ -1,12 +1,9 @@
 Loose ends and suggestions for improvements
 -------------------------------------------
 
-bugs
+could-be bugs
 - concurrently number of pressed keys limited to 3-5 (hw?)
 - no keyboard on fullscreen (even with grab on?)
-- modifier keys only generates "down" event
-- action event on "mouse wheel" generate double events
-- handle repeating keys correctly in x11/queue
 
 ogre integration
 - write small howto (the glxwindowinterface)
