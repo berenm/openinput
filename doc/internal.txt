@@ -177,33 +177,37 @@ based on real events. This allows the user to catch "jump" and
 "fire" events instead of listening for "space down" or
 "mouse wheel down".
 
-The internals of the action mapper may seem a bit complicated, but
-here goes.
-
 The user is in charge of delivering the "action map" via the
-sinp_action_install(map, num). This memory region must NOT be freed
-until either sinp is closed or a new call to sinp_action_install
-have been made.
+sinp_action_install(map, num). The memory is not used when the
+call returns.
 
 The "num" parameter contains the number of maps in the "map"
 parameter. The "map" parameter is an array of the structure named
-"sinp_actionmap", which contains the following elements:
+"sinp_actionmap", which contains the following two elements:
 
 uint actionid;
   This is the user-defined, unique action id, which the user
   listens for. Ie. it is up to the user to make a mapping
-  between this number and an action. That's easy!
+  between this number and an action. That's easy, as an action
+  should be something like '#define ACTION_JUMP 3', etc. etc.
     
-sinp_way way;
-  The trigger direction. Should the action be generated when
-  the button is pressed, released or on both.
-
 char *name;
   The name of the event, which should generate the action. The
   event name is the name of the button (or alike), for example
   "key_space" or "mouse_button_left".
 
-void *internal;
-  Currently not used.
+The actual action-map lookup is done on a 'per subsystem table
+basis'. The action mapper does not know the difference between
+a key down/up event. It is up to the user to make the distinction
+using the sinp_action_event structure, which contains a 'state'
+parameter. The same goes for the device which generated the event:
+If multiple devices of the same type are supported, the user
+must parse the 'device' member of the action event.
+
+The lookup tables contains an element for each key/possible event
+that the subsystem can generate (mouse/keyboard/etc). An element is
+simply an unsigned int. An action is not generated if this number
+is zero. Otherwise, an event is added to the queue with the number.
+That's both pretty simply and pretty fast...
 
 --------------------------------------------------------------------
