@@ -97,7 +97,6 @@ dnl Makefiles to be generated
 AC_CONFIG_FILES([
 	sinp.pc \
 	Makefile \
-	doc/Makefile \
 	include/Makefile \
 	test/Makefile \
 	src/Makefile \

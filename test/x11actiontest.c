@@ -71,7 +71,7 @@ void test() {
     return;
   }
   else {
-    printf("--- map insatll ok!\n");
+    printf("--- map install ok!\n");
   }
 
   // Try to fetch an event
