@@ -66,6 +66,7 @@ sint sinp_init(char *window_id, uint flags) {
   appstate_init();
   mouse_init();
   keyboard_init();
+  action_init();
 
   // Set running flag
   sinp_running = TRUE;

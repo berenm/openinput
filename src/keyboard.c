@@ -33,9 +33,8 @@
 static sinp_device *keydev;
 static uchar keystate[SK_LAST];
 static uint modstate;
-
-// Conversion key->name
 static char *keynames[SK_LAST];
+static uchar keyaction[SK_LAST];
 
 // Key repeat
 struct {
@@ -53,8 +52,9 @@ sint keyboard_init() {
   int i;
 
   // Clear tables
-  memset(keystate, FALSE, sizeof(keystate)/sizeof(keystate[0]));
-  memset(keynames, 0, sizeof(keynames)/sizeof(keynames[0]));
+  memset(keystate, FALSE, TABLESIZE(keystate));
+  memset(keyaction, FALSE, TABLESIZE(keyaction));
+  memset(keynames, 0, TABLESIZE(keynames));
   modstate = SM_NONE;
 
   // Disable key-repeat
@@ -318,7 +318,7 @@ uchar *sinp_key_keystate(sint *num) {
 char *sinp_key_getname(sinp_key key) {
   char *name;
 
-  name = NULL;
+  name = keynames[SK_UNKNOWN];
 
   if(key < SK_LAST) {
     name = keynames[key];
@@ -344,7 +344,7 @@ inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last) {
 /* ******************************************************************** */
 
 // Return key for name (public)
-sinp_key sinp_key_getkey(char *name) {
+sinp_key sinp_key_getcode(char *name) {
   int i;
   sinp_key k;
 
@@ -352,10 +352,18 @@ sinp_key sinp_key_getkey(char *name) {
   if(!name) {
     return SK_UNKNOWN;
   }
-  if((strlen(name) < 1) || (strlen(name) > SINP_MAX_KEYLENGTH)) {
+  if((strlen(name) < SINP_MIN_KEYLENGTH) ||
+     (strlen(name) > SINP_MAX_KEYLENGTH)) {
     return SK_UNKNOWN;
   }
-  if(strcmp(name, "unknown") == 0) {
+
+  // Check prefix
+  if(strncmp(name, "key_", 4) != 0) {
+    return SK_UNKNOWN;
+  }
+
+  // Catch this one now
+  if(strcmp(name, "key_unknown") == 0) {
     return SK_UNKNOWN;
   }
 
@@ -363,20 +371,20 @@ sinp_key sinp_key_getkey(char *name) {
   k = SK_UNKNOWN;
 
   // Letter or digit
-  if(strlen(name) == 1) {
-    if((name[0] >= 'a') && (name[0] <= 'z')) {
-      return SK_A + (name[0]-'a');
+  if(strlen(name) == 5) {
+    if((name[4] >= 'a') && (name[4] <= 'z')) {
+      return SK_A + (name[4]-'a');
     }
-    if((name[0] >= '0') && (name[0] <= '9')) {
-      return SK_0 + (name[0]-'0');
+    if((name[4] >= '0') && (name[4] <= '9')) {
+      return SK_0 + (name[4]-'0');
     }
 
     return SK_UNKNOWN;
   }
 
   // Function keys (only these and 'f' starts with 'f')
-  if(name[0] == 'f') {
-    i = atoi(name+1);
+  if(name[4] == 'f') {
+    i = atoi(name+5);
     if((i>=1) && (i<=15)) {
       return SK_F1 + i - 1;
     }
@@ -385,8 +393,8 @@ sinp_key sinp_key_getkey(char *name) {
   }
 
   // International
-  if(strncmp(name, "int", 3) == 0) {
-    i = atoi(name+3);
+  if(strncmp(name, "key_int", 7) == 0) {
+    i = atoi(name+7);
     if((i>=0) && (i<=95)) {
       return SK_INT_0 + i;
     }
@@ -400,8 +408,8 @@ sinp_key sinp_key_getkey(char *name) {
   }
 
   // Numeric keypad numbers
-  if(strncmp(name, "num_", 4) == 0) {
-    i = atoi(name+4);
+  if(strncmp(name, "key_num_", 8) == 0) {
+    i = atoi(name+8);
     if((i>=0) && (i<=9)) {
       return SK_N_0 + i;
     }
@@ -418,7 +426,7 @@ sinp_key sinp_key_getkey(char *name) {
   }
 
   // Delete
-  if(strcmp(name, "delete") == 0) {
+  if(strcmp(name, "key_delete") == 0) {
     return SK_DELETE;
   }
 

@@ -262,3 +262,74 @@ sint sinp_mouse_warp(sint x, sint y) {
 }
 
 /* ******************************************************************** */
+
+// Return mouse button name (public)
+char *sinp_mouse_getname(sinp_mouse button) {
+  // Dead simple
+  switch(button) {
+  case SP_BUTTON_LEFT:
+    return "mouse_button_left";
+
+  case SP_BUTTON_RIGHT:
+    return "mouse_button_right";
+
+  case SP_BUTTON_MIDDLE:
+    return "mouse_button_middle";
+
+  case SP_WHEEL_UP:
+    return "mouse_wheel_up";
+
+  case SP_WHEEL_DOWN:
+    return "mouse_wheel_down";
+
+  case SP_MOTION:
+    return "mouse_motion";
+
+  default:
+    return "mouse_unknown";
+  }
+}
+
+/* ******************************************************************** */
+
+// Return mouse-id for name (public)
+sinp_mouse sinp_mouse_getcode(char *name) {
+  // Dummies
+  if(!name) {
+    return SP_UNKNOWN;
+  }
+  if((strlen(name) < SINP_MIN_KEYLENGTH) ||
+     (strlen(name) > SINP_MAX_KEYLENGTH)) {
+    return SP_UNKNOWN;
+  }
+
+  // Check prefix
+  if(strncmp(name, "mouse_", 6) != 0) {
+    return SP_UNKNOWN;
+  }
+
+  // Do the comparisons
+  if(strcmp(name, "mouse_button_left") == 0) {
+    return SP_BUTTON_LEFT;
+  }
+  if(strcmp(name, "mouse_button_right") == 0) {
+    return SP_BUTTON_RIGHT;
+  }
+  if(strcmp(name, "mouse_button_middle") == 0) {
+    return SP_BUTTON_MIDDLE;
+  }
+  if(strcmp(name, "mouse_wheel_up") == 0) {
+    return SP_WHEEL_UP;
+  }
+  if(strcmp(name, "mouse_wheel_down") == 0) {
+    return SP_WHEEL_DOWN;
+  }
+  if(strcmp(name, "mouse_motion") == 0) {
+    return SP_MOTION;
+  }
+
+  // We shouldn't reach this point
+  return SP_UNKNOWN;
+}
+
+/* ******************************************************************** */

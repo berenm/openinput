@@ -33,47 +33,12 @@
  ******************************************************************** */
 
 // Basic integer types
-typedef unsigned char       uchar;
-typedef signed char         schar;
-typedef unsigned short      ushort;
-typedef signed short        sshort;
-typedef unsigned int        uint;
-typedef signed int          sint;
-
-/* ********************************************************************
- * Event types and masks
- ******************************************************************** */
-
-// Event types
-typedef enum {
-  SINP_NOEVENT                    = 0,  // No event
-  SINP_KEYUP                      = 1,  // Key released
-  SINP_KEYDOWN                    = 2,  // Key pressed
-  SINP_MOUSEMOVE                  = 3,  // Mouse motion
-  SINP_MOUSEBUTTONUP              = 4,  // Button pressed
-  SINP_MOUSEBUTTONDOWN            = 5,  // Button released
-  SINP_ACTIVE                     = 6,  // App. focus gain/loss
-  SINP_RESIZE                     = 7,  // App. window resize
-  SINP_EXPOSE                     = 8,  // App. needs redraw
-  SINP_QUIT                       = 9,  // Quit requested
-  SINP_DISCOVERY                  = 10  // Device driver available
-} sinp_type;
-  
-// Event masks
-#define SINP_EVENT_MASK(x) (1<<(x))
-#define SINP_MASK_ALL 0xffffffff
-#define SINP_MASK_KEYUP           SINP_EVENT_MASK(SINP_KEYUP)
-#define SINP_MASK_KEYDOWN         SINP_EVENT_MASK(SINP_KEYDOWN)
-#define SINP_MASK_MOUSEMOVE       SINP_EVENT_MASK(SINP_MOUSEMOVE)
-#define SINP_MASK_MOUSEBUTTONUP   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP)
-#define SINP_MASK_MOUSEBUTTONDOWN SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN)
-#define SINP_MASK_MOUSE           (SINP_EVENT_MASK(SINP_MOUSEMOVE) | \
-				   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP) | \
-				   SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN))
-#define SINP_MASK_RESIZE          SINP_EVENT_MASK(SINP_RESIZE)
-#define SINP_MASK_EXPOSE          SINP_EVENT_MASK(SINP_EXPOSE)
-#define SINP_MASK_ACTIVE          SINP_EVENT_MASK(SINP_ACTIVE)
-#define SINP_MASK_QUIT            SINP_EVENT_MASK(SINP_QUIT)
+typedef unsigned char             uchar;
+typedef signed char               schar;
+typedef unsigned short            ushort;
+typedef signed short              sshort;
+typedef unsigned int              uint;
+typedef signed int                sint;
 
 /* ********************************************************************
  * Alternate boolean definition
@@ -85,23 +50,6 @@ typedef enum {
   SINP_DISABLE,                   // False/disable
   SINP_QUERY                      // Don't change, return current
 } sinp_bool;
-
-/* ********************************************************************
- * Mouse buttons
- ******************************************************************** */
-
-// The buttons
-#define SINP_BUTTON_LEFT          1
-#define SINP_BUTTON_MIDDLE        2
-#define SINP_BUTTON_RIGHT         3
-#define SINP_WHEEL_UP             4
-#define SINP_WHEEL_DOWN           5
-
-// Masks for buttons
-#define SINP_BUTTON_MASK(x) (1<<(x))
-#define SINP_BUTTON_LEFTMASK      SINP_BUTTON_MASK(SINP_BUTTON_LEFT)
-#define SINP_BUTTON_MIDMASK       SINP_BUTTON_MASK(SINP_BUTTON_MIDDLE)
-#define SINP_BUTTON_RIGHTMASK     SINP_BUTTON_MASK(SINP_BUTTON_RIGHT)
 
 /* ********************************************************************
  * Various defines for the library, eg. mouse buttons and error codes
@@ -134,7 +82,9 @@ typedef enum {
 #define SINP_ERR_NOT_IMPLEM       4 // Not implemented
 #define SINP_ERR_DEV_EXIST        5 // Device already initialized
 #define SINP_ERR_PARAM            6 // Invalid parameter
-
+#define SINP_ERR_NO_NAME          7 // No such event name exists
+#define SINP_ERR_NOT_UNIQUE       8 // Index was not unique
+ 
 /* ******************************************************************** */
 
 #endif

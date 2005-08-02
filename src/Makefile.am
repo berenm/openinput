@@ -22,7 +22,8 @@ events.c \
 appstate.c \
 mouse.c \
 keyboard.c \
-keynames.c
+keynames.c \
+action.c
 
 INCLUDES = \
 -I$(top_srcdir) \

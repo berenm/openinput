@@ -1,16 +1,19 @@
 EXTRA_PROGRAMS = \
-footest \
-x11test
-
-noinst_PROGRAMS = \
 keynametest \
-@TESTPRGS@
+footest \
+x11test \
+x11actiontest
+
+noinst_PROGRAMS = @TESTPRGS@
 
 footest_SOURCES = \
 footest.c
 
 x11test_SOURCES = \
 x11test.c
+
+x11actiontest_SOURCES = \
+x11actiontest.c
 
 keynametest_SOURCES = \
 keynametest.c

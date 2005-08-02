@@ -1,26 +1,24 @@
 Loose ends and suggestions for improvements
 -------------------------------------------
 
-correct/shorten variable types
-- device-index -> uchar
-- event_type -> uchar
-- x,y,width,height,deltas -> sshort
-- masks -> uint
-- document the types and common variables
+bugs
+- relative mouse movement should be relative in events
+  currently it is cummulative
+- concurrently number of pressed keys limited to 3-5 (hw?)
+- no keyboard on fullscreen (even with grab on?)
+- modifier keys only generates "down" event
+- action event on "mouse wheel" generate double events
+- handle repeating keys correctly in x11/queue
 
 ogre integration
 - write small howto (the glxwindowinterface)
-- speed optimization? poll/wait is slow?
 
-x11
-- handle repeating keys correctly
-
-queue
-- handle repeating keys correctly
-
-action-binding system
-- event based
-- state manager
+correct/shorten variable types
+- device-index -> uchar
+- event_type -> enum
+- x,y,width,height,deltas -> sshort
+- masks -> uint
+- document the types and common variables
 
 threading
 - is it really needed?
@@ -33,7 +31,4 @@ other-wierd-kind-of-input-device-support
 - tablets
 - touchscreen
 - 3d pointer devices
-
-automake/autoconf issues
-- src/x11/Makefile.am:11: variable `X_LIBS_EXTRA' not defined
-- what version should be used/required?
+- see ogre forum links (seeking input on input)

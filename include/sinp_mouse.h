@@ -1,5 +1,5 @@
 /*
- * sinp.h : Top-level include file for libsinp
+ * sinp_mouse.h : Definitions for mouse interface
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -21,28 +21,36 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_H_
-#define _SINP_H_
+#ifndef _SINP_MOUSE_H_
+#define _SINP_MOUSE_H_
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef _SINP_H_
+#error Do not include this file directly - use sinp.h
 #endif
 
 /* ********************************************************************
- * Include api
+ * Mouse buttons and masks
  ******************************************************************** */
 
-#include "sinp_types.h"
-#include "sinp_keys.h"
-#include "sinp_events.h"
-#include "sinp_mouse.h"
-#include "sinp_action.h"
-#include "sinp_api.h"
+// The pointer buttons
+typedef enum {
+  SP_UNKNOWN            = 0,
+  SP_FIRST              = 0,
+  SP_BUTTON_LEFT        = 1,
+  SP_BUTTON_MIDDLE      = 2,
+  SP_BUTTON_RIGHT       = 3,
+  SP_WHEEL_UP           = 4,
+  SP_WHEEL_DOWN         = 5,
+  SP_MOTION             = 6,
+  SP_LAST               = 7
+} sinp_mouse;
+
+// Masks for buttons
+#define SINP_BUTTON_MASK(x) (1<<(x))
+#define SINP_BUTTON_LEFTMASK      SINP_BUTTON_MASK(SP_BUTTON_LEFT)
+#define SINP_BUTTON_MIDMASK       SINP_BUTTON_MASK(SP_BUTTON_MIDDLE)
+#define SINP_BUTTON_RIGHTMASK     SINP_BUTTON_MASK(SP_BUTTON_RIGHT)
 
 /* ******************************************************************** */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -82,6 +82,16 @@ sint sinp_events_add(sinp_event *evts, sint num) {
 
 // Explictly pump events into the queue (public)
 void sinp_events_pump() {
+  static uint last = 0;
+  uint now;
+
+  // Bail out if 'no time' has passed
+  now = sinp_getticks();
+  if(now == last) {
+    return;
+  }
+  last = now;
+
   queue_lock();
 
   // Pump devices

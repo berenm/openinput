@@ -74,6 +74,17 @@ inline sint queue_unlock() {
 sint queue_add(sinp_event *evt) {
   int tail, add;
 
+  //FIXME Generate action events on keyboard/mouse
+  if((evt->type == SINP_KEYUP) ||
+     (evt->type == SINP_KEYDOWN) ||
+     (evt->type == SINP_MOUSEMOVE) ||
+     (evt->type == SINP_MOUSEBUTTONUP) ||
+     (evt->type == SINP_MOUSEBUTTONDOWN)) {
+    action_process(evt);
+  }
+
+  //FIXME: Check mask before we add the event
+
   // Find position for insertion
   tail = (queue.tail+1)%SINP_MAX_EVENTS;
 

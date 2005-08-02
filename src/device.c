@@ -31,7 +31,7 @@
 
 // Globals
 static sinp_device *devices[SINP_MAX_DEVICES];
-static sint num_devices = 0;
+static int num_devices = 0;
 
 // Include the bootstrap table
 #define _DEVICE_FILLER_
@@ -86,8 +86,8 @@ sint device_register(sinp_bootstrap *boot) {
 
 // Bootstrap devices using the bootstrap table
 void device_bootstrap(uint flags) {
-  int i;
-  int j;
+  uint i;
+  uint j;
 
   debug("device_bootstrap");
 
@@ -99,7 +99,7 @@ void device_bootstrap(uint flags) {
   // Fill structure array with available devices
   j = 0;
   for(i=0; bootstrap[i]; i++) {
-    debug("device_bootstrap: checking bootstrap entry %i", i, bootstrap[i]->name);
+    debug("device_bootstrap: checking bootstrap entry %u", i, bootstrap[i]->name);
     
     // If available, register
     if(bootstrap[i] && bootstrap[i]->avail && bootstrap[i]->create &&
@@ -110,7 +110,7 @@ void device_bootstrap(uint flags) {
     }
   }
   
-  debug("device_bootstrap: %i devices compiled in and %i available",
+  debug("device_bootstrap: %u devices compiled in and %u available",
 	i, num_devices);
 }
 
@@ -171,7 +171,7 @@ sinp_device *device_get(sint index) {
 
 // Pump events from all devices into queue
 inline void device_pumpall() {
-  int i;
+  uint i;
 
   for(i=0; i<num_devices; i++) {
     devices[i]->process(devices[i]);

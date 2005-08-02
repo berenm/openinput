@@ -81,8 +81,8 @@ uint sinp_key_modstate();
 // Get name of key (string)
 char *sinp_key_getname(sinp_key key);
 
-// Get key code given name (string)
-sinp_key sinp_key_getkey(char *name);
+// Get key code given name (sinp_key)
+sinp_key sinp_key_getcode(char *name);
 
 /* ********************************************************************
  * Mouse functions
@@ -97,6 +97,11 @@ sint sinp_mouse_relative(sint *x, sint *y);
 // Warp mouse cursor position (errorcode)
 sint sinp_mouse_warp(sint x, sint y);
 
+// Get name of mouse button (string)
+char *sinp_mouse_getname(sinp_mouse button);
+
+// Get mouse-id given name (sinp_mouse)
+sinp_mouse sinp_mouse_getcode(char *name);
 
 /* ********************************************************************
  * Misc functions
@@ -110,6 +115,19 @@ sinp_bool sinp_app_cursor(sinp_bool q);
 
 // Grab/ungrab input (state)
 sint sinp_app_grab(sinp_bool q);
+
+/* ********************************************************************
+ * Action map functions
+ ******************************************************************** */
+
+// Install actionmap (errorcode)
+sint sinp_action_install(sinp_actionmap *map, sint num);
+
+// Check/validate single actionmap structure (errorcode)
+sint sinp_action_validate(sinp_actionmap *map);
+
+// Get action state table and set num to number of elements (pointer)
+uchar *sinp_action_actionstate(sint *num);
 
 /* ******************************************************************** */
 

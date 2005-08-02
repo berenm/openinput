@@ -61,6 +61,9 @@ AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([getcwd gettimeofday isascii memchr memmove memset rmdir select strchr strcspn strdup strerror strpbrk strrchr strspn strstr])
 
+dnl Defaults
+TESTPRGS="keynametest"
+
 dnl Setup defines
 if test "x$enable_debug" = xyes; then
    AC_DEFINE([DEBUG], [1], [Internal debugging]) 
@@ -77,7 +80,7 @@ if test "x$enable_x11" = xyes; then
    AC_DEFINE([ENABLE_X11], [1], [X11 window system])
    PLATDIRS="$PLATDIRS x11"
    PLATLIBS="$PLATLIBS x11/libx11.la"
-   TESTPRGS="$TESTPRGS x11test"
+   TESTPRGS="$TESTPRGS x11test x11actiontest"
 fi
 
 if test "x$enable_unixsignal" = xyes; then
@@ -86,14 +89,15 @@ if test "x$enable_unixsignal" = xyes; then
    PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
 fi
 
+AC_SUBST(TESTPRGS)
 AC_SUBST(PLATDIRS)
 AC_SUBST(PLATLIBS)
-AC_SUBST(TESTPRGS)
 
 dnl Makefiles to be generated
 AC_CONFIG_FILES([
 	sinp.pc \
 	Makefile \
+	doc/Makefile \
 	include/Makefile \
 	test/Makefile \
 	src/Makefile \

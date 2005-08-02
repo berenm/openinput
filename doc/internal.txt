@@ -35,6 +35,7 @@ sinp_init()
 	appstate_init();
 	keyboard_init();
 	mouse_init();
+	action_init();
 
 	// Stage 5: Enter running state
 	sinp_running = TRUE;
@@ -166,5 +167,43 @@ state update functions, the "postdev" argument is encoded as:
 
 Some functions use the 'default device', eg. when warping the
 pointer and for window size/focus managment.
+
+--------------------------------------------------------------------
+
+* General info on Action mapper
+
+The action mapper generates abstract events (and a state-table)
+based on real events. This allows the user to catch "jump" and
+"fire" events instead of listening for "space down" or
+"mouse wheel down".
+
+The internals of the action mapper may seem a bit complicated, but
+here goes.
+
+The user is in charge of delivering the "action map" via the
+sinp_action_install(map, num). This memory region must NOT be freed
+until either sinp is closed or a new call to sinp_action_install
+have been made.
+
+The "num" parameter contains the number of maps in the "map"
+parameter. The "map" parameter is an array of the structure named
+"sinp_actionmap", which contains the following elements:
+
+uint actionid;
+  This is the user-defined, unique action id, which the user
+  listens for. Ie. it is up to the user to make a mapping
+  between this number and an action. That's easy!
+    
+sinp_way way;
+  The trigger direction. Should the action be generated when
+  the button is pressed, released or on both.
+
+char *name;
+  The name of the event, which should generate the action. The
+  event name is the name of the button (or alike), for example
+  "key_space" or "mouse_button_left".
+
+void *internal;
+  Currently not used.
 
 --------------------------------------------------------------------

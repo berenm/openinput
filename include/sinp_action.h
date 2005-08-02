@@ -1,5 +1,5 @@
 /*
- * sinp.h : Top-level include file for libsinp
+ * sinp_action.h : Definitions for action mapper interface
  *
  * This file is a part of libsinp - the simple input library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -21,28 +21,23 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_H_
-#define _SINP_H_
+#ifndef _SINP_ACTION_H_
+#define _SINP_ACTION_H_
 
-#ifdef __cplusplus
-extern "C" {
+#ifndef _SINP_H_
+#error Do not include this file directly - use sinp.h
 #endif
 
 /* ********************************************************************
- * Include api
+ * Action mapper directions and map structure
  ******************************************************************** */
 
-#include "sinp_types.h"
-#include "sinp_keys.h"
-#include "sinp_events.h"
-#include "sinp_mouse.h"
-#include "sinp_action.h"
-#include "sinp_api.h"
+// Action map structure
+typedef struct sinp_actionmap {
+  uint actionid;                 // Unique user-defined id
+  char *name;                    // Trigger event (key_*, mouse_*, etc.)
+} sinp_actionmap;
 
 /* ******************************************************************** */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

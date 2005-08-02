@@ -106,12 +106,21 @@ inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last);
 
 /* ******************************************************************** */
 
+// Action state
+sint action_init();
+inline void action_process(sinp_event *evt);
+
+/* ******************************************************************** */
+
 // Debug macro
 #ifdef DEBUG
 void debug(char *format, ...);
 #else
 #define debug(format, args...) ((void)0)
 #endif
+
+// Table size helper
+#define TABLESIZE(table) (sizeof(table)/sizeof(table[0]))
 
 // True and false
 #ifndef TRUE
@@ -125,6 +134,7 @@ void debug(char *format, ...);
 #define SINP_MAX_DEVICES 64
 #define SINP_MAX_EVENTS 128
 #define SINP_SLEEP 10
+#define SINP_MIN_KEYLENGTH 5
 #define SINP_MAX_KEYLENGTH 20
 
 /* ******************************************************************** */

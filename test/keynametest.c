@@ -23,6 +23,7 @@
 
 // Includes
 #include <stdio.h>
+#include <string.h>
 #include "sinp.h"
 
 /* ******************************************************************** */
@@ -33,6 +34,8 @@ int main(int argc, char *argv[]) {
   sinp_key c;
   char *name;
   int i;
+  int j;
+  int m;
 
   // Init sinp
   printf("*** keynametest start\n");
@@ -44,7 +47,7 @@ int main(int argc, char *argv[]) {
 
     // Convert to name and back again
     name = sinp_key_getname(k);
-    c = sinp_key_getkey(name);
+    c = sinp_key_getcode(name);
 
     // Pretty-printing
     printf("Key '%3i'\t getname: '%s'", k, name);
@@ -61,6 +64,29 @@ int main(int argc, char *argv[]) {
       printf("\t good\n");
     }      
   }
+
+  // Run through all mouse buttons
+  for(j=0; j<8; j++) {
+    
+    // Convert to name and back again
+    name = sinp_mouse_getname(j);
+    m = sinp_mouse_getcode(name);
+
+    // Pretty-printing
+    printf("Mouse '%3i'\t getname: '%s'", j, name);
+    for(i=strlen(name); i<20; i++) {
+      printf(" ");
+    }
+    printf("\t getkey: '%i'", m);
+
+    // Does keycode -> name -> keycode match?
+    if(j != m) {
+      printf("\t fail\n");
+    }
+    else {
+      printf("\t good\n");
+    }      
+      }
   
   // Close sinp
   printf("*** keynametest end\n");

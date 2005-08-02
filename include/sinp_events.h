@@ -29,6 +29,47 @@
 #endif
 
 /* ********************************************************************
+ * Event types and masks
+ ******************************************************************** */
+
+// Event types
+typedef enum {
+  SINP_NOEVENT                    = 0,  // No event
+  SINP_KEYUP                      = 1,  // Key released
+  SINP_KEYDOWN                    = 2,  // Key pressed
+  SINP_MOUSEMOVE                  = 3,  // Mouse motion
+  SINP_MOUSEBUTTONUP              = 4,  // Button pressed
+  SINP_MOUSEBUTTONDOWN            = 5,  // Button released
+  SINP_ACTIVE                     = 6,  // App. focus gain/loss
+  SINP_RESIZE                     = 7,  // App. window resize
+  SINP_EXPOSE                     = 8,  // App. needs redraw
+  SINP_QUIT                       = 9,  // Quit requested
+  SINP_DISCOVERY                  = 10, // Device driver available
+  SINP_ACTION                     = 11  // Action event (actionmap)
+} sinp_type;
+  
+// Event masks
+#define SINP_EVENT_MASK(x) (1<<(x))
+#define SINP_MASK_ALL 0xffffffff
+#define SINP_MASK_KEYUP           SINP_EVENT_MASK(SINP_KEYUP)
+#define SINP_MASK_KEYDOWN         SINP_EVENT_MASK(SINP_KEYDOWN)
+#define SINP_MASK_MOUSEMOVE       SINP_EVENT_MASK(SINP_MOUSEMOVE)
+#define SINP_MASK_MOUSEBUTTONUP   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP)
+#define SINP_MASK_MOUSEBUTTONDOWN SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN)
+#define SINP_MASK_MOUSE           (SINP_EVENT_MASK(SINP_MOUSEMOVE) | \
+				   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP) | \
+				   SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN))
+#define SINP_MASK_ACTIVE          SINP_EVENT_MASK(SINP_ACTIVE)
+#define SINP_MASK_RESIZE          SINP_EVENT_MASK(SINP_RESIZE)
+#define SINP_MASK_EXPOSE          SINP_EVENT_MASK(SINP_EXPOSE)
+#define SINP_MASK_WINDOW          (SINP_EVENT_MASK(SINP_ACTIVE) | \
+				   SINP_EVENT_MASK(SINP_RESIZE) | \
+				   SINP_EVENT_MASK(EXPOSE))
+#define SINP_MASK_DISCOVERY       SINP_EVENT_MASK(SINP_DISCOVERY)
+#define SINP_MASK_ACTION          SINP_EVENT_MASK(SINP_ACTION)
+#define SINP_MASK_QUIT            SINP_EVENT_MASK(SINP_QUIT)
+
+/* ********************************************************************
  * Special event structures
  ******************************************************************** */
 
@@ -96,6 +137,17 @@ typedef struct sinp_quit_event {
   uchar type;               // SINP_QUIT
 } sinp_quit_event;
 
+// Action event
+typedef struct sinp_action_event {
+  uchar type;               // SINP_ACTION
+  uchar device;             // Device index
+  uint actionid;            // User-defined actionid
+  uchar state;              // State (pressed/released)
+  sint data1;               // Default data slot   (1d device: x coord)
+  sint data2;               // Secondary data slot (2d device: y coord)
+  sint data3;               // Tertiary data slot  (3d device: z coord)
+} sinp_action_event;
+
 /* ********************************************************************
  * The generic (united) event structure
  ******************************************************************** */
@@ -111,6 +163,7 @@ typedef union {
   sinp_expose_event expose;
   sinp_quit_event quit;
   sinp_discovery_event discover;
+  sinp_action_event action;
 } sinp_event;
 
 /* ******************************************************************** */
