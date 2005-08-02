@@ -2,7 +2,7 @@ libsinp
 ------------------------------------------------------------------------
 
 libsinp is short for "library for simple input", and is intended as
-an easy-to-use, cross-platform input library handler. The goal is
+an easy-to-use, cross-platform input handler library. The goal is
 to provide a SDL-alike interface to input devices such as keyboards,
 mice and joysticks while keeping the dependencies for the library
 at a bare minimum.
