@@ -2,8 +2,6 @@ Loose ends and suggestions for improvements
 -------------------------------------------
 
 bugs
-- relative mouse movement should be relative in events
-  currently it is cummulative
 - concurrently number of pressed keys limited to 3-5 (hw?)
 - no keyboard on fullscreen (even with grab on?)
 - modifier keys only generates "down" event

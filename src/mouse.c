@@ -129,8 +129,10 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
     ev.move.state = button;
     ev.move.x = crd_x;
     ev.move.y = crd_y;
-    ev.move.relx = rel_x;
-    ev.move.rely = rel_y;
+    // Only send relative, not cummulative, ticks (thanks discipline!)
+    ev.move.relx = rx;
+    ev.move.rely = ry;
+
     queue_add(&ev);
   }
 }
