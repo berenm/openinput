@@ -1,7 +1,7 @@
 /*
  * internal.h : Header for internal functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,14 +21,14 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_INTERNAL_H_
-#define _SINP_INTERNAL_H_
+#ifndef _OPENINPUT_INTERNAL_H_
+#define _OPENINPUT_INTERNAL_H_
 
 /* ******************************************************************** */
 
 // Special functions
-inline sint sinp_runstate();
-inline uint sinp_getticks();
+inline sint oi_runstate();
+inline uint oi_getticks();
 
 /* ******************************************************************** */
 
@@ -37,43 +37,43 @@ sint queue_init();
 inline sint queue_lock();
 inline sint queue_unlock();
 sint queue_cut(ushort where);
-sint queue_add(sinp_event *evt);
-sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove);
+sint queue_add(oi_event *evt);
+sint queue_peep(oi_event *evts, sint num, uint mask, sint remove);
 
 /* ******************************************************************** */
 
 // Device abstraction interface
-typedef struct sinp_device {
+typedef struct oi_device {
   sint index;                                                          // Device index
   char *name;                                                          // Short device name
   char *desc;                                                          // Description of device
   uint provides;                                                       // Provide-flag
   void *private;                                                       // Private data
-  sint (*init)(struct sinp_device *dev, char *window_id, uint flags);  // Initialize device
-  sint (*destroy)(struct sinp_device *dev);                            // Shutdown device
-  void (*process)(struct sinp_device *dev);                            // Pump events into queue
-  sint (*grab)(struct sinp_device *dec, sint on);                      // Grab input focus
-  sint (*hide)(struct sinp_device *dev, sint on);                      // Hide/show cursor
-  sint (*warp)(struct sinp_device *dev, sint x, sint y);               // Warp mouse cursor
-  sint (*winsize)(struct sinp_device *dev, sint *w, sint *h);          // Query for window size
-} sinp_device;
+  sint (*init)(struct oi_device *dev, char *window_id, uint flags);    // Initialize device
+  sint (*destroy)(struct oi_device *dev);                              // Shutdown device
+  void (*process)(struct oi_device *dev);                              // Pump events into queue
+  sint (*grab)(struct oi_device *dec, sint on);                        // Grab input focus
+  sint (*hide)(struct oi_device *dev, sint on);                        // Hide/show cursor
+  sint (*warp)(struct oi_device *dev, sint x, sint y);                 // Warp mouse cursor
+  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);            // Query for window size
+} oi_device;
 
 // Platform bootstrap interface
-typedef struct sinp_bootstrap {
+typedef struct oi_bootstrap {
   char *name;                                                          // Short device name
   char *desc;                                                          // Device description
   sint provides;                                                       // Device provide-flag
   sint (*avail)(uint flags);                                           // Is device available?
-  struct sinp_device *(*create)();                                     // Return device structure
-} sinp_bootstrap;
+  struct oi_device *(*create)();                                       // Return device structure
+} oi_bootstrap;
 
 /* ******************************************************************** */
 
 // Device handling
-sint device_register(struct sinp_bootstrap *boot);
+sint device_register(struct oi_bootstrap *boot);
 void device_bootstrap(uint flags);
 sint device_init(sint index, char *window_id, uint flags);
-sinp_device *device_get(sint index);
+oi_device *device_get(sint index);
 inline void device_pumpall();
 uint device_windowid(char *str, char tok);
 sint device_destroy(sint index);
@@ -99,16 +99,16 @@ void mouse_button(sint btn, sint state, uchar postdev);
 // Keyboard state
 sint keyboard_init();
 sint keyboard_fillnames(char **kn);
-void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev);
+void keyboard_update(oi_keysym *keysym, sint state, uchar postdev);
 void keyboard_dorepeat();
 void keyboard_setmodifier(uint newmod);
-inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last);
+inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
 
 /* ******************************************************************** */
 
 // Action state
 sint action_init();
-inline void action_process(sinp_event *evt);
+inline void action_process(oi_event *evt);
 
 /* ******************************************************************** */
 
@@ -131,11 +131,11 @@ void debug(char *format, ...);
 #endif
 
 // Misc constants
-#define SINP_MAX_DEVICES 64
-#define SINP_MAX_EVENTS 128
-#define SINP_SLEEP 10
-#define SINP_MIN_KEYLENGTH 5
-#define SINP_MAX_KEYLENGTH 20
+#define OI_MAX_DEVICES 64
+#define OI_MAX_EVENTS 128
+#define OI_SLEEP 10
+#define OI_MIN_KEYLENGTH 5
+#define OI_MAX_KEYLENGTH 20
 
 /* ******************************************************************** */
 

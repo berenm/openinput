@@ -1,7 +1,7 @@
 /*
- * sinp_events.h : Event structure types
+ * openinput_events.h : Event structure types
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_EVENTS_H_
-#define _SINP_EVENTS_H_
+#ifndef _OPENINPUT_EVENTS_H_
+#define _OPENINPUT_EVENTS_H_
 
-#ifndef _SINP_H_
-#error Do not include this file directly - use sinp.h
+#ifndef _OPENINPUT_H_
+#error Do not include this file directly - use openinput.h
 #endif
 
 /* ********************************************************************
@@ -34,119 +34,119 @@
 
 // Event types
 typedef enum {
-  SINP_NOEVENT                    = 0,  // No event
-  SINP_KEYUP                      = 1,  // Key released
-  SINP_KEYDOWN                    = 2,  // Key pressed
-  SINP_MOUSEMOVE                  = 3,  // Mouse motion
-  SINP_MOUSEBUTTONUP              = 4,  // Button pressed
-  SINP_MOUSEBUTTONDOWN            = 5,  // Button released
-  SINP_ACTIVE                     = 6,  // App. focus gain/loss
-  SINP_RESIZE                     = 7,  // App. window resize
-  SINP_EXPOSE                     = 8,  // App. needs redraw
-  SINP_QUIT                       = 9,  // Quit requested
-  SINP_DISCOVERY                  = 10, // Device driver available
-  SINP_ACTION                     = 11  // Action event (actionmap)
-} sinp_type;
+  OI_NOEVENT                    = 0,  // No event
+  OI_KEYUP                      = 1,  // Key released
+  OI_KEYDOWN                    = 2,  // Key pressed
+  OI_MOUSEMOVE                  = 3,  // Mouse motion
+  OI_MOUSEBUTTONUP              = 4,  // Button pressed
+  OI_MOUSEBUTTONDOWN            = 5,  // Button released
+  OI_ACTIVE                     = 6,  // App. focus gain/loss
+  OI_RESIZE                     = 7,  // App. window resize
+  OI_EXPOSE                     = 8,  // App. needs redraw
+  OI_QUIT                       = 9,  // Quit requested
+  OI_DISCOVERY                  = 10, // Device driver available
+  OI_ACTION                     = 11  // Action event (actionmap)
+} oi_type;
   
 // Event masks
-#define SINP_EVENT_MASK(x) (1<<(x))
-#define SINP_MASK_ALL 0xffffffff
-#define SINP_MASK_KEYUP           SINP_EVENT_MASK(SINP_KEYUP)
-#define SINP_MASK_KEYDOWN         SINP_EVENT_MASK(SINP_KEYDOWN)
-#define SINP_MASK_MOUSEMOVE       SINP_EVENT_MASK(SINP_MOUSEMOVE)
-#define SINP_MASK_MOUSEBUTTONUP   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP)
-#define SINP_MASK_MOUSEBUTTONDOWN SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN)
-#define SINP_MASK_MOUSE           (SINP_EVENT_MASK(SINP_MOUSEMOVE) | \
-				   SINP_EVENT_MASK(SINP_MOUSEBUTTONUP) | \
-				   SINP_EVENT_MASK(SINP_MOUSEBUTTONDOWN))
-#define SINP_MASK_ACTIVE          SINP_EVENT_MASK(SINP_ACTIVE)
-#define SINP_MASK_RESIZE          SINP_EVENT_MASK(SINP_RESIZE)
-#define SINP_MASK_EXPOSE          SINP_EVENT_MASK(SINP_EXPOSE)
-#define SINP_MASK_WINDOW          (SINP_EVENT_MASK(SINP_ACTIVE) | \
-				   SINP_EVENT_MASK(SINP_RESIZE) | \
-				   SINP_EVENT_MASK(EXPOSE))
-#define SINP_MASK_DISCOVERY       SINP_EVENT_MASK(SINP_DISCOVERY)
-#define SINP_MASK_ACTION          SINP_EVENT_MASK(SINP_ACTION)
-#define SINP_MASK_QUIT            SINP_EVENT_MASK(SINP_QUIT)
+#define OI_EVENT_MASK(x) (1<<(x))
+#define OI_MASK_ALL 0xffffffff
+#define OI_MASK_KEYUP           OI_EVENT_MASK(OI_KEYUP)
+#define OI_MASK_KEYDOWN         OI_EVENT_MASK(OI_KEYDOWN)
+#define OI_MASK_MOUSEMOVE       OI_EVENT_MASK(OI_MOUSEMOVE)
+#define OI_MASK_MOUSEBUTTONUP   OI_EVENT_MASK(OI_MOUSEBUTTONUP)
+#define OI_MASK_MOUSEBUTTONDOWN OI_EVENT_MASK(OI_MOUSEBUTTONDOWN)
+#define OI_MASK_MOUSE           (OI_EVENT_MASK(OI_MOUSEMOVE) | \
+				   OI_EVENT_MASK(OI_MOUSEBUTTONUP) | \
+				   OI_EVENT_MASK(OI_MOUSEBUTTONDOWN))
+#define OI_MASK_ACTIVE          OI_EVENT_MASK(OI_ACTIVE)
+#define OI_MASK_RESIZE          OI_EVENT_MASK(OI_RESIZE)
+#define OI_MASK_EXPOSE          OI_EVENT_MASK(OI_EXPOSE)
+#define OI_MASK_WINDOW          (OI_EVENT_MASK(OI_ACTIVE) | \
+				   OI_EVENT_MASK(OI_RESIZE) | \
+				   OI_EVENT_MASK(EXPOSE))
+#define OI_MASK_DISCOVERY       OI_EVENT_MASK(OI_DISCOVERY)
+#define OI_MASK_ACTION          OI_EVENT_MASK(OI_ACTION)
+#define OI_MASK_QUIT            OI_EVENT_MASK(OI_QUIT)
 
 /* ********************************************************************
  * Special event structures
  ******************************************************************** */
 
 // Device discovery event
-typedef struct sinp_discovery_event {
-  uchar type;               // SINP_DISCOVERY
+typedef struct oi_discovery_event {
+  uchar type;               // OI_DISCOVERY
   uchar device;             // Device index
   char *name;               // Short name
   char *description;        // Long description
   uint provides;            // Provide mask
-} sinp_discovery_event;
+} oi_discovery_event;
 
 // Application visibility event
-typedef struct sinp_active_event {
-  uchar type;               // SINP_ACTIVE
+typedef struct oi_active_event {
+  uchar type;               // OI_ACTIVE
   uchar device;             // Device index
   uchar gain;               // Focus was 0:lost 1:gained
   uint state;               // Mask of focus state
-} sinp_active_event;
+} oi_active_event;
 
 // Keyboard event
-typedef struct sinp_keyboard_event {
-  uchar type;               // SINP_KEYUP or SINP_KEYDOWN
+typedef struct oi_keyboard_event {
+  uchar type;               // OI_KEYUP or OI_KEYDOWN
   uchar device;             // Device index
   uchar state;              // Key is 0:up 1:down
-  sinp_keysym keysym;       // Key symbol
-} sinp_keyboard_event;
+  oi_keysym keysym;       // Key symbol
+} oi_keyboard_event;
 
 // Mouse move event
-typedef struct sinp_mousemove_event {
-  uchar type;               // SINP_MOUSEMOVE
+typedef struct oi_mousemove_event {
+  uchar type;               // OI_MOUSEMOVE
   uchar device;             // Device index
   uchar state;              // Button states
   ushort x;                 // Absolute x coordinate
   ushort y;                 // Absolute y coordinate
   sshort relx;              // Relative x movement
   sshort rely;              // Relative y movement
-} sinp_mousemove_event;
+} oi_mousemove_event;
 
 // Mouse button event
-typedef struct sinp_mousebutton_event {
-  uchar type;               // SINP_MOUSEBUTTONUP or SINP_MOUSEBUTTONDOWN
+typedef struct oi_mousebutton_event {
+  uchar type;               // OI_MOUSEBUTTONUP or OI_MOUSEBUTTONDOWN
   uchar device;             // Device index
   uchar button;             // Mouse button index
   uchar state;              // Button states
   ushort x;                 // Absolute x coordinate at event time
   ushort y;                 // Absolute y coordinate at event time
-} sinp_mousebutton_event;
+} oi_mousebutton_event;
 
 // Application window resize event
-typedef struct sinp_resize_event {
-  uchar type;               // SINP_RESIZE
+typedef struct oi_resize_event {
+  uchar type;               // OI_RESIZE
   uchar device;             // Device index
   uint width;               // New window width
   uint height;              // New window height
-} sinp_resize_event;
+} oi_resize_event;
 
 // Application window needs redraw
-typedef struct sinp_expose_event {
-  uchar type;               // SINP_EXPOSE
-} sinp_expose_event;
+typedef struct oi_expose_event {
+  uchar type;               // OI_EXPOSE
+} oi_expose_event;
 
 // Quit event
-typedef struct sinp_quit_event {
-  uchar type;               // SINP_QUIT
-} sinp_quit_event;
+typedef struct oi_quit_event {
+  uchar type;               // OI_QUIT
+} oi_quit_event;
 
 // Action event
-typedef struct sinp_action_event {
-  uchar type;               // SINP_ACTION
+typedef struct oi_action_event {
+  uchar type;               // OI_ACTION
   uchar device;             // Device index
   uint actionid;            // User-defined actionid
   uchar state;              // State (pressed/released)
   sint data1;               // Default data slot   (1d device: x coord)
   sint data2;               // Secondary data slot (2d device: y coord)
   sint data3;               // Tertiary data slot  (3d device: z coord)
-} sinp_action_event;
+} oi_action_event;
 
 /* ********************************************************************
  * The generic (united) event structure
@@ -155,16 +155,16 @@ typedef struct sinp_action_event {
 // The united event structure
 typedef union {
   uchar type;
-  sinp_active_event active;
-  sinp_keyboard_event key;
-  sinp_mousemove_event move;
-  sinp_mousebutton_event button;
-  sinp_resize_event resize;
-  sinp_expose_event expose;
-  sinp_quit_event quit;
-  sinp_discovery_event discover;
-  sinp_action_event action;
-} sinp_event;
+  oi_active_event active;
+  oi_keyboard_event key;
+  oi_mousemove_event move;
+  oi_mousebutton_event button;
+  oi_resize_event resize;
+  oi_expose_event expose;
+  oi_quit_event quit;
+  oi_discovery_event discover;
+  oi_action_event action;
+} oi_event;
 
 /* ******************************************************************** */
 

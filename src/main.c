@@ -1,7 +1,7 @@
 /*
  * main.c : The initialization and shutdown functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,23 +26,23 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
-static sint sinp_running;
+static sint oi_running;
 
 /* ******************************************************************** */
 
 // Initialize default devices (public)
-sint sinp_init(char *window_id, uint flags) {
+sint oi_init(char *window_id, uint flags) {
   int i;
   int e;
 
-  debug("sinp_init");
+  debug("oi_init");
 
   // Initialize queue
-  sinp_running = FALSE;
+  oi_running = FALSE;
   queue_init();
 
   // Bootstrap all devices
@@ -54,7 +54,7 @@ sint sinp_init(char *window_id, uint flags) {
   while(device_get(i) != NULL) {
 
     // Initialize device
-    if(device_init(i, window_id, flags) != SINP_ERR_OK) {
+    if(device_init(i, window_id, flags) != OI_ERR_OK) {
       // Error initializing, count
       e++;
     }
@@ -69,20 +69,20 @@ sint sinp_init(char *window_id, uint flags) {
   action_init();
 
   // Set running flag
-  sinp_running = TRUE;
+  oi_running = TRUE;
     
   return e;
 }
 
 /* ******************************************************************** */
 
-// Shutdown sinp (public)
-sint sinp_close() {
+// Shutdown the library (public)
+sint oi_close() {
   int i;
   int e;
 
-  debug("sinp_close");
-  sinp_running = FALSE;
+  debug("oi_close");
+  oi_running = FALSE;
 
   // Parse all devices
   e = 0;
@@ -90,7 +90,7 @@ sint sinp_close() {
   while(device_get(i) != NULL) {
 
     // Destroy it
-    if(device_destroy(i) != SINP_ERR_OK) {
+    if(device_destroy(i) != OI_ERR_OK) {
       e++;
     }
 
@@ -104,14 +104,14 @@ sint sinp_close() {
 /* ******************************************************************** */
 
 // Return library running state (internal)
-inline sint sinp_runstate() {
-  return sinp_running;
+inline sint oi_runstate() {
+  return oi_running;
 }
 
 /* ******************************************************************** */
 
 // Return current system ticks (internal)
-inline uint sinp_getticks() {
+inline uint oi_getticks() {
   struct timeval now;
   uint ticks;
 

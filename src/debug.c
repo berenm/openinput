@@ -1,7 +1,7 @@
 /*
  * debug.c : Debugging helpers
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <stdarg.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 /* ******************************************************************** */
@@ -35,7 +35,7 @@
 void debug(char* format, ...) {
   va_list args;
 
-  fprintf(stderr, "sinp: ");
+  fprintf(stderr, "openinput: ");
 
   va_start(args, format);
   vfprintf(stderr, format, args);

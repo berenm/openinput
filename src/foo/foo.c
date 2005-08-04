@@ -1,7 +1,7 @@
 /*
  * foo.c : Foo (test) utility functions (bootstrapping, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,10 +32,10 @@
 #include "foo.h"
 
 // Bootstrap global
-sinp_bootstrap foo_bootstrap = {
+oi_bootstrap foo_bootstrap = {
   "foo",
   "Foo test system",
-  SINP_PRO_UNKNOWN,
+  OI_PRO_UNKNOWN,
   foo_avail,
   foo_device
 };
@@ -60,14 +60,14 @@ sint foo_avail(uint flags) {
 /* ******************************************************************** */
 
 // Install foo 'device' block
-sinp_device *foo_device() {
-  sinp_device *dev;
+oi_device *foo_device() {
+  oi_device *dev;
   foo_private *priv;
 
   debug("foo_device");
 
   // Alloc device and private data
-  dev = (sinp_device*)malloc(sizeof(sinp_device));
+  dev = (oi_device*)malloc(sizeof(oi_device));
   priv = (foo_private*)malloc(sizeof(foo_private));
   if((dev == NULL) || (priv == NULL)) {
     debug("foo_device: device creation failed");
@@ -81,7 +81,7 @@ sinp_device *foo_device() {
   }
 
   // Clear structures
-  memset(dev, 0, sizeof(sinp_device));
+  memset(dev, 0, sizeof(oi_device));
   memset(priv, 0, sizeof(foo_private));
 
   // Set members
@@ -101,20 +101,20 @@ sinp_device *foo_device() {
 /* ******************************************************************** */
 
 // Initialize foo
-sint foo_init(sinp_device *dev, char *window_id, uint flags) {
+sint foo_init(oi_device *dev, char *window_id, uint flags) {
   uint val;
   foo_private *priv;
 
   debug("foo_init: window '%s', flags %i", window_id, flags);
   
   // Sniff the handles
-  val = device_windowid(window_id, SINP_I_CONN);
+  val = device_windowid(window_id, OI_I_CONN);
   debug("foo_init: conn (c) parameter %i", val);
 
-  val = device_windowid(window_id, SINP_I_SCRN);
+  val = device_windowid(window_id, OI_I_SCRN);
   debug("foo_init: scrn (s) parameter %i", val);
 
-  val = device_windowid(window_id, SINP_I_WINID);
+  val = device_windowid(window_id, OI_I_WINID);
   debug("foo_init: winid (w) parameter %i", val);
 
   // Set some stupid private values
@@ -124,13 +124,13 @@ sint foo_init(sinp_device *dev, char *window_id, uint flags) {
   priv->x = 0;
   priv->y = 0;
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Free foo device structure
-sint foo_destroy(sinp_device *dev) {
+sint foo_destroy(oi_device *dev) {
   debug("foo_destroy");
   
   // Free device
@@ -143,24 +143,24 @@ sint foo_destroy(sinp_device *dev) {
     dev = NULL;
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Pump events into event queue
-void foo_process(sinp_device *dev) {
-  static sinp_event ev;
+void foo_process(oi_device *dev) {
+  static oi_event ev;
 
   debug("foo_process");
 
-  if(!sinp_runstate()) {
-    debug("foo_process: sinp_running false");
+  if(!oi_runstate()) {
+    debug("foo_process: oi_running false");
     return;
   }
 
   // Since this is a test device, generate an event
-  ev.type = SINP_KEYDOWN;
+  ev.type = OI_KEYDOWN;
   ev.key.device = dev->index;
   ev.key.state = 1;
   ev.key.keysym.scancode = 65;
@@ -174,44 +174,44 @@ void foo_process(sinp_device *dev) {
 /* ******************************************************************** */
 
 // Pump events into event queue
-sint foo_grab(sinp_device *dev, sint on) {
+sint foo_grab(oi_device *dev, sint on) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
   debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
   priv->grabstatus = on;
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Show/hide pointer cursor
-sint foo_hidecursor(sinp_device *dev, sint on) {
+sint foo_hidecursor(oi_device *dev, sint on) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
   debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
   priv->cursorstatus = on;
   
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Warp pointer
-sint foo_warp(sinp_device *dev, sint x, sint y) {
+sint foo_warp(oi_device *dev, sint x, sint y) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
   debug("foo_warp: warp pointer to %i, %i", x, y);
   priv->x = x;
   priv->y = y;
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Window size notifier
-sint foo_winsize(sinp_device *dev, sint *w, sint *h) {
+sint foo_winsize(oi_device *dev, sint *w, sint *h) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
   debug("foo_winsize");
@@ -220,7 +220,7 @@ sint foo_winsize(sinp_device *dev, sint *w, sint *h) {
   *w = priv->x;
   *h = priv->y;
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

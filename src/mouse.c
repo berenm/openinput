@@ -1,7 +1,7 @@
 /*
  * mouse.c : Mouse button and movement state interface
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,11 +25,11 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
-static sinp_device *mousedev;
+static oi_device *mousedev;
 static sint crd_x;
 static sint crd_y;
 static sint rel_x;
@@ -52,7 +52,7 @@ sint mouse_init() {
   // Find default/first mouse device
   i = 1;
   while((mousedev = device_get(i)) != NULL) {
-    if((mousedev->provides & SINP_PRO_MOUSE) == SINP_PRO_MOUSE) {
+    if((mousedev->provides & OI_PRO_MOUSE) == OI_PRO_MOUSE) {
       break;
     }
     i++;
@@ -60,13 +60,13 @@ sint mouse_init() {
 
   // We really want a device
   if(mousedev == NULL) {
-    return SINP_ERR_NO_DEVICE;
+    return OI_ERR_NO_DEVICE;
   }
 
   debug("mouse_init: mouse device is '%s'", mousedev->name);
 
   // Done
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -123,8 +123,8 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   
   // Postal services
   if(postdev) {
-    sinp_event ev;
-    ev.type = SINP_MOUSEMOVE;
+    oi_event ev;
+    ev.type = OI_MOUSEMOVE;
     ev.move.device = postdev;
     ev.move.state = button;
     ev.move.x = crd_x;
@@ -148,13 +148,13 @@ void mouse_button(sint btn, sint state, uchar postdev) {
 
   if(state) {
     // Down
-    type = SINP_MOUSEBUTTONDOWN;
-    newbutton |= SINP_BUTTON_MASK(btn);
+    type = OI_MOUSEBUTTONDOWN;
+    newbutton |= OI_BUTTON_MASK(btn);
   }
   else {
     // Up
-    type = SINP_MOUSEBUTTONUP;
-    newbutton = newbutton - (newbutton & SINP_BUTTON_MASK(btn));
+    type = OI_MOUSEBUTTONUP;
+    newbutton = newbutton - (newbutton & OI_BUTTON_MASK(btn));
   }
 
   // If nothing changed, bail out
@@ -167,7 +167,7 @@ void mouse_button(sint btn, sint state, uchar postdev) {
   
   // Postal services
   if(postdev) {
-    sinp_event ev;
+    oi_event ev;
     ev.type = type;
     ev.button.device = postdev;
     ev.button.button = btn;
@@ -181,7 +181,7 @@ void mouse_button(sint btn, sint state, uchar postdev) {
 /* ******************************************************************** */
 
 // Get absolute position of mouse (public)
-sint sinp_mouse_absolute(sint *x, sint *y) {
+sint oi_mouse_absolute(sint *x, sint *y) {
   // Check current position
   if(crd_x < 0) {
     crd_x = 0;
@@ -205,7 +205,7 @@ sint sinp_mouse_absolute(sint *x, sint *y) {
 /* ******************************************************************** */
 
 // Get relative position of mouse (public)
-sint sinp_mouse_relative(sint *x, sint *y) {
+sint oi_mouse_relative(sint *x, sint *y) {
   // Set data
   if(x) {
     *x = rel_x;
@@ -225,7 +225,7 @@ sint sinp_mouse_relative(sint *x, sint *y) {
 /* ******************************************************************** */
 
 // Warp (set position of) mouse (public)
-sint sinp_mouse_warp(sint x, sint y) {
+sint oi_mouse_warp(sint x, sint y) {
   int e;
 
   // Dummy checking
@@ -244,10 +244,10 @@ sint sinp_mouse_warp(sint x, sint y) {
   }
 
   // If mouse is hidden and grabbed, don't physically move it
-  if((sinp_app_cursor(SINP_QUERY) == SINP_DISABLE) &&
-     (sinp_app_grab(SINP_QUERY) == SINP_ENABLE)) {
+  if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
+     (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
     mouse_move(x, y, FALSE, mousedev->index);  
-    e = SINP_ERR_OK;
+    e = OI_ERR_OK;
   }
 
   // Warp default mouse device - driver must generate motion event!
@@ -257,7 +257,7 @@ sint sinp_mouse_warp(sint x, sint y) {
 
   // No default device to perform the warp!
   else {
-    e = SINP_ERR_NO_DEVICE;
+    e = OI_ERR_NO_DEVICE;
   }
 
   return e;
@@ -266,25 +266,25 @@ sint sinp_mouse_warp(sint x, sint y) {
 /* ******************************************************************** */
 
 // Return mouse button name (public)
-char *sinp_mouse_getname(sinp_mouse button) {
+char *oi_mouse_getname(oi_mouse button) {
   // Dead simple
   switch(button) {
-  case SP_BUTTON_LEFT:
+  case OIP_BUTTON_LEFT:
     return "mouse_button_left";
 
-  case SP_BUTTON_RIGHT:
+  case OIP_BUTTON_RIGHT:
     return "mouse_button_right";
 
-  case SP_BUTTON_MIDDLE:
+  case OIP_BUTTON_MIDDLE:
     return "mouse_button_middle";
 
-  case SP_WHEEL_UP:
+  case OIP_WHEEL_UP:
     return "mouse_wheel_up";
 
-  case SP_WHEEL_DOWN:
+  case OIP_WHEEL_DOWN:
     return "mouse_wheel_down";
 
-  case SP_MOTION:
+  case OIP_MOTION:
     return "mouse_motion";
 
   default:
@@ -295,43 +295,43 @@ char *sinp_mouse_getname(sinp_mouse button) {
 /* ******************************************************************** */
 
 // Return mouse-id for name (public)
-sinp_mouse sinp_mouse_getcode(char *name) {
+oi_mouse oi_mouse_getcode(char *name) {
   // Dummies
   if(!name) {
-    return SP_UNKNOWN;
+    return OIP_UNKNOWN;
   }
-  if((strlen(name) < SINP_MIN_KEYLENGTH) ||
-     (strlen(name) > SINP_MAX_KEYLENGTH)) {
-    return SP_UNKNOWN;
+  if((strlen(name) < OI_MIN_KEYLENGTH) ||
+     (strlen(name) > OI_MAX_KEYLENGTH)) {
+    return OIP_UNKNOWN;
   }
 
   // Check prefix
   if(strncmp(name, "mouse_", 6) != 0) {
-    return SP_UNKNOWN;
+    return OIP_UNKNOWN;
   }
 
   // Do the comparisons
   if(strcmp(name, "mouse_button_left") == 0) {
-    return SP_BUTTON_LEFT;
+    return OIP_BUTTON_LEFT;
   }
   if(strcmp(name, "mouse_button_right") == 0) {
-    return SP_BUTTON_RIGHT;
+    return OIP_BUTTON_RIGHT;
   }
   if(strcmp(name, "mouse_button_middle") == 0) {
-    return SP_BUTTON_MIDDLE;
+    return OIP_BUTTON_MIDDLE;
   }
   if(strcmp(name, "mouse_wheel_up") == 0) {
-    return SP_WHEEL_UP;
+    return OIP_WHEEL_UP;
   }
   if(strcmp(name, "mouse_wheel_down") == 0) {
-    return SP_WHEEL_DOWN;
+    return OIP_WHEEL_DOWN;
   }
   if(strcmp(name, "mouse_motion") == 0) {
-    return SP_MOTION;
+    return OIP_MOTION;
   }
 
   // We shouldn't reach this point
-  return SP_UNKNOWN;
+  return OIP_UNKNOWN;
 }
 
 /* ******************************************************************** */

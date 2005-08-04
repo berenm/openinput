@@ -1,7 +1,7 @@
 /*
  * unixsignal.h : UNIX signal handler (intr, sigsev, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,20 +21,20 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_UNIXSIGNAL_H_
-#define _SINP_UNIXSIGNAL_H_
+#ifndef _OPENINPUT_UNIXSIGNAL_H_
+#define _OPENINPUT_UNIXSIGNAL_H_
 
 /* ******************************************************************** */
 
 // Bootstrap
 sint unixsignal_avail();
-sinp_device *unixsignal_device();
+oi_device *unixsignal_device();
 
 // Device
-sint unixsignal_init(sinp_device *dev, char *window_id, uint flags);
-sint unixsignal_enable(sinp_device *dev, sint on);
-sint unixsignal_destroy(sinp_device *dev);
-void unixsignal_process(sinp_device *dev);
+sint unixsignal_init(oi_device *dev, char *window_id, uint flags);
+sint unixsignal_enable(oi_device *dev, sint on);
+sint unixsignal_destroy(oi_device *dev);
+void unixsignal_process(oi_device *dev);
 
 // Handler
 void unixsignal_handler(int signum);

@@ -1,7 +1,7 @@
 /*
  * foo.h : Foo (test) utility functions (bootstrapping, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,23 +21,23 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_FOO_H_
-#define _SINP_FOO_H_
+#ifndef _OPENINPUT_FOO_H_
+#define _OPENINPUT_FOO_H_
 
 /* ******************************************************************** */
 
 // Bootstrap
 sint foo_avail();
-sinp_device *foo_device();
+oi_device *foo_device();
 
 // Device
-sint foo_init(sinp_device *dev, char *window_id, uint flags);
-sint foo_destroy(sinp_device *dev);
-void foo_process(sinp_device *dev);
-sint foo_grab(sinp_device *dev, sint on);
-sint foo_hidecursor(sinp_device *dev, sint on);
-sint foo_warp(sinp_device *dev, sint x, sint y);
-sint foo_winsize(sinp_device *dev, sint *w, sint *h);
+sint foo_init(oi_device *dev, char *window_id, uint flags);
+sint foo_destroy(oi_device *dev);
+void foo_process(oi_device *dev);
+sint foo_grab(oi_device *dev, sint on);
+sint foo_hidecursor(oi_device *dev, sint on);
+sint foo_warp(oi_device *dev, sint x, sint y);
+sint foo_winsize(oi_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 

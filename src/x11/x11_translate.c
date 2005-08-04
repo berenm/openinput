@@ -1,7 +1,7 @@
 /*
- * x11_translate.c : Translate X11 events to SINP events
+ * x11_translate.c : Feed X11 events into the OI subsystems
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -33,129 +33,129 @@
 #include "x11.h"
 
 // Globals
-static sinp_key x11_oddmap[256];
-static sinp_key x11_miscmap[256];
+static oi_key x11_oddmap[256];
+static oi_key x11_miscmap[256];
 
 /* ******************************************************************** */
 
-// Initialize X11 -> sinp keymapper
+// Initialize X11 -> OI keymapper
 void x11_initkeymap() {
   int i;
 
   // Clear odd and misc keymaps
   for(i=0; i<(sizeof(x11_oddmap)/sizeof(x11_oddmap[0])); i++) {
-    x11_oddmap[i] = SK_UNKNOWN;
-    x11_miscmap[i] = SK_UNKNOWN;
+    x11_oddmap[i] = OIK_UNKNOWN;
+    x11_miscmap[i] = OIK_UNKNOWN;
   }
 
   // Odd keymap (highbyte 0xFE)
 #ifdef XK_dead_circumflex
-  x11_oddmap[XK_dead_circumflex & 0xFF] = SK_CARET;
+  x11_oddmap[XK_dead_circumflex & 0xFF] = OIK_CARET;
 #endif
 #ifdef XK_ISO_Level3_Shift
-  x11_oddmap[XK_ISO_Level3_Shift & 0xFF] = SK_ALTGR;
+  x11_oddmap[XK_ISO_Level3_Shift & 0xFF] = OIK_ALTGR;
 #endif
   
   // Misc keymap (highbyte 0xFF)
-  x11_miscmap[XK_BackSpace & 0xFF]    = SK_BACKSPACE;
-  x11_miscmap[XK_Tab & 0xFF]          = SK_TAB;
-  x11_miscmap[XK_Clear & 0xFF]        = SK_CLEAR;
-  x11_miscmap[XK_Return & 0xFF]       = SK_RETURN;
-  x11_miscmap[XK_Pause & 0xFF]        = SK_PAUSE;
-  x11_miscmap[XK_Escape & 0xFF]       = SK_ESC;
-  x11_miscmap[XK_Delete & 0xFF]       = SK_DELETE;
+  x11_miscmap[XK_BackSpace & 0xFF]    = OIK_BACKSPACE;
+  x11_miscmap[XK_Tab & 0xFF]          = OIK_TAB;
+  x11_miscmap[XK_Clear & 0xFF]        = OIK_CLEAR;
+  x11_miscmap[XK_Return & 0xFF]       = OIK_RETURN;
+  x11_miscmap[XK_Pause & 0xFF]        = OIK_PAUSE;
+  x11_miscmap[XK_Escape & 0xFF]       = OIK_ESC;
+  x11_miscmap[XK_Delete & 0xFF]       = OIK_DELETE;
   
-  x11_miscmap[XK_KP_0 & 0xFF]         = SK_N_0;
-  x11_miscmap[XK_KP_1 & 0xFF]         = SK_N_1;
-  x11_miscmap[XK_KP_2 & 0xFF]         = SK_N_2;
-  x11_miscmap[XK_KP_3 & 0xFF]         = SK_N_3;
-  x11_miscmap[XK_KP_4 & 0xFF]         = SK_N_4;
-  x11_miscmap[XK_KP_5 & 0xFF]         = SK_N_5;
-  x11_miscmap[XK_KP_6 & 0xFF]         = SK_N_6;
-  x11_miscmap[XK_KP_7 & 0xFF]         = SK_N_7;
-  x11_miscmap[XK_KP_8 & 0xFF]         = SK_N_8;
-  x11_miscmap[XK_KP_9 & 0xFF]         = SK_N_9;
-  x11_miscmap[XK_KP_Insert & 0xFF]    = SK_N_0;
-  x11_miscmap[XK_KP_End & 0xFF]       = SK_N_1;	
-  x11_miscmap[XK_KP_Down & 0xFF]      = SK_N_2;
-  x11_miscmap[XK_KP_Page_Down & 0xFF] = SK_N_3;
-  x11_miscmap[XK_KP_Left & 0xFF]      = SK_N_4;
-  x11_miscmap[XK_KP_Begin & 0xFF]     = SK_N_5;
-  x11_miscmap[XK_KP_Right & 0xFF]     = SK_N_6;
-  x11_miscmap[XK_KP_Home & 0xFF]      = SK_N_7;
-  x11_miscmap[XK_KP_Up & 0xFF]        = SK_N_8;
-  x11_miscmap[XK_KP_Page_Up & 0xFF]   = SK_N_9;
-  x11_miscmap[XK_KP_Delete & 0xFF]    = SK_N_PERIOD;
-  x11_miscmap[XK_KP_Decimal & 0xFF]   = SK_N_PERIOD;
-  x11_miscmap[XK_KP_Divide & 0xFF]    = SK_N_DIVIDE;
-  x11_miscmap[XK_KP_Multiply & 0xFF]  = SK_N_MULTIPLY;
-  x11_miscmap[XK_KP_Subtract & 0xFF]  = SK_N_MINUS;
-  x11_miscmap[XK_KP_Add & 0xFF]       = SK_N_PLUS;
-  x11_miscmap[XK_KP_Enter & 0xFF]     = SK_N_ENTER;
-  x11_miscmap[XK_KP_Equal & 0xFF]     = SK_N_EQUALS;
+  x11_miscmap[XK_KP_0 & 0xFF]         = OIK_N_0;
+  x11_miscmap[XK_KP_1 & 0xFF]         = OIK_N_1;
+  x11_miscmap[XK_KP_2 & 0xFF]         = OIK_N_2;
+  x11_miscmap[XK_KP_3 & 0xFF]         = OIK_N_3;
+  x11_miscmap[XK_KP_4 & 0xFF]         = OIK_N_4;
+  x11_miscmap[XK_KP_5 & 0xFF]         = OIK_N_5;
+  x11_miscmap[XK_KP_6 & 0xFF]         = OIK_N_6;
+  x11_miscmap[XK_KP_7 & 0xFF]         = OIK_N_7;
+  x11_miscmap[XK_KP_8 & 0xFF]         = OIK_N_8;
+  x11_miscmap[XK_KP_9 & 0xFF]         = OIK_N_9;
+  x11_miscmap[XK_KP_Insert & 0xFF]    = OIK_N_0;
+  x11_miscmap[XK_KP_End & 0xFF]       = OIK_N_1;	
+  x11_miscmap[XK_KP_Down & 0xFF]      = OIK_N_2;
+  x11_miscmap[XK_KP_Page_Down & 0xFF] = OIK_N_3;
+  x11_miscmap[XK_KP_Left & 0xFF]      = OIK_N_4;
+  x11_miscmap[XK_KP_Begin & 0xFF]     = OIK_N_5;
+  x11_miscmap[XK_KP_Right & 0xFF]     = OIK_N_6;
+  x11_miscmap[XK_KP_Home & 0xFF]      = OIK_N_7;
+  x11_miscmap[XK_KP_Up & 0xFF]        = OIK_N_8;
+  x11_miscmap[XK_KP_Page_Up & 0xFF]   = OIK_N_9;
+  x11_miscmap[XK_KP_Delete & 0xFF]    = OIK_N_PERIOD;
+  x11_miscmap[XK_KP_Decimal & 0xFF]   = OIK_N_PERIOD;
+  x11_miscmap[XK_KP_Divide & 0xFF]    = OIK_N_DIVIDE;
+  x11_miscmap[XK_KP_Multiply & 0xFF]  = OIK_N_MULTIPLY;
+  x11_miscmap[XK_KP_Subtract & 0xFF]  = OIK_N_MINUS;
+  x11_miscmap[XK_KP_Add & 0xFF]       = OIK_N_PLUS;
+  x11_miscmap[XK_KP_Enter & 0xFF]     = OIK_N_ENTER;
+  x11_miscmap[XK_KP_Equal & 0xFF]     = OIK_N_EQUALS;
   
-  x11_miscmap[XK_Up & 0xFF]           = SK_UP;
-  x11_miscmap[XK_Down & 0xFF]         = SK_DOWN;
-  x11_miscmap[XK_Right & 0xFF]        = SK_RIGHT;
-  x11_miscmap[XK_Left & 0xFF]         = SK_LEFT;
-  x11_miscmap[XK_Insert & 0xFF]       = SK_INSERT;
-  x11_miscmap[XK_Home & 0xFF]         = SK_HOME;
-  x11_miscmap[XK_End & 0xFF]          = SK_END;
-  x11_miscmap[XK_Page_Up & 0xFF]      = SK_PAGEUP;
-  x11_miscmap[XK_Page_Down & 0xFF]    = SK_PAGEDOWN;
+  x11_miscmap[XK_Up & 0xFF]           = OIK_UP;
+  x11_miscmap[XK_Down & 0xFF]         = OIK_DOWN;
+  x11_miscmap[XK_Right & 0xFF]        = OIK_RIGHT;
+  x11_miscmap[XK_Left & 0xFF]         = OIK_LEFT;
+  x11_miscmap[XK_Insert & 0xFF]       = OIK_INSERT;
+  x11_miscmap[XK_Home & 0xFF]         = OIK_HOME;
+  x11_miscmap[XK_End & 0xFF]          = OIK_END;
+  x11_miscmap[XK_Page_Up & 0xFF]      = OIK_PAGEUP;
+  x11_miscmap[XK_Page_Down & 0xFF]    = OIK_PAGEDOWN;
   
-  x11_miscmap[XK_F1 & 0xFF]           = SK_F1;
-  x11_miscmap[XK_F2 & 0xFF]           = SK_F2;
-  x11_miscmap[XK_F3 & 0xFF]           = SK_F3;
-  x11_miscmap[XK_F4 & 0xFF]           = SK_F4;
-  x11_miscmap[XK_F5 & 0xFF]           = SK_F5;
-  x11_miscmap[XK_F6 & 0xFF]           = SK_F6;
-  x11_miscmap[XK_F7 & 0xFF]           = SK_F7;
-  x11_miscmap[XK_F8 & 0xFF]           = SK_F8;
-  x11_miscmap[XK_F9 & 0xFF]           = SK_F9;
-  x11_miscmap[XK_F10 & 0xFF]          = SK_F10;
-  x11_miscmap[XK_F11 & 0xFF]          = SK_F11;
-  x11_miscmap[XK_F12 & 0xFF]          = SK_F12;
-  x11_miscmap[XK_F13 & 0xFF]          = SK_F13;
-  x11_miscmap[XK_F14 & 0xFF]          = SK_F14;
-  x11_miscmap[XK_F15 & 0xFF]          = SK_F15;
+  x11_miscmap[XK_F1 & 0xFF]           = OIK_F1;
+  x11_miscmap[XK_F2 & 0xFF]           = OIK_F2;
+  x11_miscmap[XK_F3 & 0xFF]           = OIK_F3;
+  x11_miscmap[XK_F4 & 0xFF]           = OIK_F4;
+  x11_miscmap[XK_F5 & 0xFF]           = OIK_F5;
+  x11_miscmap[XK_F6 & 0xFF]           = OIK_F6;
+  x11_miscmap[XK_F7 & 0xFF]           = OIK_F7;
+  x11_miscmap[XK_F8 & 0xFF]           = OIK_F8;
+  x11_miscmap[XK_F9 & 0xFF]           = OIK_F9;
+  x11_miscmap[XK_F10 & 0xFF]          = OIK_F10;
+  x11_miscmap[XK_F11 & 0xFF]          = OIK_F11;
+  x11_miscmap[XK_F12 & 0xFF]          = OIK_F12;
+  x11_miscmap[XK_F13 & 0xFF]          = OIK_F13;
+  x11_miscmap[XK_F14 & 0xFF]          = OIK_F14;
+  x11_miscmap[XK_F15 & 0xFF]          = OIK_F15;
   
-  x11_miscmap[XK_Num_Lock & 0xFF]     = SK_NUMLOCK;
-  x11_miscmap[XK_Caps_Lock & 0xFF]    = SK_CAPSLOCK;
-  x11_miscmap[XK_Scroll_Lock & 0xFF]  = SK_SCROLLOCK;
-  x11_miscmap[XK_Shift_R & 0xFF]      = SK_RSHIFT;
-  x11_miscmap[XK_Shift_L & 0xFF]      = SK_LSHIFT;
-  x11_miscmap[XK_Control_R & 0xFF]    = SK_RCTRL;
-  x11_miscmap[XK_Control_L & 0xFF]    = SK_LCTRL;
-  x11_miscmap[XK_Alt_R & 0xFF]        = SK_RALT;
-  x11_miscmap[XK_Alt_L & 0xFF]        = SK_LALT;
-  x11_miscmap[XK_Meta_R & 0xFF]       = SK_RMETA;
-  x11_miscmap[XK_Meta_L & 0xFF]       = SK_LMETA;
-  x11_miscmap[XK_Super_L & 0xFF]      = SK_LWINDOWS;
-  x11_miscmap[XK_Super_R & 0xFF]      = SK_RWINDOWS;
-  x11_miscmap[XK_Mode_switch & 0xFF]  = SK_ALTGR;
-  x11_miscmap[XK_Multi_key & 0xFF]    = SK_COMPOSE;
+  x11_miscmap[XK_Num_Lock & 0xFF]     = OIK_NUMLOCK;
+  x11_miscmap[XK_Caps_Lock & 0xFF]    = OIK_CAPSLOCK;
+  x11_miscmap[XK_Scroll_Lock & 0xFF]  = OIK_SCROLLOCK;
+  x11_miscmap[XK_Shift_R & 0xFF]      = OIK_RSHIFT;
+  x11_miscmap[XK_Shift_L & 0xFF]      = OIK_LSHIFT;
+  x11_miscmap[XK_Control_R & 0xFF]    = OIK_RCTRL;
+  x11_miscmap[XK_Control_L & 0xFF]    = OIK_LCTRL;
+  x11_miscmap[XK_Alt_R & 0xFF]        = OIK_RALT;
+  x11_miscmap[XK_Alt_L & 0xFF]        = OIK_LALT;
+  x11_miscmap[XK_Meta_R & 0xFF]       = OIK_RMETA;
+  x11_miscmap[XK_Meta_L & 0xFF]       = OIK_LMETA;
+  x11_miscmap[XK_Super_L & 0xFF]      = OIK_LWINDOWS;
+  x11_miscmap[XK_Super_R & 0xFF]      = OIK_RWINDOWS;
+  x11_miscmap[XK_Mode_switch & 0xFF]  = OIK_ALTGR;
+  x11_miscmap[XK_Multi_key & 0xFF]    = OIK_COMPOSE;
   
-  x11_miscmap[XK_Help & 0xFF]         = SK_HELP;
-  x11_miscmap[XK_Print & 0xFF]        = SK_PRINT;
-  x11_miscmap[XK_Sys_Req & 0xFF]      = SK_SYSREQ;
-  x11_miscmap[XK_Break & 0xFF]        = SK_BREAK;
-  x11_miscmap[XK_Menu & 0xFF]         = SK_MENU;
-  x11_miscmap[XK_Hyper_R & 0xFF]      = SK_MENU;
+  x11_miscmap[XK_Help & 0xFF]         = OIK_HELP;
+  x11_miscmap[XK_Print & 0xFF]        = OIK_PRINT;
+  x11_miscmap[XK_Sys_Req & 0xFF]      = OIK_SYSREQ;
+  x11_miscmap[XK_Break & 0xFF]        = OIK_BREAK;
+  x11_miscmap[XK_Menu & 0xFF]         = OIK_MENU;
+  x11_miscmap[XK_Hyper_R & 0xFF]      = OIK_MENU;
 }
 
 /* ******************************************************************** */
 
 // Perform a full keyboard state update
-void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
+void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
   char keyret[32];
-  KeyCode xcode[SK_LAST];
+  KeyCode xcode[OIK_LAST];
   uint mod;
   Window w;
   sint i;
   sint j;
   uint mask;
-  uchar newstate[SK_LAST];
+  uchar newstate[OIK_LAST];
   uchar *curstate;
   
   // Fetch pressed keys from X if not supplied
@@ -165,7 +165,7 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
   }
 
   // Query modifiers
-  mod = SM_NONE;
+  mod = OIM_NONE;
   if(XQueryPointer(d, DefaultRootWindow(d), &w, &w,
 		   &i, &j, &i, &j, &mask)) {
     x11_private *priv;
@@ -173,19 +173,19 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
 
     // Capslock
     if(mask & LockMask) {
-      mod |= SM_CAPSLOCK;
+      mod |= OIM_CAPSLOCK;
     }
     if(mask & priv->mask_altgr) {
-      mod |= SM_ALTGR;
+      mod |= OIM_ALTGR;
     }
     if(mask & priv->mask_num) {
-      mod |= SM_NUMLOCK;
+      mod |= OIM_NUMLOCK;
     }
   }
 
   // Prepare new and current keystates
   memset(newstate, 0, sizeof(newstate));
-  curstate = sinp_key_keystate(NULL);
+  curstate = oi_key_keystate(NULL);
 
   // Check each bit in the 32 bytes of the X keystate
   for(i=0; i<32; i++) {
@@ -198,7 +198,7 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
     for(j=0; j<8; j++) {
       if(keyvec[i] & (1<<j)) {
 	// Find out what that key is
-	sinp_keysym sks;
+	oi_keysym sks;
 	KeyCode kc;
 	
 	kc = i << 3 | j;
@@ -211,7 +211,7 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
   }
 
   // Set state and fetch modifiers
-  for(i=SK_FIRST+1; i<SK_LAST; i++) {  
+  for(i=OIK_FIRST+1; i<OIK_LAST; i++) {  
     if(newstate[i]) {
 
       // Store new state of key
@@ -219,36 +219,36 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
 
       // Fetch normal modifiers
       switch(i) {
-      case SK_LSHIFT:
-	mod |= SM_LSHIFT;
+      case OIK_LSHIFT:
+	mod |= OIM_LSHIFT;
 	break;
 
-      case SK_RSHIFT:
-	mod |= SM_RSHIFT;
+      case OIK_RSHIFT:
+	mod |= OIM_RSHIFT;
 	break;
 
-      case SK_LCTRL:
-	mod |= SM_LCTRL;
+      case OIK_LCTRL:
+	mod |= OIM_LCTRL;
 	break;
 
-      case SK_RCTRL:
-	mod |= SM_RCTRL;
+      case OIK_RCTRL:
+	mod |= OIM_RCTRL;
 	break;
 
-      case SK_LALT:
-	mod |= SM_LALT;
+      case OIK_LALT:
+	mod |= OIM_LALT;
 	break;
 
-      case SK_RALT:
-	mod |= SM_RALT;
+      case OIK_RALT:
+	mod |= OIM_RALT;
 	break;
 
-      case SK_LMETA:	
-	mod |= SM_LMETA;
+      case OIK_LMETA:	
+	mod |= OIM_LMETA;
 	break;
 
-      case SK_RMETA:
-	mod |= SM_RMETA;
+      case OIK_RMETA:
+	mod |= OIM_RMETA;
 	break;
 
       default:
@@ -258,18 +258,18 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
   }
 
   // Correct for locking modifiers
-  if(mod & SM_CAPSLOCK) {
-    curstate[SK_CAPSLOCK] = TRUE;
+  if(mod & OIM_CAPSLOCK) {
+    curstate[OIK_CAPSLOCK] = TRUE;
   }
   else {
-    curstate[SK_CAPSLOCK] = FALSE;
+    curstate[OIK_CAPSLOCK] = FALSE;
   }
   
-  if(mod & SM_NUMLOCK) {
-    curstate[SK_NUMLOCK] = TRUE;
+  if(mod & OIM_NUMLOCK) {
+    curstate[OIK_NUMLOCK] = TRUE;
   }
   else {
-    curstate[SK_NUMLOCK] = FALSE;
+    curstate[OIK_NUMLOCK] = FALSE;
   }
 
   keyboard_setmodifier(mod);
@@ -277,15 +277,15 @@ void x11_keystate(sinp_device *dev, Display *d, char *keyvec) {
 
 /* ******************************************************************** */
 
-// Translate X11 keysym to sinp keysym
-inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
-				  KeyCode kc, sinp_keysym *keysym) {
+// Translate X11 keysym to OI keysym
+inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
+				  KeyCode kc, oi_keysym *keysym) {
   KeySym xsym;
 
-  // Basic sinp keysym
+  // Basic OI keysym
   keysym->scancode = kc;
-  keysym->sym = SK_UNKNOWN;
-  keysym->mod = SM_NONE;
+  keysym->sym = OIK_UNKNOWN;
+  keysym->mod = OIM_NONE;
 
   // Handle X keysym
   xsym = XKeycodeToKeysym(d, kc, 0);
@@ -306,7 +306,7 @@ inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
     case 0x0C: // Hebrew
     case 0x0D: // Thai
       // Normal ASCII keymap
-      keysym->sym = (sinp_key)(xsym & 0xFF);
+      keysym->sym = (oi_key)(xsym & 0xFF);
       
       // Fix lowercase
       if((keysym->sym >= 'A') && (keysym->sym <= 'Z')) {
@@ -332,15 +332,15 @@ inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
   else {
     switch(kc) {
     case 115:
-      keysym->sym = SK_LWINDOWS;
+      keysym->sym = OIK_LWINDOWS;
       break;
 
     case 116:
-      keysym->sym = SK_RWINDOWS;
+      keysym->sym = OIK_RWINDOWS;
       break;
 
     case 117:
-      keysym->sym = SK_MENU;
+      keysym->sym = OIK_MENU;
       break;
     }
   }
@@ -352,7 +352,7 @@ inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
 /* ******************************************************************** */
 
 // Get masks of modifiers
-void x11_modmasks(Display *d, sinp_device *dev) {
+void x11_modmasks(Display *d, oi_device *dev) {
   XModifierKeymap *xmods;
   int i;
   int j;

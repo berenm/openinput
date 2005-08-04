@@ -19,7 +19,7 @@ keynametest_SOURCES = \
 keynametest.c
 
 LDADD = \
-$(top_srcdir)/src/libsinp.la
+$(top_srcdir)/src/libopeninput.la
 
 INCLUDES = \
 -I$(top_srcdir)/include

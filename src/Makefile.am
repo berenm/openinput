@@ -6,12 +6,12 @@ unixsignal
 SUBDIRS = @PLATDIRS@
 
 lib_LTLIBRARIES = \
-libsinp.la
+libopeninput.la
 
-libsinp_la_DEPENDENCIES = @PLATLIBS@
-libsinp_la_LIBADD = @PLATLIBS@
+libopeninput_la_DEPENDENCIES = @PLATLIBS@
+libopeninput_la_LIBADD = @PLATLIBS@
 
-libsinp_la_SOURCES = \
+libopeninput_la_SOURCES = \
 bootstrap.h \
 internal.h \
 main.c \

@@ -1,7 +1,7 @@
 /*
  * unixsignal.c : UNIX signal handler (intr, sigsev, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -33,10 +33,10 @@
 #include "unixsignal.h"
 
 // Bootstrap global
-sinp_bootstrap unixsignal_bootstrap = {
+oi_bootstrap unixsignal_bootstrap = {
   "unixsignal",
   "UNIX signal handler",
-  SINP_PRO_UNKNOWN,
+  OI_PRO_UNKNOWN,
   unixsignal_avail,
   unixsignal_device
 };
@@ -56,20 +56,20 @@ sint unixsignal_avail(uint flags) {
 /* ******************************************************************** */
 
 // Install device block
-sinp_device *unixsignal_device() {
-  sinp_device *dev;
+oi_device *unixsignal_device() {
+  oi_device *dev;
 
   debug("unixsignal_device");
 
   // Alloc device data
-  dev = (sinp_device*)malloc(sizeof(sinp_device));
+  dev = (oi_device*)malloc(sizeof(oi_device));
   if(dev == NULL) {
     debug("unixsignal_device: device creation failed");
     return NULL;
   }
 
   // Clear structures
-  memset(dev, 0, sizeof(sinp_device));
+  memset(dev, 0, sizeof(oi_device));
 
   // Set members
   dev->init = unixsignal_init;
@@ -88,7 +88,7 @@ sinp_device *unixsignal_device() {
 /* ******************************************************************** */
 
 // Initialize device
-sint unixsignal_init(sinp_device *dev, char *window_id, uint flags) {
+sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
   debug("unixsignal_init");
 
   // Just to be sure, no signal is pending
@@ -99,13 +99,13 @@ sint unixsignal_init(sinp_device *dev, char *window_id, uint flags) {
   signal(SIGTERM, unixsignal_handler); // Terminate (kill)
   signal(SIGSEGV, unixsignal_handler); // Segfault
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Free device structure
-sint unixsignal_destroy(sinp_device *dev) {
+sint unixsignal_destroy(oi_device *dev) {
   debug("unixsignal_destroy");
   
   // Free device
@@ -114,17 +114,17 @@ sint unixsignal_destroy(sinp_device *dev) {
     dev = NULL;
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Pump events into event queue
-void unixsignal_process(sinp_device *dev) {
-  static sinp_event ev;
+void unixsignal_process(oi_device *dev) {
+  static oi_event ev;
 
-  if(!sinp_runstate()) {
-    debug("unixsignal_process: sinp_running false");
+  if(!oi_runstate()) {
+    debug("unixsignal_process: oi_running false");
     return;
   }
 
@@ -137,7 +137,7 @@ void unixsignal_process(sinp_device *dev) {
   pendingsignal = FALSE;
 
   // A signal, send quit event
-  ev.type = SINP_QUIT;
+  ev.type = OI_QUIT;
   queue_add(&ev);
 }
 

@@ -1,7 +1,7 @@
 /*
- * sinp_api.h : Main API
+ * openinput_api.h : Main API
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_API_H_
-#define _SINP_API_H_
+#ifndef _OPENINPUT_API_H_
+#define _OPENINPUT_API_H_
 
-#ifndef _SINP_H_
-#error Do not include this file directly - use sinp.h
+#ifndef _OPENINPUT_H_
+#error Do not include this file directly - use openinput.h
 #endif
 
 /* ********************************************************************
@@ -33,10 +33,10 @@
  ******************************************************************** */
 
 // Default initialization of all available devices (num_failed)
-sint sinp_init(char* window_id, uint flags);
+sint oi_init(char* window_id, uint flags);
 
 // Shutdown all available devices (num_failed)
-sint sinp_close();
+sint oi_close();
 
 
 /* ********************************************************************
@@ -44,25 +44,25 @@ sint sinp_close();
  ******************************************************************** */
 
 // Look at event without removing it from queue (number_returned)
-sint sinp_events_peep(sinp_event *evts, sint num);
+sint oi_events_peep(oi_event *evts, sint num);
 
 // Add an event to the tail of the queue (number_added)
-sint sinp_events_add(sinp_event *evts, sint num);
+sint oi_events_add(oi_event *evts, sint num);
 
 // Pump all device to transfer events into queue (n/a)
-void sinp_events_pump();
+void oi_events_pump();
 
 // Poll events (more_pending)
-sint sinp_events_poll(sinp_event *evt);
+sint oi_events_poll(oi_event *evt);
 
 // Wait for an event (n/a)
-void sinp_events_wait(sinp_event *evt);
+void oi_events_wait(oi_event *evt);
 
 // Set event type filter mask (n/a)
-void sinp_events_setmask(uint mask);
+void oi_events_setmask(uint mask);
 
 // Get event type filter mask (event_mask)
-uint sinp_events_getmask();
+uint oi_events_getmask();
 
 
 /* ********************************************************************
@@ -70,64 +70,64 @@ uint sinp_events_getmask();
  ******************************************************************** */
 
 // Send events for down-state keys (errorcode)
-sint sinp_key_repeat(sint delay, sint interval);
+sint oi_key_repeat(sint delay, sint interval);
 
 // Get key state table and set num to number of elements (pointer)
-uchar *sinp_key_keystate(sint *num);
+uchar *oi_key_keystate(sint *num);
 
 // Return modifier mask (modifier_mask)
-uint sinp_key_modstate();
+uint oi_key_modstate();
 
 // Get name of key (string)
-char *sinp_key_getname(sinp_key key);
+char *oi_key_getname(oi_key key);
 
-// Get key code given name (sinp_key)
-sinp_key sinp_key_getcode(char *name);
+// Get key code given name (oi_key)
+oi_key oi_key_getcode(char *name);
 
 /* ********************************************************************
  * Mouse functions
  ******************************************************************** */
 
 // Get absolute position of mouse (button_mask)
-sint sinp_mouse_absolute(sint *x, sint *y);
+sint oi_mouse_absolute(sint *x, sint *y);
 
 // Get relative position of mouse (button_mask)
-sint sinp_mouse_relative(sint *x, sint *y);
+sint oi_mouse_relative(sint *x, sint *y);
 
 // Warp mouse cursor position (errorcode)
-sint sinp_mouse_warp(sint x, sint y);
+sint oi_mouse_warp(sint x, sint y);
 
 // Get name of mouse button (string)
-char *sinp_mouse_getname(sinp_mouse button);
+char *oi_mouse_getname(oi_mouse button);
 
-// Get mouse-id given name (sinp_mouse)
-sinp_mouse sinp_mouse_getcode(char *name);
+// Get mouse-id given name (oi_mouse)
+oi_mouse oi_mouse_getcode(char *name);
 
 /* ********************************************************************
  * Misc functions
  ******************************************************************** */
 
 // Get focus state of application (focus_mask)
-sint sinp_app_focus();
+sint oi_app_focus();
 
 // Show/hide cursor (state)
-sinp_bool sinp_app_cursor(sinp_bool q);
+oi_bool oi_app_cursor(oi_bool q);
 
 // Grab/ungrab input (state)
-sint sinp_app_grab(sinp_bool q);
+sint oi_app_grab(oi_bool q);
 
 /* ********************************************************************
  * Action map functions
  ******************************************************************** */
 
 // Install actionmap (errorcode)
-sint sinp_action_install(sinp_actionmap *map, sint num);
+sint oi_action_install(oi_actionmap *map, sint num);
 
 // Check/validate single actionmap structure (errorcode)
-sint sinp_action_validate(sinp_actionmap *map);
+sint oi_action_validate(oi_actionmap *map);
 
 // Get action state table and set num to number of elements (pointer)
-uchar *sinp_action_actionstate(sint *num);
+uchar *oi_action_actionstate(sint *num);
 
 /* ******************************************************************** */
 

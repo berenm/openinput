@@ -1,7 +1,7 @@
 /*
- * sinp.h : Top-level include file for libsinp
+ * openinput.h : Top-level include file for OpenInput
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,8 +21,8 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_H_
-#define _SINP_H_
+#ifndef _OPENINPUT_H_
+#define _OPENINPUT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,12 +32,12 @@ extern "C" {
  * Include api
  ******************************************************************** */
 
-#include "sinp_types.h"
-#include "sinp_keys.h"
-#include "sinp_events.h"
-#include "sinp_mouse.h"
-#include "sinp_action.h"
-#include "sinp_api.h"
+#include "openinput_types.h"
+#include "openinput_keyboard.h"
+#include "openinput_events.h"
+#include "openinput_mouse.h"
+#include "openinput_action.h"
+#include "openinput_api.h"
 
 /* ******************************************************************** */
 

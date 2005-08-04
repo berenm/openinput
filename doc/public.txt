@@ -4,9 +4,9 @@
 
 * Functions
 
-All public functions are prefixed by "sinp_", for example:
-    sinp_init();
-    sinp_event_poll();
+All public functions are prefixed by "oi_", for example:
+    oi_init();
+    oi_event_poll();
 
 --------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ type one can expect (in the last paranthesis).
 
 * "init" call parameters:
 
-In the sinp_init(window_id, flags) and sinp_dev_init(window_id, flags)
+In the oi_init(window_id, flags) and oi_dev_init(window_id, flags)
 calls, the window_id parameter is a string, which uses the following
 convention on _all_ platforms: "c:CONN s:SCRN w:WINID" CONN is the
 connection handle to the server (ie. Display under X11) SCRN is the
@@ -35,14 +35,14 @@ needs CONN and SCRN. They can be left out if they are not needed.
 The three "lock" buttons on your keyboard: CapsLock, NumLock and
 ScrollLock are special as they typically control small LEDs found on
 many keyboards. Because of this, events are generated only on
-key-presses. Each key-press generates (in turn) either an SINP_KEYDOWN
-or an SINP_KEYUP event. For example:
+key-presses. Each key-press generates (in turn) either an OI_KEYDOWN
+or an OI_KEYUP event. For example:
 
-press NumLock -> send SINP_KEYDOWN -> release NumLock -> nothing ->
-press Numlock -> send SINP_KEYUP -> release NumLock -> nothing
+press NumLock -> send OI_KEYDOWN -> release NumLock -> nothing ->
+press Numlock -> send OI_KEYUP -> release NumLock -> nothing
 
-And so on... You can always use the sinp_key_getstate() or
-sinp_key_modstate() functions to determine whether the lock-keys are
+And so on... You can always use the oi_key_getstate() or
+oi_key_modstate() functions to determine whether the lock-keys are
 up or down.
 
 --------------------------------------------------------------------

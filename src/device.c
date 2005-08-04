@@ -1,7 +1,7 @@
 /*
  * device.c : The generic device functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,14 +23,14 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "internal.h"
 
 // Globals
-static sinp_device *devices[SINP_MAX_DEVICES];
+static oi_device *devices[OI_MAX_DEVICES];
 static int num_devices = 0;
 
 // Include the bootstrap table
@@ -41,7 +41,7 @@ static int num_devices = 0;
 /* ******************************************************************** */
 
 // Register device via bootstrap
-sint device_register(sinp_bootstrap *boot) {
+sint device_register(oi_bootstrap *boot) {
 
   // Create the device and set basics
   devices[num_devices] = boot->create();
@@ -51,7 +51,7 @@ sint device_register(sinp_bootstrap *boot) {
     if(!devices[num_devices]->init ||
        !devices[num_devices]->destroy ||
        !devices[num_devices]->process) {
-      return SINP_ERR_NOT_IMPLEM;
+      return OI_ERR_NOT_IMPLEM;
     }
 
     // Fill trivial stuff
@@ -65,8 +65,8 @@ sint device_register(sinp_bootstrap *boot) {
 
     // Send the discovery event
     {
-      sinp_event ev;
-      ev.type = SINP_DISCOVERY;
+      oi_event ev;
+      ev.type = OI_DISCOVERY;
       ev.discover.device = num_devices;
       ev.discover.name = boot->name;
       ev.discover.description = boot->desc;
@@ -75,11 +75,11 @@ sint device_register(sinp_bootstrap *boot) {
     }
 
     num_devices++;
-    return SINP_ERR_OK;
+    return OI_ERR_OK;
   }
   
   // Failure
-  return SINP_ERR_NO_DEVICE;
+  return OI_ERR_NO_DEVICE;
 }
 
 /* ******************************************************************** */
@@ -118,37 +118,37 @@ void device_bootstrap(uint flags) {
 
 // Initialize all devices which have been booted
 sint device_init(sint index, char *window_id, uint flags) {
-  sinp_device *dev;
+  oi_device *dev;
   int e;
 
   debug("device_init");
 
   dev = device_get(index);
   if(dev == NULL) {
-    return SINP_ERR_INDEX;
+    return OI_ERR_INDEX;
   }
 
   // Graceful device creation
   e = dev->init(dev, window_id, flags);
-  if(e != SINP_ERR_OK) {
+  if(e != OI_ERR_OK) {
     return e;
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Destroy a device
 sint device_destroy(sint index) {
-  sinp_device *dev;
+  oi_device *dev;
 
   debug("device_destroy");
 
   // Dummy check
   dev = device_get(index);
   if(dev == NULL) {
-    return SINP_ERR_INDEX;
+    return OI_ERR_INDEX;
   }
 
   // Kill device
@@ -158,7 +158,7 @@ sint device_destroy(sint index) {
 /* ******************************************************************** */
 
 // Return a device structure
-sinp_device *device_get(sint index) {
+oi_device *device_get(sint index) {
   // Dummy check
   if((index < 1) || (index > num_devices)) {
     return NULL;

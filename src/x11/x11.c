@@ -1,7 +1,7 @@
 /*
  * x11.c : X11 utility functions (bootstrapping, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,10 +34,10 @@
 #include "x11.h"
 
 // Bootstrap global
-sinp_bootstrap x11_bootstrap = {
+oi_bootstrap x11_bootstrap = {
   "x11",
   "X11 Window system",
-  SINP_PRO_KEYBOARD | SINP_PRO_MOUSE | SINP_PRO_WINDOW,
+  OI_PRO_KEYBOARD | OI_PRO_MOUSE | OI_PRO_WINDOW,
   x11_avail,
   x11_device,
 };
@@ -51,7 +51,7 @@ sint x11_avail(uint flags) {
   debug("x11_avail");
 
   // Check flags
-  if(flags & SINP_FLAG_NOWINDOW) {
+  if(flags & OI_FLAG_NOWINDOW) {
     return FALSE;
   }
 
@@ -70,14 +70,14 @@ sint x11_avail(uint flags) {
 /* ******************************************************************** */
 
 // Bootstrap: Install X11 'device' block
-sinp_device *x11_device() {
-  sinp_device *dev;
+oi_device *x11_device() {
+  oi_device *dev;
   x11_private *priv;
 
   debug("x11_device");
 
   // Alloc
-  dev = (sinp_device*)malloc(sizeof(sinp_device));
+  dev = (oi_device*)malloc(sizeof(oi_device));
   priv = (x11_private*)malloc(sizeof(x11_private));
   if((dev == NULL) || (priv == NULL)) {
     debug("x11_device: device creation failed");
@@ -91,7 +91,7 @@ sinp_device *x11_device() {
   }
 
   // Clear structures
-  memset(dev, 0, sizeof(sinp_device));
+  memset(dev, 0, sizeof(oi_device));
   memset(priv, 0, sizeof(x11_private));
 
   // Set members
@@ -111,21 +111,21 @@ sinp_device *x11_device() {
 /* ******************************************************************** */
 
 // Initialize X11
-sint x11_init(sinp_device *dev, char *window_id, uint flags) {
+sint x11_init(oi_device *dev, char *window_id, uint flags) {
   x11_private *priv;
 
   priv = (x11_private*)dev->private;
   debug("x11_init");
 
   // Parse the window_id flags
-  priv->disp = (Display*)device_windowid(window_id, SINP_I_CONN);
-  priv->screen = (Screen*)device_windowid(window_id, SINP_I_SCRN);
-  priv->win = (Window)device_windowid(window_id, SINP_I_WINID);
+  priv->disp = (Display*)device_windowid(window_id, OI_I_CONN);
+  priv->screen = (Screen*)device_windowid(window_id, OI_I_SCRN);
+  priv->win = (Window)device_windowid(window_id, OI_I_WINID);
 
   // We require conn and winid parameters
   if(!(priv->disp) || !(priv->win)) {
     debug("x11_init: conn (c) and winid (w) parameters required\n");
-    return SINP_ERR_NO_DEVICE;
+    return OI_ERR_NO_DEVICE;
   }
 
   // Install error handlers
@@ -149,13 +149,13 @@ sint x11_init(sinp_device *dev, char *window_id, uint flags) {
   priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);  
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Clear X11 'device' block
-sint x11_destroy(sinp_device *dev) {
+sint x11_destroy(oi_device *dev) {
   x11_private *priv;
 
   debug("x11_destroy");
@@ -176,19 +176,19 @@ sint x11_destroy(sinp_device *dev) {
     dev = NULL;
   }
   
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Pump event into the queue
-void x11_process(sinp_device *dev) {
+void x11_process(oi_device *dev) {
   x11_private *priv;
 
   priv = (x11_private*)dev->private;
 
   // Process all pending events
-  while(sinp_runstate() && x11_pending(priv->disp)) {
+  while(oi_runstate() && x11_pending(priv->disp)) {
     x11_dispatch(dev, priv->disp);
   }
 }
@@ -196,7 +196,7 @@ void x11_process(sinp_device *dev) {
 /* ******************************************************************** */
 
 // Grab (lock) mouse/keyboard in window
-sint x11_grab(sinp_device *dev, sint on) {
+sint x11_grab(oi_device *dev, sint on) {
   x11_private *priv;
   int i;
 
@@ -221,7 +221,7 @@ sint x11_grab(sinp_device *dev, sint on) {
       if(i == GrabSuccess) {
 	break;
       }
-      usleep(SINP_SLEEP);
+      usleep(OI_SLEEP);
     }
 
     // Set flag for possible relative mouse
@@ -236,13 +236,13 @@ sint x11_grab(sinp_device *dev, sint on) {
     priv->relative &= ~SX11_GRAB;
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Show/hide mouse cursor
-sint x11_hidecursor(sinp_device *dev, sint on) {
+sint x11_hidecursor(oi_device *dev, sint on) {
   x11_private *priv;
 
   debug("x11_hidecursor: state:%i", on);
@@ -260,13 +260,13 @@ sint x11_hidecursor(sinp_device *dev, sint on) {
     priv->relative &= ~SX11_HIDE;
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Warp mouse
-sint x11_warp(sinp_device *dev, sint x, sint y) {
+sint x11_warp(oi_device *dev, sint x, sint y) {
   x11_private *priv;
 
   priv = (x11_private*)dev->private;
@@ -275,13 +275,13 @@ sint x11_warp(sinp_device *dev, sint x, sint y) {
   XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
   XSync(priv->disp, False);
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Get window sizes
-sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
+sint x11_winsize(oi_device *dev, sint *w, sint *h) {
   x11_private *priv;
   XWindowAttributes attr;
 
@@ -296,7 +296,7 @@ sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
 
   debug("x11_winsize: width:%i height:%i", *w, *h);
   
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -305,7 +305,7 @@ sint x11_winsize(sinp_device *dev, sint *w, sint *h) {
 sint x11_error(Display *d, XErrorEvent *e) {
   debug("x11_error: code %u", e->error_code);
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -314,7 +314,7 @@ sint x11_error(Display *d, XErrorEvent *e) {
 sint x11_fatal(Display *d) {
   debug("x11_fatal: fatal I/O error");
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

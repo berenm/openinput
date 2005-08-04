@@ -1,7 +1,7 @@
 /*
- * sinp_types.h : Basic type definitions
+ * openinput_types.h : Basic type definitions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_TYPES_H_
-#define _SINP_TYPES_H_
+#ifndef _OPENINPUT_TYPES_H_
+#define _OPENINPUT_TYPES_H_
 
-#ifndef _SINP_H_
-#error Do not include this file directly - use sinp.h
+#ifndef _OPENINPUT_H_
+#error Do not include this file directly - use openinput.h
 #endif
 
 /* ********************************************************************
@@ -46,44 +46,45 @@ typedef signed int                sint;
 
 // On/off/query 
 typedef enum {
-  SINP_ENABLE,                    // True/enable
-  SINP_DISABLE,                   // False/disable
-  SINP_QUERY                      // Don't change, return current
-} sinp_bool;
+  OI_ENABLE,                    // True/enable
+  OI_DISABLE,                   // False/disable
+  OI_QUERY                      // Don't change, return current
+} oi_bool;
 
 /* ********************************************************************
- * Various defines for the library, eg. mouse buttons and error codes
+ * Various defines for the library
  ******************************************************************** */
 
 // Init string parameters for window_id
-#define SINP_I_CONN              'c' // Server connection handle
-#define SINP_I_SCRN              's' // Screen handle
-#define SINP_I_WINID             'w' // Window handle
+#define OI_I_CONN              'c' // Server connection handle
+#define OI_I_SCRN              's' // Screen handle
+#define OI_I_WINID             'w' // Window handle
 
 // Device provide flags
-#define SINP_PRO_UNKNOWN          1 // Unknown/test type device
-#define SINP_PRO_KEYBOARD         2 // Keyboard input device
-#define SINP_PRO_MOUSE            4 // Pointer input device (mouse)
-#define SINP_PRO_JOYSTICK         8 // Joystick input device
-#define SINP_PRO_WINDOW          16 // Window stuff (move/state/size)
+#define OI_PRO_UNKNOWN          1 // Unknown/test type device
+#define OI_PRO_WINDOW           2 // Window stuff (move/state/size)
+#define OI_PRO_SYSTEM           4 // System events (segfault/interrupt/etc)
+#define OI_PRO_KEYBOARD         8 // Keyboard input device
+#define OI_PRO_MOUSE           16 // Pointer input device (mouse)
+#define OI_PRO_JOYSTICK        32 // Joystick input device
 
 // Application activation
-#define SINP_FOCUS_MOUSE          1 // Window has mouse focus
-#define SINP_FOCUS_INPUT          2 // Window has keyboard (input) focus
-#define SINP_FOCUS_VISIBLE        4 // Window is visible
+#define OI_FOCUS_MOUSE          1 // Window has mouse focus
+#define OI_FOCUS_INPUT          2 // Window has keyboard (input) focus
+#define OI_FOCUS_VISIBLE        4 // Window is visible
 
-// Initialization flags for sinp_init
-#define SINP_FLAG_NOWINDOW        1 // Do not hook into window
+// Initialization flags for oi_init
+#define OI_FLAG_NOWINDOW        1 // Do not hook into window
 
 // Error codes
-#define SINP_ERR_OK               0 // All ok
-#define SINP_ERR_NO_DEVICE        1 // Wrong device
-#define SINP_ERR_INDEX            2 // Index query out of bounds
-#define SINP_ERR_NOT_IMPLEM       4 // Not implemented
-#define SINP_ERR_DEV_EXIST        5 // Device already initialized
-#define SINP_ERR_PARAM            6 // Invalid parameter
-#define SINP_ERR_NO_NAME          7 // No such event name exists
-#define SINP_ERR_NOT_UNIQUE       8 // Index was not unique
+#define OI_ERR_OK               0 // All ok
+#define OI_ERR_NO_DEVICE        1 // Wrong device
+#define OI_ERR_INDEX            2 // Index query out of bounds
+#define OI_ERR_NOT_IMPLEM       4 // Not implemented
+#define OI_ERR_DEV_EXIST        5 // Device already initialized
+#define OI_ERR_PARAM            6 // Invalid parameter
+#define OI_ERR_NO_NAME          7 // No such event name exists
+#define OI_ERR_NOT_UNIQUE       8 // Index was not unique
  
 /* ******************************************************************** */
 

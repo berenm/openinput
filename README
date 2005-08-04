@@ -1,28 +1,31 @@
-libsinp
+OpenInput
 ------------------------------------------------------------------------
 
-libsinp is short for "library for simple input", and is intended as
-an easy-to-use, cross-platform input handler library. The goal is
-to provide a SDL-alike interface to input devices such as keyboards,
-mice and joysticks while keeping the dependencies for the library
-at a bare minimum.
+The OpenInput library is intended as an easy-to-use, cross-platform
+input handler library. The goal is to provide a SDL-alike interface to
+input devices such as keyboards, mice and joysticks while keeping the
+dependencies for the library at a bare minimum.
 
 A lot of code has been ripped, abused and otherwise mangled and
 mingled from the SDL project (http://www.libsdl.org/), and you
 should know that
 
        Without the EXCELLENT piece of software SDL is
-       libsinp would simply never have existed!
+       OpenInput would simply never have existed!
        Thank you so much and keep up the good work!
 
-libsinp is licensed under the GNU Lesser General Public License (LGPL).
+OpenInput is licensed under the GNU Lesser General Public License (LGPL).
 
 See the INSTALL file for installation instructions.
 
 The official subversion repository containing the sources and friends
-for libsinp can be obtained using the following subversion commands:
+for OpenInput can be obtained using the following subversion commands:
 
 	svn co https://makob.dk/svn/libsinp/trunk libsinp
+
+Please note that this repository location is due to change to another
+host (which will also complete the name change from libsinp to
+OpenInput).
 
 If you feel you deserve commit-priviligies, please send me an email at
 makob@makob.dk. Report bugs to makob@makob.dk.

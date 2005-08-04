@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: libsinp
-Description: Simple input handler library.
+Name: libopeninput
+Description: Free, open, cross-platform input handling
 Version: @VERSION@
-Libs: -L${libdir} -lsinp
+Libs: -L${libdir} -lopeninput
 Cflags: -I${includedir}/@PACKAGE@

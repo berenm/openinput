@@ -1,7 +1,7 @@
 /*
  * queue.c : The event queue functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,12 +25,12 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
 static struct {
-  sinp_event events[SINP_MAX_EVENTS];
+  oi_event events[OI_MAX_EVENTS];
   sshort head;
   sshort tail;
 } queue;
@@ -49,7 +49,7 @@ sint queue_init() {
   //FIXME: Mutexes and threads should gracefully be started here
 
   // All done
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -57,7 +57,7 @@ sint queue_init() {
 // Lock queue (internal)
 inline sint queue_lock() {
   //FIXME: Implement this
-  return SINP_ERR_NOT_IMPLEM;
+  return OI_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
@@ -65,28 +65,28 @@ inline sint queue_lock() {
 // Unlock queue (internal)
 inline sint queue_unlock() {
   //FIXME: Implement this
-  return SINP_ERR_NOT_IMPLEM;
+  return OI_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
 
 // Add events to queue (internal)
-sint queue_add(sinp_event *evt) {
+sint queue_add(oi_event *evt) {
   int tail, add;
 
   //FIXME Generate action events on keyboard/mouse
-  if((evt->type == SINP_KEYUP) ||
-     (evt->type == SINP_KEYDOWN) ||
-     (evt->type == SINP_MOUSEMOVE) ||
-     (evt->type == SINP_MOUSEBUTTONUP) ||
-     (evt->type == SINP_MOUSEBUTTONDOWN)) {
+  if((evt->type == OI_KEYUP) ||
+     (evt->type == OI_KEYDOWN) ||
+     (evt->type == OI_MOUSEMOVE) ||
+     (evt->type == OI_MOUSEBUTTONUP) ||
+     (evt->type == OI_MOUSEBUTTONDOWN)) {
     action_process(evt);
   }
 
   //FIXME: Check mask before we add the event
 
   // Find position for insertion
-  tail = (queue.tail+1)%SINP_MAX_EVENTS;
+  tail = (queue.tail+1)%OI_MAX_EVENTS;
 
   // Overflow, drop it
   if(tail == queue.head) {
@@ -116,12 +116,12 @@ sint queue_cut(ushort where) {
   // Cut head
   if(where == queue.head) {
     // Simply increase head
-    queue.head = (queue.head+1)%SINP_MAX_EVENTS;
+    queue.head = (queue.head+1)%OI_MAX_EVENTS;
     return queue.head;
   }
   
   // Cut tail
-  if(((where+1)%SINP_MAX_EVENTS) == queue.tail) {
+  if(((where+1)%OI_MAX_EVENTS) == queue.tail) {
     queue.tail = where;
     return queue.tail;
   }
@@ -134,12 +134,12 @@ sint queue_cut(ushort where) {
     // Wrap around negative tail
     --queue.tail;
     if(queue.tail < 0) {
-      queue.tail = SINP_MAX_EVENTS-1;
+      queue.tail = OI_MAX_EVENTS-1;
     }
 
     // Shift everything backwards
     for(here=where; here!=queue.tail; here=next) {
-      next = (here+1)%SINP_MAX_EVENTS;
+      next = (here+1)%OI_MAX_EVENTS;
 
       // We use COPYING here
       queue.events[here] = queue.events[next];
@@ -153,8 +153,8 @@ sint queue_cut(ushort where) {
 /* ******************************************************************** */
 
 // Take a peep at the queue (internal)
-sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove) {
-  sinp_event tmpevt;
+sint queue_peep(oi_event *evts, sint num, uint mask, sint remove) {
+  oi_event tmpevt;
   int here;
   int copy;
 
@@ -170,7 +170,7 @@ sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove) {
   copy = 0;
   while((copy < num) && (here != queue.tail)) {
     // Check mask
-    if(mask & SINP_EVENT_MASK(queue.events[here].type)) {
+    if(mask & OI_EVENT_MASK(queue.events[here].type)) {
 
       // Transfer to user by COPYING
       evts[copy] = queue.events[here];
@@ -181,13 +181,13 @@ sint queue_peep(sinp_event *evts, sint num, uint mask, sint remove) {
 	here = queue_cut(here);
       }
       else {
-	here = (here+1)%SINP_MAX_EVENTS;
+	here = (here+1)%OI_MAX_EVENTS;
       }
     }
 
     // Mask does not match, fetch next event in queue
     else {
-      here = (here+1)%SINP_MAX_EVENTS;
+      here = (here+1)%OI_MAX_EVENTS;
     }
   }
   

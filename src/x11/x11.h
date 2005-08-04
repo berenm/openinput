@@ -1,7 +1,7 @@
 /*
  * x11.h : X11 utility functions (bootstrapping, etc.)
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,25 +21,25 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_X11_H_
-#define _SINP_X11_H_
+#ifndef _OPENINPUT_X11_H_
+#define _OPENINPUT_X11_H_
 
 /* ******************************************************************** */
 
 // Bootstrap entries
 sint x11_avail();
-sinp_device *x11_device();
+oi_device *x11_device();
 
 /* ******************************************************************** */
 
 // Device entries
-sint x11_init(sinp_device *dev, char *window_id, uint flags);
-sint x11_destroy(sinp_device *dev);
-void x11_process(sinp_device *dev);
-sint x11_grab(sinp_device *dev, sint on);
-sint x11_hidecursor(sinp_device *dev, sint on);
-sint x11_warp(sinp_device *dev, sint x, sint y);
-sint x11_winsize(sinp_device *dev, sint *w, sint *h);
+sint x11_init(oi_device *dev, char *window_id, uint flags);
+sint x11_destroy(oi_device *dev);
+void x11_process(oi_device *dev);
+sint x11_grab(oi_device *dev, sint on);
+sint x11_hidecursor(oi_device *dev, sint on);
+sint x11_warp(oi_device *dev, sint x, sint y);
+sint x11_winsize(oi_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 
@@ -48,13 +48,13 @@ Cursor x11_mkcursor(Display *d, Window w);
 sint x11_error(Display *d, XErrorEvent *e);
 sint x11_fatal(Display *d);
 inline sint x11_pending(Display *d);
-inline void x11_dispatch(sinp_device *dev, Display *d);
-inline sinp_keysym *x11_translate(Display *d, XKeyEvent *xkey,
-				  KeyCode kc, sinp_keysym *keysym);
+inline void x11_dispatch(oi_device *dev, Display *d);
+inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
+				KeyCode kc, oi_keysym *keysym);
 void x11_initkeymap();
-void x11_keystate(sinp_device *dev, Display *d, char *keyvector);
-void x11_modmasks(Display *d, sinp_device *dev);
-inline void x11_relative_mouse(sinp_device *dev, XEvent *xev);
+void x11_keystate(oi_device *dev, Display *d, char *keyvector);
+void x11_modmasks(Display *d, oi_device *dev);
+inline void x11_relative_mouse(oi_device *dev, XEvent *xev);
 inline schar x11_keyrepeat(Display *d, XEvent *evt);
 
 /* ******************************************************************** */

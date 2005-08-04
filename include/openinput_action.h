@@ -1,7 +1,7 @@
 /*
- * sinp_action.h : Definitions for action mapper interface
+ * openinput_action.h : Definitions for action mapper interface
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_ACTION_H_
-#define _SINP_ACTION_H_
+#ifndef _OPENINPUT_ACTION_H_
+#define _OPENINPUT_ACTION_H_
 
-#ifndef _SINP_H_
-#error Do not include this file directly - use sinp.h
+#ifndef _OPENINPUT_H_
+#error Do not include this file directly - use openinput.h
 #endif
 
 /* ********************************************************************
@@ -33,10 +33,10 @@
  ******************************************************************** */
 
 // Action map structure
-typedef struct sinp_actionmap {
+typedef struct oi_actionmap {
   uint actionid;                 // Unique user-defined id
   char *name;                    // Trigger event (key_*, mouse_*, etc.)
-} sinp_actionmap;
+} oi_actionmap;
 
 /* ******************************************************************** */
 

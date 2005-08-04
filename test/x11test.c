@@ -1,7 +1,7 @@
 /*
  * x11test.c : X11 test driver
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
-#include "sinp.h"
+#include "openinput.h"
 #include <X11/Xlib.h>
 #include <stdio.h>
 
@@ -54,20 +54,20 @@ void help() {
 
 /* ******************************************************************** */
 
-// The libsinp test
+// The openinput test
 void test(Display *d, Window w, uint scrn) {
   int e;
-  sinp_event ev;
+  oi_event ev;
   char csw[100];
   int sgrab;
   int scursor;
 
-  // Init sinp
+  // Init OI
   sprintf(csw, "c:%u s:%u w:%u", (uint)d, (uint)scrn, (uint)w);
   printf("--- init parameter '%s'\n", csw);
 
-  e = sinp_init(csw, 0);
-  printf("--- sinp_init, code %i\n\n", e);
+  e = oi_init(csw, 0);
+  printf("--- oi_init, code %i\n\n", e);
 
   // States
   sgrab = 1;
@@ -79,80 +79,80 @@ void test(Display *d, Window w, uint scrn) {
   // Try to fetch an event
   e = 1;
   while(e) {
-    sinp_events_wait(&ev);
+    oi_events_wait(&ev);
 
     // Quit
-    if(ev.type == SINP_QUIT) {
+    if(ev.type == OI_QUIT) {
       e = 0;
     }
 
     // Mouse button up
-    else if((ev.type == SINP_MOUSEBUTTONUP) ||
-	    (ev.type == SINP_MOUSEBUTTONDOWN)) {
+    else if((ev.type == OI_MOUSEBUTTONUP) ||
+	    (ev.type == OI_MOUSEBUTTONDOWN)) {
       printf("--- mouse button state %i at position %i,%i\n",
 	     ev.button.state, ev.button.x, ev.button.y);
     }
     
     // Mouse move
-    else if(ev.type == SINP_MOUSEMOVE) {
+    else if(ev.type == OI_MOUSEMOVE) {
       printf("--- mouse move  abs:%i,%i \t rel:%i,%i\n",
 	     ev.move.x, ev.move.y,
 	     ev.move.relx, ev.move.rely);
     }
 
     // Key down
-    else if(ev.type == SINP_KEYDOWN) {
+    else if(ev.type == OI_KEYDOWN) {
       printf("--- key pressed -> %i:'%s'\n", ev.key.keysym.sym,
-	     sinp_key_getname(ev.key.keysym.sym));
+	     oi_key_getname(ev.key.keysym.sym));
     }
     
     // Key up
-    else if(ev.type == SINP_KEYUP) {
+    else if(ev.type == OI_KEYUP) {
       printf("--- key release -> %i:'%s'\n", ev.key.keysym.sym,
-	     sinp_key_getname(ev.key.keysym.sym));
+	     oi_key_getname(ev.key.keysym.sym));
 
       switch(ev.key.keysym.sym) {
-      case SK_H:
+      case OIK_H:
 	// Help
 	help();
 	break;
 
-      case SK_G:
+      case OIK_G:
 	// Grab
 	toggle(&sgrab);
-	sinp_app_grab(sgrab);
+	oi_app_grab(sgrab);
 	printf("*** grab state %i\n", sgrab);
 	break;
 
-      case SK_C:
+      case OIK_C:
 	// Cursor
 	toggle(&scursor);
 	if(scursor) {
-	  sinp_app_cursor(SINP_ENABLE);
+	  oi_app_cursor(OI_ENABLE);
 	} else {
-	  sinp_app_cursor(SINP_DISABLE);
+	  oi_app_cursor(OI_DISABLE);
 	}
 	printf("*** cursor state %i\n", scursor);
 	break;
 	
-      case SK_M:
+      case OIK_M:
 	// Print mouse state
 	{
 	  int x,y;
-	  sinp_mouse_absolute(&x, &y);
+	  oi_mouse_absolute(&x, &y);
 	  printf("*** mouse absolute: %i,%i\n", x, y);
-	  sinp_mouse_relative(&x, &y);
+	  oi_mouse_relative(&x, &y);
 	  printf("*** mouse relative: %i,%i\n", x, y);
 	}
 	break;
 
-      case SK_W:
+      case OIK_W:
 	// Warp
-	sinp_mouse_warp(10, 10);
+	oi_mouse_warp(10, 10);
      	printf("*** warped\n");
 	break;
 
-      case SK_Q:
+      case OIK_Q:
 	// Quit
 	e = 0;
 	break;
@@ -166,19 +166,19 @@ void test(Display *d, Window w, uint scrn) {
     // Other event
     else {
       switch(ev.type) {
-      case SINP_ACTIVE:
+      case OI_ACTIVE:
 	printf("--- active event\n");
 	break;
 
-      case SINP_RESIZE:
+      case OI_RESIZE:
 	printf("--- resize event\n");
 	break;
 
-      case SINP_EXPOSE:
+      case OI_EXPOSE:
 	printf("--- expose event\n");
 	break;
 
-      case SINP_DISCOVERY:
+      case OI_DISCOVERY:
 	printf("--- discovery event\n");
 	break;
 
@@ -189,9 +189,9 @@ void test(Display *d, Window w, uint scrn) {
     }
   }
 
-  // Close sinp
-  e = sinp_close();
-  printf("--- sinp_close, code %i\n\n", e);
+  // Close OI
+  e = oi_close();
+  printf("--- oi_close, code %i\n\n", e);
 }
 
 /* ******************************************************************** */

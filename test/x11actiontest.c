@@ -1,7 +1,7 @@
 /*
  * x11actiontest.c : Action mapper test using X11 input
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 /* ******************************************************************** */
 
 // Includes
-#include "sinp.h"
+#include "openinput.h"
 #include <X11/Xlib.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,15 +31,15 @@
 
 /* ******************************************************************** */
 
-// The libsinp test
+// The openinput test
 void test() {
   int e;
   int i;
-  sinp_event ev;
-  sinp_actionmap *map;
+  oi_event ev;
+  oi_actionmap *map;
 
   // Build a simple actionmap
-  map = (sinp_actionmap*)malloc(sizeof(sinp_actionmap) * NUM_MAPS);
+  map = (oi_actionmap*)malloc(sizeof(oi_actionmap) * NUM_MAPS);
 
   map[0].actionid = 1;
   map[0].name = "key_space";
@@ -59,14 +59,14 @@ void test() {
   // Print validation codes
   for(i=0; i<NUM_MAPS; i++) {
     printf("--- validating map %i: ", i);
-    e = sinp_action_validate(&(map[i]));
+    e = oi_action_validate(&(map[i]));
     printf("code %i\n", e);
   }
 
   // Install the map
-  e = sinp_action_install(map, NUM_MAPS);
+  e = oi_action_install(map, NUM_MAPS);
   printf("--- installed map, code %i\n", e);
-  if(e != SINP_ERR_OK) {
+  if(e != OI_ERR_OK) {
     printf("--- map install failed - aborting\n");
     return;
   }
@@ -77,15 +77,15 @@ void test() {
   // Try to fetch an event
   e = 1;
   while(e) {
-    sinp_events_wait(&ev);
+    oi_events_wait(&ev);
 
     // Quit
-    if(ev.type == SINP_QUIT) {
+    if(ev.type == OI_QUIT) {
       printf("--- quit event - aborting\n");
       e = 0;
     }
 
-    if(ev.type == SINP_ACTION) {
+    if(ev.type == OI_ACTION) {
       printf("--- action event\n");
       printf("device: %hhu\nactionid: %u\nstate: %hhu\n",
 	     ev.action.device, ev.action.actionid, ev.action.state);
@@ -133,22 +133,22 @@ int main(int argc, char* argv[]) {
     XNextEvent(disp, &evt);
   } while(evt.type != MapNotify);
 
-  // Init libsinp
+  // Init OI
   sprintf(csw, "c:%u s:%u w:%u", (uint)disp, (uint)scrn, (uint)win);
-  i = sinp_init(csw, 0);
-  printf("--- sinp_init, code %i\n\n", i);
+  i = oi_init(csw, 0);
+  printf("--- oi_init, code %i\n\n", i);
 
   // Perform the test
-  if(i == SINP_ERR_OK) {
+  if(i == OI_ERR_OK) {
     test();
   }
   else {
-    printf("--- libsinp not initialized - test not performed\n");
+    printf("--- openinput not initialized - test not performed\n");
   }
   
-  // Close libsinp
-  i = sinp_close();
-  printf("--- sinp_close, code %i\n\n", i);
+  // Close OI
+  i = oi_close();
+  printf("--- oi_close, code %i\n\n", i);
 
   // Close window and connection
   XDestroyWindow(disp, win);

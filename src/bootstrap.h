@@ -1,7 +1,7 @@
 /*
  * bootstrap.h : Header for platform bootstrap functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,27 +21,27 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_BOOTSTRAP_H_
-#define _SINP_BOOTSTRAP_H_
+#ifndef _OPENINPUT_BOOTSTRAP_H_
+#define _OPENINPUT_BOOTSTRAP_H_
 
 /* ******************************************************************** */
 
 // Bootstrap function forward definitions
 #ifdef ENABLE_FOO
-extern sinp_bootstrap foo_bootstrap;
+extern oi_bootstrap foo_bootstrap;
 #endif
 #ifdef ENABLE_X11
-extern sinp_bootstrap x11_bootstrap;
+extern oi_bootstrap x11_bootstrap;
 #endif
 #ifdef ENABLE_UNIXSIGNAL
-extern sinp_bootstrap unixsignal_bootstrap;
+extern oi_bootstrap unixsignal_bootstrap;
 #endif
 
 /* ******************************************************************** */
 
 // Global variable for "device.c" only! All drivers must fill in an entry
 #ifdef _DEVICE_FILLER_
-static sinp_bootstrap *bootstrap[] = {
+static oi_bootstrap *bootstrap[] = {
 
   // Begin list
 #ifdef ENABLE_FOO

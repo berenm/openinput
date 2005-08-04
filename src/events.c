@@ -1,7 +1,7 @@
 /*
  * events.c : The event handling functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,7 +25,7 @@
 #include "config.h"
 #include <stdio.h>
 #include <unistd.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
@@ -34,7 +34,7 @@ static uint event_mask = 0;
 /* ******************************************************************** */
 
 // Look at events in queue without removal (public)
-sint sinp_events_peep(sinp_event *evts, sint num) {
+sint oi_events_peep(oi_event *evts, sint num) {
   sint p;
 
   queue_lock();
@@ -47,7 +47,7 @@ sint sinp_events_peep(sinp_event *evts, sint num) {
 /* ******************************************************************** */
 
 // Add events to the queue (public)
-sint sinp_events_add(sinp_event *evts, sint num) {
+sint oi_events_add(oi_event *evts, sint num) {
   int i;
   int j;
   int tot;
@@ -59,7 +59,7 @@ sint sinp_events_add(sinp_event *evts, sint num) {
   for(i=0; i<num; i++) {
 
     // If filter mask does not match, look at next
-    if(!(SINP_EVENT_MASK(evts[i].type) & ~event_mask)) {
+    if(!(OI_EVENT_MASK(evts[i].type) & ~event_mask)) {
       continue;
     }
 
@@ -81,12 +81,12 @@ sint sinp_events_add(sinp_event *evts, sint num) {
 /* ******************************************************************** */
 
 // Explictly pump events into the queue (public)
-void sinp_events_pump() {
+void oi_events_pump() {
   static uint last = 0;
   uint now;
 
   // Bail out if 'no time' has passed
-  now = sinp_getticks();
+  now = oi_getticks();
   if(now == last) {
     return;
   }
@@ -106,10 +106,10 @@ void sinp_events_pump() {
 /* ******************************************************************** */
 
 // Poll for an event (public)
-sint sinp_events_poll(sinp_event *evt) {
+sint oi_events_poll(oi_event *evt) {
   int found;
 
-  sinp_events_pump();
+  oi_events_pump();
 
   // Peep for 1 event with removal
   found = queue_peep(evt, 1, ~event_mask, TRUE);
@@ -120,29 +120,29 @@ sint sinp_events_poll(sinp_event *evt) {
 /* ******************************************************************** */
 
 // Wait for an event (public)
-void sinp_events_wait(sinp_event *evt) {
+void oi_events_wait(oi_event *evt) {
   int found;
 
   // Wait until an event occurs
   found = 0;
   while(!found) {
     // Pump and read
-    sinp_events_pump();
+    oi_events_pump();
 
     found = queue_peep(evt, 1, ~event_mask, TRUE);
-    usleep(SINP_SLEEP);
+    usleep(OI_SLEEP);
   }
 }
 
 /* ******************************************************************** */
 
 // Set mask for incoming events (public)
-void sinp_events_setmask(uint mask) {
-  sinp_event ev;
+void oi_events_setmask(uint mask) {
+  oi_event ev;
 
   // Set mask and discard all pending events
   event_mask = mask;
-  while(sinp_events_poll(&ev)) {
+  while(oi_events_poll(&ev)) {
     ;
   }
 }
@@ -150,7 +150,7 @@ void sinp_events_setmask(uint mask) {
 /* ******************************************************************** */
 
 // Set mask for incoming events (public)
-uint sinp_events_getmask() {
+uint oi_events_getmask() {
   return event_mask;
 }
 

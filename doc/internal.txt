@@ -16,16 +16,16 @@ must allocate space for the event(s) before calling the functon.
 
 The following describes the basic flow in the boot process.
 
-sinp_init()
+oi_init()
 	// Stage 1: Initialize the queue
-	sinp_running = FALSE;
+	oi_running = FALSE;
 	queue_init();
 
 	// Stage 2: Bootstrap devices
 	device_bootstrap()
 		bootstrap->avail(); ***
 		bootstrap->create(); ***
-		queue_add(sinp_discovery_event);
+		queue_add(oi_discovery_event);
 
 	// State 3: Initialize devices
 	device_init();
@@ -38,7 +38,7 @@ sinp_init()
 	action_init();
 
 	// Stage 5: Enter running state
-	sinp_running = TRUE;
+	oi_running = TRUE;
 
 You, as a device driver hacker, needs only implement the functions
 marked by ***. All other steps are handled automatically by the
@@ -46,7 +46,7 @@ bootstrap process. Also, in order for device_bootstrap() to use your
 driver, you'll need to hook into the boostrap-table - please see
 the 'bootstrap.h' file for information (it's dead simple!).
 
-Important: Do NOT dispatch events before the sinp_running flag has
+Important: Do NOT dispatch events before the oi_running flag has
 been set! Devices may (if multithreaded) begin to run before the
 state managers have initialized. You can, however, use the queue
 if you really have to (like sending discovery events).
@@ -69,7 +69,7 @@ char *desc;
   Device long description, eg. 'X11 Window system'.
 
 sint provides;
-  A bitmask of SINP_PRO_* bits that describes what the device
+  A bitmask of OI_PRO_* bits that describes what the device
   provides.
 
 sint (*avail)(unsigned int flags);
@@ -78,7 +78,7 @@ sint (*avail)(unsigned int flags);
   result is either true (1) or false (0). The flags paramater is the
   same as delivered to device->init functions (ie. user-supplied).
 
-sinp_device *(*create)();
+oi_device *(*create)();
   Function pointer that returns the 'device' structure. This function
   is only called when the avail()-function has returned true. The
   function should ONLY setup the device-structure. Any further
@@ -110,28 +110,28 @@ void *private;
   very bad idea in order to ensure reuse of the same driver (more
   keyboards of same type).
 
-sint (*init)(sinp_device *dev, char *window_id, uint flags);
-  Function pointer for the device initialization. Called by sinp_init()
+sint (*init)(oi_device *dev, char *window_id, uint flags);
+  Function pointer for the device initialization. Called by oi_init()
   in the second boot stage.
 
-sint (*destroy)(sinp_device *dev);
+sint (*destroy)(oi_device *dev);
   Close the device. Should free any private data.
 
-void (*process)(sinp_device *dev);
+void (*process)(oi_device *dev);
   Do the event processing. This typically consists of a
   while(pending){dispatch} loop, where the dispatcher feeds events into
   the queue and/or uses the keyboard/mouse/app-state functions.
 
-sint (*grab)(sinp_device *dec, sint on);
+sint (*grab)(oi_device *dec, sint on);
   Grabs input and pointer focus.
 
-sint (*hide)(sinp_device *dev, sint on);
+sint (*hide)(oi_device *dev, sint on);
   Hides cursor.
 
-sint (*warp)(sinp_device *dev, sint x, sint y);
+sint (*warp)(oi_device *dev, sint x, sint y);
   Warp (move) the mouse cursor to the given coordinates.
 
-sint (*winsize)(sinp_device *dev, sint *x, sint *y);
+sint (*winsize)(oi_device *dev, sint *x, sint *y);
   Function should fill 'x' and 'y' with the current window
   geometry, ie. width and height in pixels.
 
@@ -178,12 +178,12 @@ based on real events. This allows the user to catch "jump" and
 "mouse wheel down".
 
 The user is in charge of delivering the "action map" via the
-sinp_action_install(map, num). The memory is not used when the
+oi_action_install(map, num). The memory is not used when the
 call returns.
 
 The "num" parameter contains the number of maps in the "map"
 parameter. The "map" parameter is an array of the structure named
-"sinp_actionmap", which contains the following two elements:
+"oi_actionmap", which contains the following two elements:
 
 uint actionid;
   This is the user-defined, unique action id, which the user
@@ -195,19 +195,5 @@ char *name;
   The name of the event, which should generate the action. The
   event name is the name of the button (or alike), for example
   "key_space" or "mouse_button_left".
-
-The actual action-map lookup is done on a 'per subsystem table
-basis'. The action mapper does not know the difference between
-a key down/up event. It is up to the user to make the distinction
-using the sinp_action_event structure, which contains a 'state'
-parameter. The same goes for the device which generated the event:
-If multiple devices of the same type are supported, the user
-must parse the 'device' member of the action event.
-
-The lookup tables contains an element for each key/possible event
-that the subsystem can generate (mouse/keyboard/etc). An element is
-simply an unsigned int. An action is not generated if this number
-is zero. Otherwise, an event is added to the queue with the number.
-That's both pretty simply and pretty fast...
 
 --------------------------------------------------------------------

@@ -1,7 +1,7 @@
 /*
  * footest.c : Foo test driver
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,33 +23,33 @@
 
 // Includes
 #include <stdio.h>
-#include "sinp.h"
+#include "openinput.h"
 
 /* ******************************************************************** */
 
 // Main function
 int main(int argc, char *argv[]) {
   int e;
-  sinp_event ev;
+  oi_event ev;
 
   // Startup
   printf("*** footest start ***\n\n");
   
-  // Init sinp
-  e = sinp_init("c:1 s:2 w:3", 0);
-  printf("--- sinp_init, code %i\n\n", e);
+  // Init OI
+  e = oi_init("c:1 s:2 w:3", 0);
+  printf("--- oi_init, code %i\n\n", e);
 
   // Try to fetch an event
-  e = sinp_events_poll(&ev);
-  printf("--- sinp_events_poll, code %i\n", e);
+  e = oi_events_poll(&ev);
+  printf("--- oi_events_poll, code %i\n", e);
   if(e > 0) {
     printf("--- event type %i\n", ev.type);
   }
   printf("\n");
 
-  // Close sinp
-  e = sinp_close();
-  printf("--- sinp_close, code %i\n\n", e);
+  // Close OI
+  e = oi_close();
+  printf("--- oi_close, code %i\n\n", e);
 
   // Done
   printf("*** footest stop ***\n");

@@ -1,7 +1,7 @@
 /*
  * x11_translate.c : Overall X11 event handler
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 // Includes
 #include "config.h"
-#include "sinp.h"
+#include "openinput.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,7 +34,7 @@
 /* ******************************************************************** */
 
 // Relative mouse motion (grabbed and hidden)
-inline void x11_relative_mouse(sinp_device *dev, XEvent *xev) {
+inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
   x11_private *priv;
   int deltax;
   int deltay;
@@ -149,8 +149,8 @@ inline schar x11_keyrepeat(Display *d, XEvent *evt) {
 
 /* ******************************************************************** */
 
-// Dispatch a pending X11 event into the sinp event queue
-inline void x11_dispatch(sinp_device *dev, Display *d) {
+// Dispatch a pending X11 event into the OI event queue
+inline void x11_dispatch(oi_device *dev, Display *d) {
   XEvent xev;
   
   // Fetch the event
@@ -170,11 +170,11 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
        (xev.xcrossing.mode != NotifyUngrab)) {
       
       // Move if grabbed, otherwise change focus
-      if(sinp_app_grab(SINP_QUERY) == SINP_ENABLE) {
+      if(oi_app_grab(OI_QUERY) == OI_ENABLE) {
 	mouse_move(xev.xcrossing.x, xev.xcrossing.y, FALSE, dev->index);
       }
       else {
-	appstate_focus(SINP_FOCUS_MOUSE,
+	appstate_focus(OI_FOCUS_MOUSE,
 		       xev.type == EnterNotify,
 		       dev->index);
       }
@@ -186,7 +186,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
   case FocusIn:
   case FocusOut:
     debug("x11_dispatch: focus_in/out (in/down:%i)", xev.type == FocusIn);
-    appstate_focus(SINP_FOCUS_INPUT,
+    appstate_focus(OI_FOCUS_INPUT,
 		   xev.type == FocusIn,
 		   dev->index);
     break;
@@ -228,7 +228,7 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
   case KeyRelease:
     debug("x11_dispatch: key_press/release (in/down:%i)", xev.type == KeyPress);
     {
-      sinp_keysym keysym;
+      oi_keysym keysym;
       x11_private *priv;
       
       priv = (x11_private*)dev->private;
@@ -252,14 +252,14 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Window gets iconified
   case UnmapNotify:
     debug("x11_dispatch: unmap_notify");
-    appstate_focus(FALSE, SINP_FOCUS_INPUT | SINP_FOCUS_VISIBLE, dev->index);
+    appstate_focus(FALSE, OI_FOCUS_INPUT | OI_FOCUS_VISIBLE, dev->index);
     break;
 
 
     // Window gets restored (uniconified)
   case MapNotify:
     debug("x11_dispatch: map_notify");
-    appstate_focus(TRUE, SINP_FOCUS_VISIBLE, dev->index);
+    appstate_focus(TRUE, OI_FOCUS_VISIBLE, dev->index);
     break;
 
 
@@ -278,8 +278,8 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
     // Window manager close window
     if((xev.xclient.format == 32) &&
        (xev.xclient.data.l[0] == ((x11_private*)dev->private)->wm_delete_window)) {
-      sinp_event ev;
-      ev.type = SINP_QUIT;
+      oi_event ev;
+      ev.type = OI_QUIT;
       queue_add(&ev);
     }    
     break;
@@ -289,8 +289,8 @@ inline void x11_dispatch(sinp_device *dev, Display *d) {
   case Expose:
     debug("x11_dispatch: expose");
     {
-      sinp_event ev;
-      ev.type = SINP_EXPOSE;
+      oi_event ev;
+      ev.type = OI_EXPOSE;
       queue_add(&ev);
     }
     break;

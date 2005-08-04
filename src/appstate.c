@@ -1,7 +1,7 @@
 /*
  * appstate.c : Application state (focus/grab/cursor) interface 
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -25,14 +25,14 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
-static sinp_device *windowdev;
+static oi_device *windowdev;
 static sint focus;
-static sinp_bool grab;
-static sinp_bool cursor;
+static oi_bool grab;
+static oi_bool cursor;
 static sint win_width;
 static sint win_height;
 
@@ -43,7 +43,7 @@ sint appstate_init() {
   int i;
 
   // Ok, our focus is complete
-  focus = SINP_FOCUS_MOUSE | SINP_FOCUS_INPUT | SINP_FOCUS_VISIBLE;
+  focus = OI_FOCUS_MOUSE | OI_FOCUS_INPUT | OI_FOCUS_VISIBLE;
 
   // Not grabbed, and cursor is visible
   grab = FALSE;
@@ -52,7 +52,7 @@ sint appstate_init() {
   // Find default/first window device
   i = 1;
   while((windowdev = device_get(i)) != NULL) {
-    if((windowdev->provides & SINP_PRO_WINDOW) == SINP_PRO_WINDOW) {
+    if((windowdev->provides & OI_PRO_WINDOW) == OI_PRO_WINDOW) {
       break;
     }
     i++;
@@ -60,7 +60,7 @@ sint appstate_init() {
 
   // We really want a window
   if(windowdev == NULL) {
-    return SINP_ERR_NO_DEVICE;
+    return OI_ERR_NO_DEVICE;
   }
 
   // Get window metrics
@@ -69,13 +69,13 @@ sint appstate_init() {
   }
   else {
     // No winsize function, very bad
-    return SINP_ERR_NOT_IMPLEM;
+    return OI_ERR_NOT_IMPLEM;
   }
 
   debug("appstate_init: window device is '%s'", windowdev->name);
 
   // Done
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -103,8 +103,8 @@ void appstate_focus(sint gain, sint state, uchar postdev) {
 
   // Postal services
   if(postdev) {
-    sinp_event ev;
-    ev.type = SINP_ACTIVE;
+    oi_event ev;
+    ev.type = OI_ACTIVE;
     ev.active.device = postdev;
     ev.active.gain = gain & TRUE;
     ev.active.state = state;
@@ -122,8 +122,8 @@ void appstate_resize(sint w, sint h, uchar postdev) {
 
   // Postal services
   if(postdev) {
-    sinp_event ev;
-    ev.type = SINP_RESIZE;
+    oi_event ev;
+    ev.type = OI_RESIZE;
     ev.resize.device = postdev;
     ev.resize.width = w;
     ev.resize.height = h;
@@ -148,37 +148,37 @@ inline sint appstate_height() {
 /* ******************************************************************** */
 
 // Get focus state of application (public)
-sint sinp_app_focus() {
+sint oi_app_focus() {
   return focus;
 }
 
 /* ******************************************************************** */
 
 // Show/hide cursor (public)
-sinp_bool sinp_app_cursor(sinp_bool q) {
+oi_bool oi_app_cursor(oi_bool q) {
   int hide;
 
   switch(q) {
-  case SINP_ENABLE:
+  case OI_ENABLE:
     hide = FALSE;
     break;
     
-  case SINP_DISABLE:
+  case OI_DISABLE:
     hide = TRUE;
     break;
 
-  case SINP_QUERY:
+  case OI_QUERY:
     if(cursor) {
-      return SINP_ENABLE;
+      return OI_ENABLE;
     }
     else {
-      return SINP_DISABLE;
+      return OI_DISABLE;
     }
   }
   
   // Set cursor mode on all devices
   {
-    sinp_device *dev;
+    oi_device *dev;
     int i = 1;
     while((dev = device_get(i)) != NULL) {
       // Hide is an optional function
@@ -190,7 +190,7 @@ sinp_bool sinp_app_cursor(sinp_bool q) {
       if(!hide && dev->warp) {
 	sint x;
 	sint y;
-	sinp_mouse_absolute(&x, &y);
+	oi_mouse_absolute(&x, &y);
 	dev->warp(dev, x, y);
       }
       i++;
@@ -200,36 +200,36 @@ sinp_bool sinp_app_cursor(sinp_bool q) {
   // Remember mode
   cursor = hide;
 
-  return SINP_QUERY;
+  return OI_QUERY;
 }
 
 /* ******************************************************************** */
 
 // Grab/ungrab input (public)
-sint sinp_app_grab(sinp_bool q) {
+sint oi_app_grab(oi_bool q) {
   int eat;
   
   switch(q) {
-  case SINP_ENABLE:
+  case OI_ENABLE:
     eat = TRUE;
     break;
     
-  case SINP_DISABLE:
+  case OI_DISABLE:
     eat = FALSE;
     break;
 
-  case SINP_QUERY:
+  case OI_QUERY:
     if(grab) {
-      return SINP_ENABLE;
+      return OI_ENABLE;
     }
     else {
-      return SINP_DISABLE;
+      return OI_DISABLE;
     }
   }
   
   // Set cursor mode on all devices
   {
-    sinp_device *dev;
+    oi_device *dev;
     int i = 1;
     while((dev = device_get(i)) != NULL) {
       // Grab is an optional function
@@ -243,7 +243,7 @@ sint sinp_app_grab(sinp_bool q) {
   // Remember mode
   grab = eat;
 
-  return SINP_QUERY;
+  return OI_QUERY;
 }
 
 /* ******************************************************************** */

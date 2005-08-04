@@ -1,7 +1,7 @@
 /*
  * keyboard.c : Keyboard state interface
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,15 +26,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Globals
-static sinp_device *keydev;
-static uchar keystate[SK_LAST];
+static oi_device *keydev;
+static uchar keystate[OIK_LAST];
 static uint modstate;
-static char *keynames[SK_LAST];
-static uchar keyaction[SK_LAST];
+static char *keynames[OIK_LAST];
 
 // Key repeat
 struct {
@@ -42,7 +41,7 @@ struct {
   sint delay;
   sint interval;
   uint timestamp;
-  sinp_event ev;
+  oi_event ev;
 } keyboard_keyrep;
 
 /* ******************************************************************** */
@@ -53,12 +52,11 @@ sint keyboard_init() {
 
   // Clear tables
   memset(keystate, FALSE, TABLESIZE(keystate));
-  memset(keyaction, FALSE, TABLESIZE(keyaction));
   memset(keynames, 0, TABLESIZE(keynames));
-  modstate = SM_NONE;
+  modstate = OIM_NONE;
 
   // Disable key-repeat
-  sinp_key_repeat(0, 0);
+  oi_key_repeat(0, 0);
 
   // Fill keyboard names
   keyboard_fillnames(keynames);
@@ -66,7 +64,7 @@ sint keyboard_init() {
   // Find default/first mouse device
   i = 1;
   while((keydev = device_get(i)) != NULL) {
-    if((keydev->provides & SINP_PRO_KEYBOARD) == SINP_PRO_KEYBOARD) {
+    if((keydev->provides & OI_PRO_KEYBOARD) == OI_PRO_KEYBOARD) {
       break;
     }
     i++;
@@ -74,20 +72,20 @@ sint keyboard_init() {
 
   // We really, really want a keyboard!
   if(keydev == NULL) {
-    return SINP_ERR_NO_DEVICE;
+    return OI_ERR_NO_DEVICE;
   }
 
   debug("keyboard_init: keyboard device is '%s'", keydev->name);
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Update keyboard/modifier state (internal)
-void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
-  sinp_type type;
-  sinp_event ev;
+void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
+  oi_type type;
+  oi_event ev;
   uint newmod;
   uchar repeat;
   
@@ -103,67 +101,67 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
     // Handle each modifier-key
     switch(keysym->sym) {
       
-    case SK_NUMLOCK:
+    case OIK_NUMLOCK:
       // Locks are special
-      newmod ^= SM_NUMLOCK;
-      if(!(newmod & SM_NUMLOCK)) {
+      newmod ^= OIM_NUMLOCK;
+      if(!(newmod & OIM_NUMLOCK)) {
 	state = FALSE;
       }
       keysym->mod = newmod;
       break;
       
-    case SK_CAPSLOCK:
+    case OIK_CAPSLOCK:
       // Locks are special
-      newmod ^= SM_CAPSLOCK;
-      if(!(newmod & SM_CAPSLOCK)) {
+      newmod ^= OIM_CAPSLOCK;
+      if(!(newmod & OIM_CAPSLOCK)) {
 	state = FALSE;
       }
       keysym->mod = newmod;
       break;
 
-    case SK_SCROLLOCK:
+    case OIK_SCROLLOCK:
       // Locks are special
-      newmod ^= SM_SCROLLOCK;
-      if(!(newmod & SM_SCROLLOCK)) {
+      newmod ^= OIM_SCROLLOCK;
+      if(!(newmod & OIM_SCROLLOCK)) {
 	state = FALSE;
       }
       keysym->mod = newmod;
       break;
 
-    case SK_RSHIFT:
-      newmod |= SM_RSHIFT;
+    case OIK_RSHIFT:
+      newmod |= OIM_RSHIFT;
       break;
 
-    case SK_LSHIFT:
-      newmod |= SM_LSHIFT;
+    case OIK_LSHIFT:
+      newmod |= OIM_LSHIFT;
       break;
 
-    case SK_RCTRL:
-      newmod |= SM_RCTRL;
+    case OIK_RCTRL:
+      newmod |= OIM_RCTRL;
       break;
 
-    case SK_LCTRL:
-      newmod |= SM_LCTRL;
+    case OIK_LCTRL:
+      newmod |= OIM_LCTRL;
       break;
 
-    case SK_RALT:
-      newmod |= SM_RALT;
+    case OIK_RALT:
+      newmod |= OIM_RALT;
       break;
 
-    case SK_LALT:
-      newmod |= SM_LALT;
+    case OIK_LALT:
+      newmod |= OIM_LALT;
       break;
 
-    case SK_RMETA:
-      newmod |= SM_RMETA;
+    case OIK_RMETA:
+      newmod |= OIM_RMETA;
       break;
 
-    case SK_LMETA:
-      newmod |= SM_LMETA;
+    case OIK_LMETA:
+      newmod |= OIM_LMETA;
       break;
 
-    case SK_ALTGR:
-      newmod |= SM_ALTGR;
+    case OIK_ALTGR:
+      newmod |= OIM_ALTGR;
       break;
 
     default:
@@ -176,46 +174,46 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
     // Handle each modifier-key
     switch(keysym->sym) {
       
-    case SK_NUMLOCK:
-    case SK_CAPSLOCK:
-    case SK_SCROLLOCK:
+    case OIK_NUMLOCK:
+    case OIK_CAPSLOCK:
+    case OIK_SCROLLOCK:
       // Only send down-events on num and capslock
       return;
 
-    case SK_RSHIFT:
-      newmod &= ~SM_RSHIFT;
+    case OIK_RSHIFT:
+      newmod &= ~OIM_RSHIFT;
       break;
 
-    case SK_LSHIFT:
-      newmod &= ~SM_LSHIFT;
+    case OIK_LSHIFT:
+      newmod &= ~OIM_LSHIFT;
       break;
 
-    case SK_RCTRL:
-      newmod &= ~SM_RCTRL;
+    case OIK_RCTRL:
+      newmod &= ~OIM_RCTRL;
       break;
 
-    case SK_LCTRL:
-      newmod &= ~SM_LCTRL;
+    case OIK_LCTRL:
+      newmod &= ~OIM_LCTRL;
       break;
 
-    case SK_RALT:
-      newmod &= ~SM_RALT;
+    case OIK_RALT:
+      newmod &= ~OIM_RALT;
       break;
 
-    case SK_LALT:
-      newmod &= ~SM_LALT;
+    case OIK_LALT:
+      newmod &= ~OIM_LALT;
       break;
 
-    case SK_RMETA:
-      newmod &= ~SM_RMETA;
+    case OIK_RMETA:
+      newmod &= ~OIM_RMETA;
       break;
 
-    case SK_LMETA:
-      newmod &= ~SM_LMETA;
+    case OIK_LMETA:
+      newmod &= ~OIM_LMETA;
       break;
 
-    case SK_ALTGR:
-      newmod &= ~SM_ALTGR;
+    case OIK_ALTGR:
+      newmod &= ~OIM_ALTGR;
       break;
 
     default:
@@ -228,10 +226,10 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
 
   // Handle down and up type event
   if(state) {
-    type = SINP_KEYDOWN;
+    type = OI_KEYDOWN;
   }
   else {
-    type = SINP_KEYUP;
+    type = OI_KEYUP;
 
     // Disable repeat if key matches
     if(keyboard_keyrep.timestamp &&
@@ -259,7 +257,7 @@ void keyboard_update(sinp_keysym *keysym, sint state, uchar postdev) {
   if(repeat && (keyboard_keyrep.delay > 0)) {
     keyboard_keyrep.ev = ev;
     keyboard_keyrep.first = TRUE;
-    keyboard_keyrep.timestamp = sinp_getticks();
+    keyboard_keyrep.timestamp = oi_getticks();
   }
 
   // Postal services
@@ -277,7 +275,7 @@ void keyboard_dorepeat() {
 
   // Available?
   if(keyboard_keyrep.timestamp) {
-    now = sinp_getticks();
+    now = oi_getticks();
     interval = now - keyboard_keyrep.timestamp;
 
     // New keypress?
@@ -308,16 +306,16 @@ void keyboard_setmodifier(uint newmod) {
 /* ******************************************************************** */
 
 // Return current modifier state (public)
-uint sinp_key_modstate() {
+uint oi_key_modstate() {
   return modstate;
 }
 
 /* ******************************************************************** */
 
 // Return key state table or size (public)
-uchar *sinp_key_keystate(sint *num) {
+uchar *oi_key_keystate(sint *num) {
   if(num != NULL) {
-    *num = SK_LAST;
+    *num = OIK_LAST;
   }
   return keystate;
 }
@@ -325,12 +323,12 @@ uchar *sinp_key_keystate(sint *num) {
 /* ******************************************************************** */
 
 // Return name for key (public)
-char *sinp_key_getname(sinp_key key) {
+char *oi_key_getname(oi_key key) {
   char *name;
 
-  name = keynames[SK_UNKNOWN];
+  name = keynames[OIK_UNKNOWN];
 
-  if(key < SK_LAST) {
+  if(key < OIK_LAST) {
     name = keynames[key];
   }
 
@@ -340,80 +338,80 @@ char *sinp_key_getname(sinp_key key) {
 /* ******************************************************************** */
 
 // Byte-for-byte keycode-keyname check (internal)
-inline sinp_key keyboard_scangetkey(char *name, sinp_key first, sinp_key last) {
-  sinp_key k;
+inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
+  oi_key k;
 
   for(k=first; k<=last; k++) {
-    if(strcmp(name, sinp_key_getname(k)) == 0) {
+    if(strcmp(name, oi_key_getname(k)) == 0) {
       return k;
     }
   }
-  return SK_UNKNOWN;
+  return OIK_UNKNOWN;
 }
 
 /* ******************************************************************** */
 
 // Return key for name (public)
-sinp_key sinp_key_getcode(char *name) {
+oi_key oi_key_getcode(char *name) {
   int i;
-  sinp_key k;
+  oi_key k;
 
   // Dummies
   if(!name) {
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
-  if((strlen(name) < SINP_MIN_KEYLENGTH) ||
-     (strlen(name) > SINP_MAX_KEYLENGTH)) {
-    return SK_UNKNOWN;
+  if((strlen(name) < OI_MIN_KEYLENGTH) ||
+     (strlen(name) > OI_MAX_KEYLENGTH)) {
+    return OIK_UNKNOWN;
   }
 
   // Check prefix
   if(strncmp(name, "key_", 4) != 0) {
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
 
   // Catch this one now
   if(strcmp(name, "key_unknown") == 0) {
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
 
   // Just to be sure...
-  k = SK_UNKNOWN;
+  k = OIK_UNKNOWN;
 
   // Letter or digit
   if(strlen(name) == 5) {
     if((name[4] >= 'a') && (name[4] <= 'z')) {
-      return SK_A + (name[4]-'a');
+      return OIK_A + (name[4]-'a');
     }
     if((name[4] >= '0') && (name[4] <= '9')) {
-      return SK_0 + (name[4]-'0');
+      return OIK_0 + (name[4]-'0');
     }
 
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
 
   // Function keys (only these and 'f' starts with 'f')
   if(name[4] == 'f') {
     i = atoi(name+5);
     if((i>=1) && (i<=15)) {
-      return SK_F1 + i - 1;
+      return OIK_F1 + i - 1;
     }
     
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
 
   // International
   if(strncmp(name, "key_int", 7) == 0) {
     i = atoi(name+7);
     if((i>=0) && (i<=95)) {
-      return SK_INT_0 + i;
+      return OIK_INT_0 + i;
     }
     
-    return SK_UNKNOWN;
+    return OIK_UNKNOWN;
   }
 
   // Numeric keypad non-numbers (num_period -> num_equals)
-  if((k = keyboard_scangetkey(name, SK_N_PERIOD, SK_N_EQUALS)) != SK_UNKNOWN) {
+  if((k = keyboard_scangetkey(name, OIK_N_PERIOD, OIK_N_EQUALS)) != OIK_UNKNOWN) {
     return k;
   }
 
@@ -421,46 +419,46 @@ sinp_key sinp_key_getcode(char *name) {
   if(strncmp(name, "key_num_", 8) == 0) {
     i = atoi(name+8);
     if((i>=0) && (i<=9)) {
-      return SK_N_0 + i;
+      return OIK_N_0 + i;
     }
   }
 
   // Backspace -> Slash
-  if((k = keyboard_scangetkey(name, SK_BACKSPACE, SK_SLASH)) != SK_UNKNOWN) {
+  if((k = keyboard_scangetkey(name, OIK_BACKSPACE, OIK_SLASH)) != OIK_UNKNOWN) {
     return k;
   }
 
   // Colon -> Backquote
-  if((k = keyboard_scangetkey(name, SK_COLON, SK_BACKQUOTE)) != SK_UNKNOWN) {
+  if((k = keyboard_scangetkey(name, OIK_COLON, OIK_BACKQUOTE)) != OIK_UNKNOWN) {
     return k;
   }
 
   // Delete
   if(strcmp(name, "key_delete") == 0) {
-    return SK_DELETE;
+    return OIK_DELETE;
   }
 
   // Up -> pagedown
-  if((k = keyboard_scangetkey(name, SK_UP, SK_PAGEDOWN)) != SK_UNKNOWN) {
+  if((k = keyboard_scangetkey(name, OIK_UP, OIK_PAGEDOWN)) != OIK_UNKNOWN) {
     return k;
   }
 
   // Numlock -> undo
-  if((k = keyboard_scangetkey(name, SK_NUMLOCK, SK_UNDO)) != SK_UNKNOWN) {
+  if((k = keyboard_scangetkey(name, OIK_NUMLOCK, OIK_UNDO)) != OIK_UNKNOWN) {
     return k;
   }
 
   // No more keys left
-  return SK_UNKNOWN;
+  return OIK_UNKNOWN;
 }
 
 /* ******************************************************************** */
 
 // Setup key repeat system (public)
-sint sinp_key_repeat(sint delay, sint interval) {
+sint oi_key_repeat(sint delay, sint interval) {
   // Dummy check
   if((delay < 0) || (interval < 0)) {
-    return SINP_ERR_PARAM;
+    return OI_ERR_PARAM;
   }
 
   // Setup
@@ -469,7 +467,7 @@ sint sinp_key_repeat(sint delay, sint interval) {
   keyboard_keyrep.interval = interval;
   keyboard_keyrep.timestamp = 0;
   
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

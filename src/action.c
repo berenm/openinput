@@ -1,7 +1,7 @@
 /*
  * action.c : The action mapper functions
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 #include "internal.h"
 
 // Global state table and count
@@ -34,10 +34,10 @@ static uchar *action_state;
 static sint action_count;
 
 // Lookup table for keyboard
-static uint action_keyboard[SK_LAST];
+static uint action_keyboard[OIK_LAST];
 
 // Lookup table for mouse
-static uint action_mouse[SP_LAST];
+static uint action_mouse[OIP_LAST];
 
 /* ******************************************************************** */
 
@@ -49,22 +49,22 @@ sint action_init() {
   action_state = NULL;
   action_count = 0;
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Install user defined actionmap (public)
-sint sinp_action_install(sinp_actionmap *map, sint num) {
+sint oi_action_install(oi_actionmap *map, sint num) {
   sint i;
   sint j;
   sint big;
 
-  debug("sinp_action_install");
+  debug("oi_action_install");
 
   // Dummy
   if((map == NULL) || (num <= 0)) {
-    return SINP_ERR_PARAM;
+    return OI_ERR_PARAM;
   }
 
   // Scan for uniqueness of actionid (asume unsorted set)
@@ -72,7 +72,7 @@ sint sinp_action_install(sinp_actionmap *map, sint num) {
   for(i=0; i<num; i++) {
     for(j=i+1; j<num; j++) {
       if(map[i].actionid == map[j].actionid) {
-	return SINP_ERR_NOT_UNIQUE;
+	return OI_ERR_NOT_UNIQUE;
       }
     }
 
@@ -82,16 +82,16 @@ sint sinp_action_install(sinp_actionmap *map, sint num) {
     }
   }
 
-  debug("sinp_action_install: map is unique, biggest id: %i", big);
+  debug("oi_action_install: map is unique, biggest id: %i", big);
 
   // Validate elements
   for(i=0; i<num; i++) {
-    if(sinp_action_validate(&(map[i])) != SINP_ERR_OK) {
-      return SINP_ERR_PARAM;
+    if(oi_action_validate(&(map[i])) != OI_ERR_OK) {
+      return OI_ERR_PARAM;
     }
   }
 
-  debug("sinp_action_install: map is valid");
+  debug("oi_action_install: map is valid");
 
   // Clean lookup tables
   memset(action_keyboard, 0, TABLESIZE(action_keyboard));
@@ -110,60 +110,60 @@ sint sinp_action_install(sinp_actionmap *map, sint num) {
   // Parse event and fill the lookup tables
   for(i=0; i<num; i++) {
     // Action is keyboard
-    if((j = sinp_key_getcode(map[i].name))) {
+    if((j = oi_key_getcode(map[i].name))) {
       action_keyboard[j] = map[i].actionid;
 
-      debug("sinp_action_install: keyboard action:\t id:%u name:'%s'",
+      debug("oi_action_install: keyboard action:\t id:%u name:'%s'",
 	    map[i].actionid, map[i].name);
     }
 
     // Action is mouse
-    else if((j = sinp_mouse_getcode(map[i].name))) {
+    else if((j = oi_mouse_getcode(map[i].name))) {
       action_mouse[j] = map[i].actionid;
 
-      debug("sinp_action_install: mouse action:\t id:%u name:'%s'",
+      debug("oi_action_install: mouse action:\t id:%u name:'%s'",
 	    map[i].actionid, map[i].name);
     }
 
     // Add more lookup tables here
   }
 
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Validate single actionmap structure (public)
-sint sinp_action_validate(sinp_actionmap *map) {
+sint oi_action_validate(oi_actionmap *map) {
   // Check the basic of the structure
   if(map == NULL) {
-    return SINP_ERR_PARAM;
+    return OI_ERR_PARAM;
   }
   if(map->actionid == 0) {
-    return SINP_ERR_PARAM;
+    return OI_ERR_PARAM;
   }
   if(map->name == NULL) {
-    return SINP_ERR_PARAM;
+    return OI_ERR_PARAM;
   }
-  if((strlen(map->name) < SINP_MIN_KEYLENGTH) ||
-     (strlen(map->name) > SINP_MAX_KEYLENGTH)) {
-    return SINP_ERR_PARAM;
+  if((strlen(map->name) < OI_MIN_KEYLENGTH) ||
+     (strlen(map->name) > OI_MAX_KEYLENGTH)) {
+    return OI_ERR_PARAM;
   }
 
   // Does event name exist? Simply ask all managers
-  if((sinp_key_getcode(map->name) == SK_UNKNOWN) &&
-     (sinp_mouse_getcode(map->name) == SP_UNKNOWN)) {
-    return SINP_ERR_NO_NAME;
+  if((oi_key_getcode(map->name) == OIK_UNKNOWN) &&
+     (oi_mouse_getcode(map->name) == OIP_UNKNOWN)) {
+    return OI_ERR_NO_NAME;
   }
   
   // Everything should be ok now
-  return SINP_ERR_OK;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
 // Return state table (public)
-uchar *sinp_action_actionstate(sint *num) {
+uchar *oi_action_actionstate(sint *num) {
   if(num != NULL) {
     *num = action_count;
   }
@@ -173,8 +173,8 @@ uchar *sinp_action_actionstate(sint *num) {
 /* ******************************************************************** */
 
 // Check map and change state/generate event (internal)
-inline void action_process(sinp_event *evt) {
-  static sinp_event act;
+inline void action_process(oi_event *evt) {
+  static oi_event act;
   int i;
   int state = 0;
 
@@ -184,7 +184,7 @@ inline void action_process(sinp_event *evt) {
   }
 
   // Set defaults
-  act.type = SINP_ACTION;
+  act.type = OI_ACTION;
   act.action.device = 0;
   act.action.data1 = 0;
   act.action.data2 = 0;
@@ -197,8 +197,8 @@ inline void action_process(sinp_event *evt) {
    */
 
   // Discrete: Keyboard
-  if((evt->type == SINP_KEYUP) ||
-     (evt->type == SINP_KEYDOWN)) {
+  if((evt->type == OI_KEYUP) ||
+     (evt->type == OI_KEYDOWN)) {
 
     i = evt->key.keysym.sym;
     
@@ -206,24 +206,24 @@ inline void action_process(sinp_event *evt) {
     if(action_keyboard[i] != 0) {
       act.action.device = evt->key.device;
       act.action.actionid = action_keyboard[i];
-      act.action.state = (evt->type == SINP_KEYDOWN);
+      act.action.state = (evt->type == OI_KEYDOWN);
 
       debug("action_process: %u (keyboard)", act.action.actionid);
     }
   }
 
   // Discrete: Mouse button
-  else if((evt->type == SINP_MOUSEBUTTONUP) ||
-	  (evt->type == SINP_MOUSEBUTTONDOWN)) {
+  else if((evt->type == OI_MOUSEBUTTONUP) ||
+	  (evt->type == OI_MOUSEBUTTONDOWN)) {
 
     i = evt->button.button;
 
     // Mouse wheel is discrete
-    if(((i == SP_WHEEL_UP) && (action_mouse[i] != 0)) ||
-       ((i == SP_WHEEL_DOWN) && (action_mouse[i] != 0))) {
+    if(((i == OIP_WHEEL_UP) && (action_mouse[i] != 0)) ||
+       ((i == OIP_WHEEL_DOWN) && (action_mouse[i] != 0))) {
 
       // Only trigger on the down-event
-      if(evt->type == SINP_MOUSEBUTTONDOWN) {
+      if(evt->type == OI_MOUSEBUTTONDOWN) {
 
 	act.action.device = evt->button.device;
 	act.action.actionid = action_mouse[i];
@@ -238,18 +238,18 @@ inline void action_process(sinp_event *evt) {
       
       act.action.device = evt->button.device;
       act.action.actionid = action_mouse[i];
-      act.action.state = (evt->type == SINP_MOUSEBUTTONDOWN);
+      act.action.state = (evt->type == OI_MOUSEBUTTONDOWN);
       
       debug("action_process: %u (mouse button)", act.action.actionid);
     }
   }
 
   // Real: Mouse move
-  if((evt->type == SINP_MOUSEMOVE) &&
-     (action_mouse[SP_MOTION] != 0)) {
+  if((evt->type == OI_MOUSEMOVE) &&
+     (action_mouse[OIP_MOTION] != 0)) {
     
     act.action.device = evt->move.device;
-    act.action.actionid = action_mouse[SP_MOTION];
+    act.action.actionid = action_mouse[OIP_MOTION];
     act.action.state = TRUE;
     act.action.data1 = evt->move.relx;
     act.action.data2 = evt->move.rely;
@@ -258,7 +258,7 @@ inline void action_process(sinp_event *evt) {
   }
   else {
     // Make sure state table is zero'ed
-    action_state[action_mouse[SP_MOTION]] = FALSE;
+    action_state[action_mouse[OIP_MOTION]] = FALSE;
   }
 
   // If nothing was changed, the device index is zero

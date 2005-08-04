@@ -1,7 +1,7 @@
 /*
- * sinp_mouse.h : Definitions for mouse interface
+ * openinput_mouse.h : Definitions for mouse interface
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -21,11 +21,11 @@
 
 /* ******************************************************************** */
 
-#ifndef _SINP_MOUSE_H_
-#define _SINP_MOUSE_H_
+#ifndef _OPENINPUT_MOUSE_H_
+#define _OPENINPUT_MOUSE_H_
 
-#ifndef _SINP_H_
-#error Do not include this file directly - use sinp.h
+#ifndef _OPENINPUT_H_
+#error Do not include this file directly - use openinput.h
 #endif
 
 /* ********************************************************************
@@ -34,22 +34,22 @@
 
 // The pointer buttons
 typedef enum {
-  SP_UNKNOWN            = 0,
-  SP_FIRST              = 0,
-  SP_BUTTON_LEFT        = 1,
-  SP_BUTTON_MIDDLE      = 2,
-  SP_BUTTON_RIGHT       = 3,
-  SP_WHEEL_UP           = 4,
-  SP_WHEEL_DOWN         = 5,
-  SP_MOTION             = 6,
-  SP_LAST               = 7
-} sinp_mouse;
+  OIP_UNKNOWN            = 0,
+  OIP_FIRST              = 0,
+  OIP_BUTTON_LEFT        = 1,
+  OIP_BUTTON_MIDDLE      = 2,
+  OIP_BUTTON_RIGHT       = 3,
+  OIP_WHEEL_UP           = 4,
+  OIP_WHEEL_DOWN         = 5,
+  OIP_MOTION             = 6,
+  OIP_LAST               = 7
+} oi_mouse;
 
 // Masks for buttons
-#define SINP_BUTTON_MASK(x) (1<<(x))
-#define SINP_BUTTON_LEFTMASK      SINP_BUTTON_MASK(SP_BUTTON_LEFT)
-#define SINP_BUTTON_MIDMASK       SINP_BUTTON_MASK(SP_BUTTON_MIDDLE)
-#define SINP_BUTTON_RIGHTMASK     SINP_BUTTON_MASK(SP_BUTTON_RIGHT)
+#define OI_BUTTON_MASK(x) (1<<(x))
+#define OI_BUTTON_LEFTMASK      OI_BUTTON_MASK(OIP_BUTTON_LEFT)
+#define OI_BUTTON_MIDMASK       OI_BUTTON_MASK(OIP_BUTTON_MIDDLE)
+#define OI_BUTTON_RIGHTMASK     OI_BUTTON_MASK(OIP_BUTTON_RIGHT)
 
 /* ******************************************************************** */
 

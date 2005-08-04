@@ -1,7 +1,7 @@
 /*
  * keynametest.c : Test key code/names
  *
- * This file is a part of libsinp - the simple input library.
+ * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
  *
  * This library is free software; you can redistribute it and/or
@@ -24,30 +24,30 @@
 // Includes
 #include <stdio.h>
 #include <string.h>
-#include "sinp.h"
+#include "openinput.h"
 
 /* ******************************************************************** */
 
 // Main function
 int main(int argc, char *argv[]) {
-  sinp_key k;
-  sinp_key c;
+  oi_key k;
+  oi_key c;
   char *name;
   int i;
   int j;
   int m;
 
-  // Init sinp
+  // Init openinput
   printf("*** keynametest start\n");
-  sinp_init("c:0 s:0 w:0", SINP_FLAG_NOWINDOW);
-  printf("*** sinp initialized\n");
+  oi_init("c:0 s:0 w:0", OI_FLAG_NOWINDOW);
+  printf("*** openinput initialized\n");
 
   // Run through all keys
-  for(k=SK_FIRST; k<SK_LAST; k++) {
+  for(k=OIK_FIRST; k<OIK_LAST; k++) {
 
     // Convert to name and back again
-    name = sinp_key_getname(k);
-    c = sinp_key_getcode(name);
+    name = oi_key_getname(k);
+    c = oi_key_getcode(name);
 
     // Pretty-printing
     printf("Key '%3i'\t getname: '%s'", k, name);
@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
   for(j=0; j<8; j++) {
     
     // Convert to name and back again
-    name = sinp_mouse_getname(j);
-    m = sinp_mouse_getcode(name);
+    name = oi_mouse_getname(j);
+    m = oi_mouse_getcode(name);
 
     // Pretty-printing
     printf("Mouse '%3i'\t getname: '%s'", j, name);
@@ -88,9 +88,9 @@ int main(int argc, char *argv[]) {
     }      
       }
   
-  // Close sinp
+  // Close openinput
   printf("*** keynametest end\n");
-  sinp_close();
+  oi_close();
   return 0;
 }
 
