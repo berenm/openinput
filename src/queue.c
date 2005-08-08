@@ -37,7 +37,17 @@ static struct {
 
 /* ******************************************************************** */
 
-// Initialize queue-event system (internal)
+/**
+ * @ingroup IQueue
+ * @brief Initialize queue
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Called on library initialization. This function initializes
+ * the queue system, which is one of the first subsystems to
+ * be initialized, as device driver bootstrapping may depend
+ * of the queue to exist (to generate discovery events).
+ */
 sint queue_init() {
   debug("queue_init");
   
@@ -54,7 +64,14 @@ sint queue_init() {
 
 /* ******************************************************************** */
 
-// Lock queue (internal)
+/**
+ * @ingroup IQueue
+ * @brief Lock queue
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Mutual exclusion lock of event queue.
+ */
 inline sint queue_lock() {
   //FIXME: Implement this
   return OI_ERR_NOT_IMPLEM;
@@ -62,7 +79,14 @@ inline sint queue_lock() {
 
 /* ******************************************************************** */
 
-// Unlock queue (internal)
+/**
+ * @ingroup IQueue
+ * @brief Unlock queue
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Mutual exclusion unlock of event queue.
+ */
 inline sint queue_unlock() {
   //FIXME: Implement this
   return OI_ERR_NOT_IMPLEM;
@@ -70,7 +94,19 @@ inline sint queue_unlock() {
 
 /* ******************************************************************** */
 
-// Add events to queue (internal)
+/**
+ * @ingroup IQueue
+ * @brief Add event to queue
+ *
+ * @param evt pointer to event
+ * @returns true (1) if event added, false (0) otherwise
+ *
+ * Add a single event to the event queue. This is the function
+ * you want to use if you want to inject events into the
+ * event queue yourself. Please note that you should use
+ * the state managers if possible, as these will take
+ * care of a lot of other nice stuff for you.
+ */
 sint queue_add(oi_event *evt) {
   int tail, add;
 
@@ -110,7 +146,17 @@ sint queue_add(oi_event *evt) {
 
 /* ******************************************************************** */
 
-// Cut out an event from the queue (internal)
+/**
+ * @ingroup IQueue
+ * @brief Delete event in queue
+ *
+ * @param where index of event to delete
+ * @returns index of deleted event
+ *
+ * Cut (delete) an event from the queue.
+ * Handles both deletion of head, tail and somewhere
+ * in between (though the latter is slow).
+ */
 sint queue_cut(ushort where) {
 
   // Cut head
@@ -152,7 +198,21 @@ sint queue_cut(ushort where) {
 
 /* ******************************************************************** */
 
-// Take a peep at the queue (internal)
+/**
+ * @ingroup IQueue
+ * @brief Look at events in the queue
+ *
+ * @param evts pointer to where to store events
+ * @param num number of events to copy
+ * @param mask event filter mask
+ * @param remove true (1) if events should be cut, false (0) otherwise
+ * @returns number of copied events
+ *
+ * Take a peep at the event queue, ie. copy events to pointer.
+ * Events are ignored if they match the filter mask. If the
+ * "remove" paramter is set, the events are cut from the queue
+ * using queue_cut.
+ */
 sint queue_peep(oi_event *evts, sint num, uint mask, sint remove) {
   oi_event tmpevt;
   int here;

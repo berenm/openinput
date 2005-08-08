@@ -33,7 +33,18 @@ static uint event_mask = 0;
 
 /* ******************************************************************** */
 
-// Look at events in queue without removal (public)
+/**
+ * @ingroup PEvents
+ * @brief Take a peep at the queue
+ *
+ * @param evts where to place the event(s)
+ * @param num number of events to return
+ * @returns number of events returned
+ *
+ * Take a peep at the event queue. That is, look at
+ * the first events in the queue but do remove the
+ * events from the queue
+ */
 sint oi_events_peep(oi_event *evts, sint num) {
   sint p;
 
@@ -46,7 +57,16 @@ sint oi_events_peep(oi_event *evts, sint num) {
 
 /* ******************************************************************** */
 
-// Add events to the queue (public)
+/**
+ * @ingroup PEvents
+ * @brief Add events to the queue
+ *
+ * @param evts pointer to event(s)
+ * @param num number of events to add
+ * @returns number of events added
+ *
+ * Inject events to the event queue
+ */
 sint oi_events_add(oi_event *evts, sint num) {
   int i;
   int j;
@@ -80,7 +100,15 @@ sint oi_events_add(oi_event *evts, sint num) {
 
 /* ******************************************************************** */
 
-// Explictly pump events into the queue (public)
+/**
+ * @ingroup PEvents
+ * @brief Pump events into the queue
+ *
+ * Explicitly make all device-drivers pump events into the
+ * event queue. You should probably NOT use this function
+ * as both oi_events_poll and oi_events_wait calls the
+ * pump-function automatically
+ */
 void oi_events_pump() {
   static uint last = 0;
   uint now;
@@ -105,7 +133,18 @@ void oi_events_pump() {
 
 /* ******************************************************************** */
 
-// Poll for an event (public)
+/**
+ * @ingroup PEvents
+ * @brief Poll for events
+ *
+ * @param evt pointer of where to store event
+ * @returns true (1) when events are available, false (0) otherwise
+ *
+ * Poll the event queue for events. This is typically the function
+ * you want to use in a game, as the function returns immediately.
+ * Use the function inside a while()-loop to handle all pending
+ * events
+ */
 sint oi_events_poll(oi_event *evt) {
   int found;
 
@@ -119,7 +158,16 @@ sint oi_events_poll(oi_event *evt) {
 
 /* ******************************************************************** */
 
-// Wait for an event (public)
+/**
+ * @ingroup PEvents
+ * @brief Wait for events
+ *
+ * @param evt pointer of where to store event
+ *
+ * For for a single event to appear. This call is blocking, so
+ * you probably only want to use this if you're writing a
+ * regular application (ie. not a game with high FPS requirements)
+ */
 void oi_events_wait(oi_event *evt) {
   int found;
 
@@ -136,7 +184,17 @@ void oi_events_wait(oi_event *evt) {
 
 /* ******************************************************************** */
 
-// Set mask for incoming events (public)
+/**
+ * @ingroup PEvents
+ * @brief Set event filter mask
+ *
+ * @param mask event mask
+ *
+ * Filter out events using a event mask. See
+ * @ref PEventmask for mask definitions.
+ * A mask of 0 (zero) will not filter any events, which
+ * is the default.
+ */
 void oi_events_setmask(uint mask) {
   oi_event ev;
 
@@ -149,7 +207,15 @@ void oi_events_setmask(uint mask) {
 
 /* ******************************************************************** */
 
-// Set mask for incoming events (public)
+/**
+ * @ingroup PEvents
+ * @brief Get event filter mask
+ *
+ * @returns current event mask
+ *
+ * Return the current event filter mask, see
+ * also @ref PEventmask
+ */
 uint oi_events_getmask() {
   return event_mask;
 }

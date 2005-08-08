@@ -41,6 +41,15 @@ extern oi_bootstrap unixsignal_bootstrap;
 
 // Global variable for "device.c" only! All drivers must fill in an entry
 #ifdef _DEVICE_FILLER_
+
+/**
+ * @ingroup ITypes
+ * @brief The bootstrap table
+ *
+ * This array of bootstrap structures is parsed when OpenInput is
+ * initialized. Each driver is investigated and the device initialized
+ * if the driver successfully detects the device.
+ */
 static oi_bootstrap *bootstrap[] = {
 
   // Begin list

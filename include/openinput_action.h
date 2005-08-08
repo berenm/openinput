@@ -28,14 +28,18 @@
 #error Do not include this file directly - use openinput.h
 #endif
 
-/* ********************************************************************
- * Action mapper directions and map structure
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Action map structure
+/**
+ * @ingroup PAction
+ * @brief Action map structure
+ *
+ * This structure defines an action-map
+ */
 typedef struct oi_actionmap {
-  uint actionid;                 // Unique user-defined id
-  char *name;                    // Trigger event (key_*, mouse_*, etc.)
+  uint actionid;                 /**< User-defined id, the action */
+  char *name;                    /**< Trigger on this named event */
 } oi_actionmap;
 
 /* ******************************************************************** */

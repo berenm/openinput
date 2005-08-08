@@ -28,9 +28,7 @@
 #error Do not include this file directly - use openinput.h
 #endif
 
-/* ********************************************************************
- * Main functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Default initialization of all available devices (num_failed)
 sint oi_init(char* window_id, uint flags);
@@ -38,10 +36,7 @@ sint oi_init(char* window_id, uint flags);
 // Shutdown all available devices (num_failed)
 sint oi_close();
 
-
-/* ********************************************************************
- * Event functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Look at event without removing it from queue (number_returned)
 sint oi_events_peep(oi_event *evts, sint num);
@@ -64,10 +59,7 @@ void oi_events_setmask(uint mask);
 // Get event type filter mask (event_mask)
 uint oi_events_getmask();
 
-
-/* ********************************************************************
- * Keyboard functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Send events for down-state keys (errorcode)
 sint oi_key_repeat(sint delay, sint interval);
@@ -84,9 +76,7 @@ char *oi_key_getname(oi_key key);
 // Get key code given name (oi_key)
 oi_key oi_key_getcode(char *name);
 
-/* ********************************************************************
- * Mouse functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Get absolute position of mouse (button_mask)
 sint oi_mouse_absolute(sint *x, sint *y);
@@ -103,9 +93,7 @@ char *oi_mouse_getname(oi_mouse button);
 // Get mouse-id given name (oi_mouse)
 oi_mouse oi_mouse_getcode(char *name);
 
-/* ********************************************************************
- * Misc functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Get focus state of application (focus_mask)
 sint oi_app_focus();
@@ -116,9 +104,7 @@ oi_bool oi_app_cursor(oi_bool q);
 // Grab/ungrab input (state)
 sint oi_app_grab(oi_bool q);
 
-/* ********************************************************************
- * Action map functions
- ******************************************************************** */
+/* ******************************************************************** */
 
 // Install actionmap (errorcode)
 sint oi_action_install(oi_actionmap *map, sint num);

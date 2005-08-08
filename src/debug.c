@@ -32,6 +32,17 @@
 
 #ifdef DEBUG
 
+/**
+ * @ingroup IMain
+ * @brief Debug printf-helper
+ *
+ * @param format string pointer with printf-formatting
+ * @param ... more arguments (varargs)
+ *
+ * Print debug information to standard-error. You should use this
+ * function instead of regular printf's, as this function is only
+ * used on debug-enabled builds.
+ */
 void debug(char* format, ...) {
   va_list args;
 

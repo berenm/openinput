@@ -26,6 +26,48 @@
 
 /* ******************************************************************** */
 
+/**
+ * @ingroup ITypes
+ * @defgroup IDevstruct Device abstraction interface
+ * @brief Device driver abstraction interface
+ *
+ * This is the primary device abstraction layer and entry point for
+ * OpenInput to access the drivers capabilities. This should be created
+ * dynamically from the bootstrap create function
+ */
+typedef struct oi_device {
+  sint index;                                                        /**< Device index */
+  char *name;                                                        /**< Short device name */
+  char *desc;                                                        /**< Description of device */
+  uint provides;                                                     /**< Provide-flag */
+  void *private;                                                     /**< Private data */
+  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device */
+  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device */
+  void (*process)(struct oi_device *dev);                            /**< Pump events into queue */
+  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus */
+  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor */
+  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor */
+  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size */
+} oi_device;
+
+/**
+ * @ingroup ITypes
+ * @defgroup IDevboot Device bootstrap interface
+ * @brief Device driver bootstrap interface
+ *
+ * Static structure used to kickstart device drivers when the
+ * library is initialized
+ */
+typedef struct oi_bootstrap {
+  char *name;                                                        /**< Short device name */
+  char *desc;                                                        /**< Device description */
+  sint provides;                                                     /**< Device provide-flag */
+  sint (*avail)(uint flags);                                         /**< Is device available */
+  struct oi_device *(*create)();                                     /**< Return device structure */
+} oi_bootstrap;
+
+/* ******************************************************************** */
+
 // Special functions
 inline sint oi_runstate();
 inline uint oi_getticks();
@@ -40,32 +82,6 @@ sint queue_cut(ushort where);
 sint queue_add(oi_event *evt);
 sint queue_peep(oi_event *evts, sint num, uint mask, sint remove);
 
-/* ******************************************************************** */
-
-// Device abstraction interface
-typedef struct oi_device {
-  sint index;                                                          // Device index
-  char *name;                                                          // Short device name
-  char *desc;                                                          // Description of device
-  uint provides;                                                       // Provide-flag
-  void *private;                                                       // Private data
-  sint (*init)(struct oi_device *dev, char *window_id, uint flags);    // Initialize device
-  sint (*destroy)(struct oi_device *dev);                              // Shutdown device
-  void (*process)(struct oi_device *dev);                              // Pump events into queue
-  sint (*grab)(struct oi_device *dec, sint on);                        // Grab input focus
-  sint (*hide)(struct oi_device *dev, sint on);                        // Hide/show cursor
-  sint (*warp)(struct oi_device *dev, sint x, sint y);                 // Warp mouse cursor
-  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);            // Query for window size
-} oi_device;
-
-// Platform bootstrap interface
-typedef struct oi_bootstrap {
-  char *name;                                                          // Short device name
-  char *desc;                                                          // Device description
-  sint provides;                                                       // Device provide-flag
-  sint (*avail)(uint flags);                                           // Is device available?
-  struct oi_device *(*create)();                                       // Return device structure
-} oi_bootstrap;
 
 /* ******************************************************************** */
 
@@ -92,7 +108,7 @@ void appstate_resize(sint w, sint h, uchar postdev);
 // Mouse state
 sint mouse_init();
 void mouse_move(sint x, sint y, sint relative, uchar postdev);
-void mouse_button(sint btn, sint state, uchar postdev);
+void mouse_button(oi_mouse btn, sint state, uchar postdev);
 
 /* ******************************************************************** */
 
@@ -131,11 +147,19 @@ void debug(char *format, ...);
 #endif
 
 // Misc constants
-#define OI_MAX_DEVICES 64
-#define OI_MAX_EVENTS 128
-#define OI_SLEEP 10
-#define OI_MIN_KEYLENGTH 5
-#define OI_MAX_KEYLENGTH 20
+/**
+ * @ingroup ITypes
+ * @defgroup IConsts Internal constants
+ * @{
+ */
+#define OI_MAX_DEVICES 64                                           /**< Max number of attached devices */
+#define OI_MAX_EVENTS 128                                           /**< Size of event queue */
+#define OI_SLEEP 10                                                 /**< Ms to sleep in busy wait-loop */
+#define OI_MIN_KEYLENGTH 5                                          /**< Min symbolic event name */
+#define OI_MAX_KEYLENGTH 20                                         /**< Max symbolic event name */
+/**
+ * @}
+ */
 
 /* ******************************************************************** */
 

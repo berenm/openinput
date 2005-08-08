@@ -40,7 +40,17 @@ static int num_devices = 0;
 
 /* ******************************************************************** */
 
-// Register device via bootstrap
+/**
+ * @ingroup IDevice
+ * @brief Register new device via bootstrap
+ *
+ * @param boot pointer to bootstrap structure
+ * @returns errorcode, see @ref PErrors
+ *
+ * Helper function the initialize a device driver. This
+ * is automatically called for all "available" devices on
+ * library initilization
+ */
 sint device_register(oi_bootstrap *boot) {
 
   // Create the device and set basics
@@ -84,7 +94,17 @@ sint device_register(oi_bootstrap *boot) {
 
 /* ******************************************************************** */
 
-// Bootstrap devices using the bootstrap table
+/**
+ * @ingroup IDevice
+ * @brief Bootstrap all devices
+ *
+ * @param flags library initization flags
+ *
+ * This function parses the bootstrap table, runs the
+ * avail-function and possibly created the device
+ * using device_register. The function is called on
+ * library initialization.
+ */
 void device_bootstrap(uint flags) {
   uint i;
   uint j;
@@ -116,7 +136,18 @@ void device_bootstrap(uint flags) {
 
 /* ******************************************************************** */
 
-// Initialize all devices which have been booted
+/**
+ * @ingroup IDevice
+ * @brief Initialize all devices
+ *
+ * @param index device index
+ * @param window_id window init string, see @ref PWindow
+ * @param flags init flags, see @ref PFlags
+ * @returns errorcode, see @ref PErrors
+ * 
+ * This function initializes a device, ie. calls the
+ * device structure "init" function.
+ */
 sint device_init(sint index, char *window_id, uint flags) {
   oi_device *dev;
   int e;
@@ -139,7 +170,15 @@ sint device_init(sint index, char *window_id, uint flags) {
 
 /* ******************************************************************** */
 
-// Destroy a device
+/**
+ * @ingroup IDevice
+ * @brief Destroy a device
+ *
+ * @param index device index
+ * @returns errorcode, see @ref PErrors
+ * 
+ * Shutdown a device.
+ */
 sint device_destroy(sint index) {
   oi_device *dev;
 
@@ -157,7 +196,15 @@ sint device_destroy(sint index) {
 
 /* ******************************************************************** */
 
-// Return a device structure
+/**
+ * @ingroup IDevice
+ * @brief Get device structure
+ *
+ * @param index device index
+ * @returns pointer to device structure
+ * 
+ * Fetch a device structure given device index.
+ */
 oi_device *device_get(sint index) {
   // Dummy check
   if((index < 1) || (index > num_devices)) {
@@ -169,7 +216,14 @@ oi_device *device_get(sint index) {
 
 /* ******************************************************************** */
 
-// Pump events from all devices into queue
+/**
+ * @ingroup IDevice
+ * @brief Pump events from all devices
+ *
+ * 
+ * Run through all devices and process them, ie.
+ * make them pump events into the queue.
+ */
 inline void device_pumpall() {
   uint i;
 
@@ -180,7 +234,18 @@ inline void device_pumpall() {
 
 /* ******************************************************************** */
 
-// Parse and convert window_id string into uints
+
+/**
+ * @ingroup IDevice
+ * @brief Parse window_id init string
+ *
+ * @param str pointer to window_id string, see @ref PWindow
+ * @param tok parameter to parse, see @ref PWindow
+ * @returns converted parameter (as an uint)
+ *
+ * Parse and convert string parameter to an uint. Basically
+ * this is just an advanced atoi-function.
+ */
 uint device_windowid(char *str, char tok) {
   char *match;
   char *sub;

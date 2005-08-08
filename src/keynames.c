@@ -28,7 +28,19 @@
 
 /* ******************************************************************** */
 
-// Fill keyboard names
+/**
+ * @ingroup IKeyboard
+ * @brief Fill keyboard name table
+ *
+ * @param kn pointer to array to be filled with button name strings
+ * @returns errorcode, see @ref PErrors
+ *
+ * Fill the table (pointed to by "kn") with keyboard
+ * string names. This is used in both oi_key_getname and
+ * oi_key_getcode to translate between stings and keycodes.
+ *
+ * And yup - this function is lengthy but quite trivial!
+ */
 sint keyboard_fillnames(char **kn) {
   int i;
 

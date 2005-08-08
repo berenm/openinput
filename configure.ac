@@ -1,6 +1,6 @@
 dnl Autoconf
 AC_PREREQ(2.59)
-AC_INIT([libopeninput], 0.0.1, [makob@makob.dk])
+AC_INIT([OpenInput], 0.0.1, [makob@makob.dk], [openinput])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
@@ -96,6 +96,7 @@ AC_SUBST(PLATLIBS)
 dnl Makefiles to be generated
 AC_CONFIG_FILES([
 	openinput.pc \
+	doc/Doxyfile \
 	Makefile \
 	include/Makefile \
 	test/Makefile \

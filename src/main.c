@@ -34,7 +34,28 @@ static sint oi_running;
 
 /* ******************************************************************** */
 
-// Initialize default devices (public)
+/**
+ * @ingroup PMain
+ * @brief Initialize OpenInput
+ *
+ * @param window_id window hook parameters, see @ref PWindow
+ * @param flags library initialization flags, see @ref PFlags
+ * @returns errorcode, see @ref PErrors
+ *
+ * This function prepares OpenInput for use, and must be called
+ * before the library can be used.
+ *
+ * When invoked, the following happens:
+ * -# the event queue is initialized
+ * -# all devices are bootstrapped
+ * -# available devices are initialized
+ * -# the application state manager is initialized
+ * -# the mouse state manager is initialized
+ * -# the keyboard state manager is initialized
+ * -# the action state manager is initialized
+ * -# OpenInput enters "initialized mode"
+ * -# you're good to go! ;-)
+ */
 sint oi_init(char *window_id, uint flags) {
   int i;
   int e;
@@ -76,7 +97,16 @@ sint oi_init(char *window_id, uint flags) {
 
 /* ******************************************************************** */
 
-// Shutdown the library (public)
+/**
+ * @ingroup PMain
+ * @brief Shutdown the library
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Call this function to terminate OpenInput. You should call
+ * this function to make OpenInput tidy up when your applicaiton
+ * closes - it not, you may experience memory leaks and the like.
+ */
 sint oi_close() {
   int i;
   int e;
@@ -103,14 +133,37 @@ sint oi_close() {
 
 /* ******************************************************************** */
 
-// Return library running state (internal)
+/**
+ * @ingroup IMain
+ * @brief Get library run-state
+ *
+ * @returns run state (true or false)
+ *
+ * You can use this function to check if you are
+ * allowed to generate events and otherwise use functions
+ * in the library. It is especially important for device
+ * drivers to check this, since events (apart from direct
+ * queue injects) may not be generated when the library
+ * is initializing.
+ *
+ * See oi_init for more information.
+ */
 inline sint oi_runstate() {
   return oi_running;
 }
 
 /* ******************************************************************** */
 
-// Return current system ticks (internal)
+/**
+ * @ingroup IMain
+ * @brief Get timestamp
+ *
+ * @returns system ticks in ms
+ *
+ * This function returns the number of system ticks
+ * with a resolution of 1/1000 second (ms). This can
+ * be used for timestamps and alike.
+ */
 inline uint oi_getticks() {
   struct timeval now;
   uint ticks;

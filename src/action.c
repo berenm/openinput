@@ -41,7 +41,12 @@ static uint action_mouse[OIP_LAST];
 
 /* ******************************************************************** */
 
-// Initialize the action mapper (internal)
+/**
+ * @ingroup IAction
+ * @brief Initialize action mapper
+ *
+ * Must be called on library initialization.
+ */
 sint action_init() {
   debug("action_init");
 
@@ -54,7 +59,16 @@ sint action_init() {
 
 /* ******************************************************************** */
 
-// Install user defined actionmap (public)
+/**
+ * @ingroup PAction
+ * @brief Install new action map
+ *
+ * @param map pointer to the action map
+ * @param num number of elements in map
+ * @returns errorcode, see @ref PErrors
+ *
+ * Free current action map (if any) and install new one.
+ */
 sint oi_action_install(oi_actionmap *map, sint num) {
   sint i;
   sint j;
@@ -134,6 +148,16 @@ sint oi_action_install(oi_actionmap *map, sint num) {
 /* ******************************************************************** */
 
 // Validate single actionmap structure (public)
+/**
+ * @ingroup PAction
+ * @brief Validate a single action map
+ *
+ * @param map pointer to action map
+ * @returns errorcode, see @ref PErrors
+ *
+ * Check if action map is valid. For example,
+ * check that the event name exists
+ */
 sint oi_action_validate(oi_actionmap *map) {
   // Check the basic of the structure
   if(map == NULL) {
@@ -162,7 +186,17 @@ sint oi_action_validate(oi_actionmap *map) {
 
 /* ******************************************************************** */
 
-// Return state table (public)
+/**
+ * @ingroup PAction
+ * @brief Get pointer to action state table
+ *
+ * @param num pointer to integer to be filled with number of states.
+ * Can be NULL
+ * @returns pointer to state table
+ *
+ * Obtain pointer to action state table. The structure is internal
+ * and must NOT be freed or altered!
+ */
 uchar *oi_action_actionstate(sint *num) {
   if(num != NULL) {
     *num = action_count;
@@ -172,7 +206,16 @@ uchar *oi_action_actionstate(sint *num) {
 
 /* ******************************************************************** */
 
-// Check map and change state/generate event (internal)
+/**
+ * @ingroup IAction
+ * @brief Process event and possible generate an action
+ *
+ * @param evt pointer to event
+ *
+ * Parse given event, and if action map exists, generate
+ * the action event. The action event is automatically
+ * injected into the queue.
+ */
 inline void action_process(oi_event *evt) {
   static oi_event act;
   int i;

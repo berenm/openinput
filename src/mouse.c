@@ -38,7 +38,15 @@ static sint button;
 
 /* ******************************************************************** */
 
-// Initialize mouse states (internal)
+/**
+ * @ingroup IMouse
+ * @brief Initialize mouse state manager
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Called on library initialization. The function prepares
+ * the mouse manager for use.
+ */
 sint mouse_init() {
   int i;
 
@@ -71,7 +79,22 @@ sint mouse_init() {
 
 /* ******************************************************************** */
 
-// Update mouse motion (internal)
+/**
+ * @ingroup IMouse
+ * @brief Mouse motion update
+ *
+ * @param x horizontal position/movement
+ * @param y vertical position/movement
+ * @param relative false (0) if x,y is absolute coordinate, true
+ *   if x,y is relative movement
+ * @param postdev device index of sender, 0 disables posting
+ *
+ * Inject absolute and relative mouse movement into the mouse
+ * state manager. The x,y parameters should both be in pixels.
+ *
+ * Device drivers which resembles pointer devices probably wants
+ * to use this function to inject events into the library.
+ */
 void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   sint nx;
   sint ny;
@@ -139,9 +162,18 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
 
 /* ******************************************************************** */
 
-// Update mouse button
-void mouse_button(sint btn, sint state, uchar postdev) {
-  sint newbutton;
+/**
+ * @ingroup IMouse
+ * @brief Mouse button update
+ *
+ * @param btn button index
+ * @param state pressed (true) or released (false)
+ * @param postdev device index of sender, 0 disables posting
+ *
+ * Feed mouse button press/release into mouse state manager.
+ */
+void mouse_button(oi_mouse btn, sint state, uchar postdev) {
+  oi_mouse newbutton;
   uchar type;
 
   newbutton = button;
@@ -180,7 +212,18 @@ void mouse_button(sint btn, sint state, uchar postdev) {
 
 /* ******************************************************************** */
 
-// Get absolute position of mouse (public)
+/**
+ * @ingroup PMouse
+ * @brief Get absolute position of mouse pointer
+ *
+ * @param x pointer to horizontal position
+ * @param y pointer to vertical position
+ * @returns mouse button mask, see @ref PMouseMask
+ *
+ * Get the absolute position of the mouse cursor
+ * (stored in the integer pointers) and the current
+ * button state as a button mask.
+ */
 sint oi_mouse_absolute(sint *x, sint *y) {
   // Check current position
   if(crd_x < 0) {
@@ -204,7 +247,17 @@ sint oi_mouse_absolute(sint *x, sint *y) {
 
 /* ******************************************************************** */
 
-// Get relative position of mouse (public)
+/**
+ * @ingroup PMouse
+ * @brief Get relative mouse motion
+ *
+ * @param x pointer to horizontal motion
+ * @param y pointer to vertical motion
+ * @returns mouse button mask, see @ref PMouseMask
+ *
+ * Get the relative mouse motion since last call
+ * to this function (ie. it is cummulative).
+ */
 sint oi_mouse_relative(sint *x, sint *y) {
   // Set data
   if(x) {
@@ -224,7 +277,18 @@ sint oi_mouse_relative(sint *x, sint *y) {
 
 /* ******************************************************************** */
 
-// Warp (set position of) mouse (public)
+/**
+ * @ingroup PMouse
+ * @brief Warp (move) mouse pointer
+ *
+ * @param x absolute horizontal position of cursor
+ * @param y absolute vertical position of cursor
+ * @returns errorcode, see @ref PErrors
+ *
+ * Move the mouse cursor to the defined absolute
+ * position. The function generates a mouse
+ * movement event.
+ */
 sint oi_mouse_warp(sint x, sint y) {
   int e;
 
@@ -265,7 +329,16 @@ sint oi_mouse_warp(sint x, sint y) {
 
 /* ******************************************************************** */
 
-// Return mouse button name (public)
+/**
+ * @ingroup PMouse
+ * @brief Return string from event-code
+ *
+ * @param button Button or mouse motion code
+ * @returns string containing button or motion name
+ *
+ * Get the "symbolic" name for a mouse event like
+ * buttons and motion.
+ */
 char *oi_mouse_getname(oi_mouse button) {
   // Dead simple
   switch(button) {
@@ -294,7 +367,15 @@ char *oi_mouse_getname(oi_mouse button) {
 
 /* ******************************************************************** */
 
-// Return mouse-id for name (public)
+/**
+ * @ingroup PMouse
+ * @brief Get mouse button/motion code given string
+ *
+ * @param name string name of button/motion
+ * @returns mouse button/motion code
+ *
+ * Translate symbolic string into mouse code.
+ */
 oi_mouse oi_mouse_getcode(char *name) {
   // Dummies
   if(!name) {

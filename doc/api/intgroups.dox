@@ -1,0 +1,125 @@
+/**
+@defgroup Internal Internal API
+@brief The internal driver API for OpenInput
+
+This is the internal driver API. These functions are
+available only when hacking the OpenInput library itself
+
+@{
+*/
+/**
+@}
+*/
+
+/**
+@defgroup ITypes Types, structures and constants
+@brief Type definitions and constants
+@ingroup Internal
+
+Structures, global constants and type definitions
+for library internals.
+
+@{
+*/
+/**
+@}
+*/
+
+/**
+@defgroup IMain Library interface
+@brief OpenInput miscellaneous internal functions
+@ingroup Internal
+
+Global constants and miscellaneous functions
+
+@{
+*/
+/**
+@}
+*/
+
+/**
+@defgroup IDevice Device driver interface
+@brief Device driver interface
+@ingroup Internal
+
+API used internally by device drivers
+
+@{
+ */
+/**
+@}
+ */
+
+/**
+@defgroup IKeyboard Keyboard state manager
+@brief Generic keyboard handling and state managment
+@ingroup Internal
+
+Helper functions for all types of keyboards. You should use
+this API provided here to feed key-presses and other events
+into OpenInput
+
+@{
+ */
+/**
+@}
+ */
+
+/**
+@defgroup IMouse Mouse state manager
+@brief Generic mouse button and movement handling and state managment
+@ingroup Internal
+
+Helper functions for mice. Use this API to feed mouse movement and
+button presses into the OpenInput system
+
+@{
+ */
+/**
+@}
+ */
+
+/**
+@defgroup IQueue Event queue
+@brief Events are placed in a generic queue accessible in this API
+@ingroup Internal
+
+The queue functions lets you add events which can later be read by
+the user using the event-functions. You rarely have to inject events
+directly into the queue, since this is taken care for by the
+state managers, see @ref IKeyboard @ref IMouse and @ref IAppstate
+
+@{
+ */
+/**
+@}
+ */
+
+/**
+@defgroup IAppstate Application state
+@brief Application interface for window handling
+@ingroup Internal
+
+This API lets device drivers notify OpenInput about window events
+like resize, expose, iconify and close events
+
+@{
+ */
+/**
+@}
+ */
+
+/**
+@defgroup IAction Action mapper
+@brief Action mapper setup and translation interface
+@ingroup Internal
+
+These functions translate specific events into abstract action events
+using a user-defined table
+
+@{
+ */
+/**
+@}
+ */

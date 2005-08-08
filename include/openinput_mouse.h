@@ -28,11 +28,15 @@
 #error Do not include this file directly - use openinput.h
 #endif
 
-/* ********************************************************************
- * Mouse buttons and masks
- ******************************************************************** */
+/* ******************************************************************** */
 
-// The pointer buttons
+/**
+ * @ingroup PTypes
+ * @defgroup PMousename Mouse button definitions
+ * @brief Mouse buttons
+ *
+ * Definition of mouse buttons
+ */
 typedef enum {
   OIP_UNKNOWN            = 0,
   OIP_FIRST              = 0,
@@ -42,14 +46,23 @@ typedef enum {
   OIP_WHEEL_UP           = 4,
   OIP_WHEEL_DOWN         = 5,
   OIP_MOTION             = 6,
-  OIP_LAST               = 7
+  OIP_LAST
 } oi_mouse;
 
-// Masks for buttons
+
+/**
+ * @ingroup PTypes
+ * @defgroup PMouseMask Mouse button masks
+ * @brief Definition of mouse button masks
+ *
+ * Mouse button bits used in state parameters.
+ * @{
+ */
 #define OI_BUTTON_MASK(x) (1<<(x))
 #define OI_BUTTON_LEFTMASK      OI_BUTTON_MASK(OIP_BUTTON_LEFT)
 #define OI_BUTTON_MIDMASK       OI_BUTTON_MASK(OIP_BUTTON_MIDDLE)
 #define OI_BUTTON_RIGHTMASK     OI_BUTTON_MASK(OIP_BUTTON_RIGHT)
+/** @} */
 
 /* ******************************************************************** */
 

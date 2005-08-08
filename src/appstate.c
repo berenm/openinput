@@ -38,7 +38,12 @@ static sint win_height;
 
 /* ******************************************************************** */
 
-// Initialize application state (internal)
+/**
+ * @ingroup IAppstate
+ * @brief Initialize application state manager
+ *
+ * Must be called on library initialization.
+ */
 sint appstate_init() {
   int i;
 
@@ -80,7 +85,18 @@ sint appstate_init() {
 
 /* ******************************************************************** */
 
-// Set focus state (internal)
+/**
+ * @ingroup IAppstate
+ * @brief Update focus state
+ *
+ * @param gain focus gained:1 or lost:0
+ * @param state type of focus gained/lost
+ * @param postdev device index of sender, 0 disables event posting
+ *
+ * Update the focus state of the application (ie. window).
+ * Rhree types of focus exists: #OI_FOCUS_MOUSE #OI_FOCUS_INPUT and
+ * #OI_FOCUS_VISIBLE
+ */
 void appstate_focus(sint gain, sint state, uchar postdev) {
   sint newfocus;
 
@@ -115,6 +131,16 @@ void appstate_focus(sint gain, sint state, uchar postdev) {
 /* ******************************************************************** */
 
 // Update window size changes
+/**
+ * @ingroup IAppstate
+ * @brief Update application window size state
+ *
+ * @param w width of window
+ * @param h height of window
+ * @param postdev device index of sender, 0 disables event posting
+ *
+ * Update the window size state.
+ */
 void appstate_resize(sint w, sint h, uchar postdev) {
   // Store state
   win_width = w;
@@ -133,28 +159,55 @@ void appstate_resize(sint w, sint h, uchar postdev) {
 
 /* ******************************************************************** */
    
-// Return window width (internal)
+/**
+ * @ingroup IAppstate
+ * @brief Get application window width
+ *
+ * @returns window width (pixels)
+ */
 inline sint appstate_width() {
   return win_width;
 }
 
 /* ******************************************************************** */
 
-// Return window height (internal)
+/**
+ * @ingroup IAppstate
+ * @brief Get application window height
+ *
+ * @returns window height (pixels)
+ */
 inline sint appstate_height() {
   return win_height;
 }
 
 /* ******************************************************************** */
 
-// Get focus state of application (public)
+/**
+ * @ingroup PAppstate
+ * @brief Get application focus state
+ *
+ * @returns focus bitmask
+ *
+ * A bitmask comprised of #OI_FOCUS_MOUSE #OI_FOCUS_INPUT or
+ * #OI_FOCUS_VISIBLE
+ */
 sint oi_app_focus() {
   return focus;
 }
 
 /* ******************************************************************** */
 
-// Show/hide cursor (public)
+/**
+ * @ingroup PAppstate
+ * @brief Hide or display the mouse cursor
+ *
+ * @param q new cursor state or query
+ * @returns state of cursor visiblity
+ *
+ * Show or hide the mouse cursor. The state can also
+ * be queried using #OI_QUERY
+ */
 oi_bool oi_app_cursor(oi_bool q) {
   int hide;
 
@@ -205,7 +258,16 @@ oi_bool oi_app_cursor(oi_bool q) {
 
 /* ******************************************************************** */
 
-// Grab/ungrab input (public)
+/**
+ * @ingroup PAppstate
+ * @brief Grab or release the mouse cursor
+ * 
+ * @param q enable/disable/query grabbing
+ * @returns state of grabbing
+ *
+ * Grab or release the mouse cursor. The grab state can
+ * also be queried using #OI_QUERY
+ */
 sint oi_app_grab(oi_bool q) {
   int eat;
   

@@ -36,7 +36,7 @@ static uint modstate;
 static char *keynames[OIK_LAST];
 
 // Key repeat
-struct {
+static struct {
   uchar first;
   sint delay;
   sint interval;
@@ -46,7 +46,14 @@ struct {
 
 /* ******************************************************************** */
 
-// Initialize keyboard state manager (internal)
+/**
+ * @ingroup IKeyboard
+ * @brief Initialize keyboard state manager
+ *
+ * @returns errorcode, see @ref PErrors
+ *
+ * Must be called on library initialization.
+ */
 sint keyboard_init() {
   int i;
 
@@ -82,7 +89,20 @@ sint keyboard_init() {
 
 /* ******************************************************************** */
 
-// Update keyboard/modifier state (internal)
+/**
+ * @ingroup IKeyboard
+ * @brief Update keyboard button state
+ *
+ * @param keysym keyboard symbol structure
+ * @param state state, ie. pressed or released
+ * @param postdev device index of sender, 0 disables posting
+ *
+ * Device drivers should use this function to generate keyboard
+ * events and update the internal keyboard state table.
+ * The function correctly translates modifier buttons into 
+ * modifier-masks and handles the lock-button: CapsLock, NumLock
+ * and ScrollLock.
+ */
 void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
   oi_type type;
   oi_event ev;
@@ -268,7 +288,18 @@ void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
 
 /* ******************************************************************** */
 
-// Repeat keyboard events (internal)
+/**
+ * @ingroup IKeyboard
+ * @brief Repeat keyboard events
+ *
+ * This function generates keyboard events depending, ie.
+ * either pressed/released events. The user must setup
+ * the delay and interval settings before events are
+ * posted.
+ *
+ * The function is called by oi_events_pump, and
+ * should not be invoked from elsewhere
+ */
 void keyboard_dorepeat() {
   uint now;
   sint interval;
@@ -298,21 +329,52 @@ void keyboard_dorepeat() {
 
 /* ******************************************************************** */
 
-// Set modifier mask
+/**
+ * @ingroup IKeyboard
+ * @brief Set keyboard modifier
+ *
+ * @param newmod modifier mask
+ *
+ * Set new keyboard modifier mask.
+ */
 void keyboard_setmodifier(uint newmod) {
   modstate = newmod;
 }
 
 /* ******************************************************************** */
 
-// Return current modifier state (public)
+/**
+ * @ingroup PKeyboard
+ * @brief Get keyboard modifier state
+ *
+ * @returns modifier mask
+ *
+ * Return the current keyboard modifier state, ie.
+ * which modifiers (alt, shift, meta, etc.) are down.
+ * See @ref PModname for modifier definitions.
+ */
 uint oi_key_modstate() {
   return modstate;
 }
 
 /* ******************************************************************** */
 
-// Return key state table or size (public)
+/**
+ * @ingroup PKeyboard
+ * @brief Get key state table
+ *
+ * @param num pointer to size of table
+ * @returns pointer to keyboard state table
+ *
+ * Return the internal keyboard state table, which can be
+ * parsed to determine which keys are down using the keycode
+ * as array index (eg. table[OIK_A]).
+ *
+ * Note that the returned table is internal for OpenInput, and
+ * you may NOT free or alter it. If the "num" parameter is not
+ * NULL, it will be filled with the number of available elements
+ * in the state table.
+ */
 uchar *oi_key_keystate(sint *num) {
   if(num != NULL) {
     *num = OIK_LAST;
@@ -322,7 +384,17 @@ uchar *oi_key_keystate(sint *num) {
 
 /* ******************************************************************** */
 
-// Return name for key (public)
+/**
+ * @ingroup PKeyboard
+ * @brief Return string name for keycode
+ *
+ * @param key keycode
+ * @returns string containing button name
+ *
+ * Get the "symbolic" keyboard button name given keycode.
+ * You can use this in configuration files and other
+ * user-semi-friendly environments.
+ */
 char *oi_key_getname(oi_key key) {
   char *name;
 
@@ -337,7 +409,23 @@ char *oi_key_getname(oi_key key) {
 
 /* ******************************************************************** */
 
-// Byte-for-byte keycode-keyname check (internal)
+/**
+ * @ingroup IKeyboard
+ * @brief Keycode to keyname translation for special keys
+ *
+ * @param name string containing key name
+ * @param first keycode index to start search
+ * @param last keycode index to end search
+ * @returns keycode
+ *
+ * Scan the range between (both inclusive) "first" and "last"
+ * for the key named "name", and return the keycode.
+ *
+ * This function should be used only when other, faster, means
+ * are exhausted (such as calculation of offset).
+ *
+ * If no name matches, the keycode returned is OIK_UNKNOWN.
+ */
 inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
   oi_key k;
 
@@ -351,7 +439,25 @@ inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
 
 /* ******************************************************************** */
 
-// Return key for name (public)
+/**
+ * @ingroup PKeyboard
+ * @brief Get keycode for button string
+ *
+ * @param name string name of button
+ * @returns keycode
+ *
+ * Perform a lookup of the keyboard button with "name" and
+ * return the OpenInput keycode. You should not use this in
+ * time critical regions, as some keycodes are found using
+ * string comparisons (which is time-consuming).
+ *
+ * This function may be usable when converting from
+ * user-semi-friendly configuration files to something which
+ * can be used inside your application.
+ *
+ * If the name is not a known keyboard button name
+ * OIK_UNKNOWN is returned.
+ */
 oi_key oi_key_getcode(char *name) {
   int i;
   oi_key k;
@@ -454,7 +560,28 @@ oi_key oi_key_getcode(char *name) {
 
 /* ******************************************************************** */
 
-// Setup key repeat system (public)
+/**
+ * @ingroup PKeyboard
+ * @brief Setup key repeater
+ *
+ * @param delay delay in ms for first event
+ * @param interval interval in ms between events
+ * @returns errorcode, see @ref PErrors
+ *
+ * Set "delay" and "interval" to a number higer than
+ * zero to enable generation of key-repeat events (which
+ * are simply press/release events when a button is held
+ * pressed). To disable the repeat-system, set both parameters
+ * to 0 (zero).
+ *
+ * Delay is the time a button must be held down for the
+ * repeat-system to be started.
+ *
+ * When the delay has expired, an event will be triggered
+ * based on the interval time.
+ *
+ * Both delay and interval are "ms" (1/1000 second).
+ */
 sint oi_key_repeat(sint delay, sint interval) {
   // Dummy check
   if((delay < 0) || (interval < 0)) {
