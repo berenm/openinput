@@ -6,17 +6,19 @@
 This is the API reference documentation for OpenInput, the
 cross-platform, easy-to-use, SDL-like input handling library.
 
-The API is rougly split into two seperate modules:
-@li The public API
-@li The internal API
+The API is rougly split into three logical sections:
+@li The @ref Public
+@li The @ref Internal
+@li The @ref Drivers
 
 As you might have guessed, what you need to use OpenInput is ONLY
 the public API. You should not bother reading the internal API, as this
 is mainly targetted device driver developers. Of course, you are
 encouraged to develop drivers, but as a user of the library, simply
-ignore it...
+ignore it. The same is true for the device drivers, which you can't
+access directly as a user of the library.
 
 You can find the official OpenInput homepage at
-http://makob.dk/pages/libsinp.php
+http://openinput.dotsrc.org
 
 */

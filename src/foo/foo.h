@@ -41,4 +41,20 @@ sint foo_winsize(oi_device *dev, sint *w, sint *h);
 
 /* ******************************************************************** */
 
+/**
+ * @ingroup DFoo
+ * @brief Foo driver private instance data
+ *
+ * Private data is private for the particular
+ * instance of the device driver.
+ */
+typedef struct foo_private {
+  sint grabstatus;   /**< Pointer grabbed or free */
+  sint cursorstatus; /**< Cursor shown of hidden */
+  sint x;            /**< Cursor horizontal position */
+  sint y;            /**< Cursor vertical position */
+} foo_private;
+
+/* ******************************************************************** */
+
 #endif

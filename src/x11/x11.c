@@ -33,6 +33,19 @@
 #include "bootstrap.h"
 #include "x11.h"
 
+/**
+ * @ingroup Drivers
+ * @defgroup DX11 X11 device driver
+ * @brief X11 window system driver
+ *
+ * The X11 window system driver handles mice and
+ * keyboards under X11. It also supports hooking
+ * into an existing window, grabbing of both
+ * input (keyboard) and pointer (mouse). Also,
+ * the mouse cursor can be hidden and shown on
+ * demand.
+ */
+
 // Bootstrap global
 oi_bootstrap x11_bootstrap = {
   "x11",
@@ -43,8 +56,19 @@ oi_bootstrap x11_bootstrap = {
 };
 
 /* ******************************************************************** */
- 
-// Bootstrap: Check availablity of X11
+
+/**
+ * @ingroup DX11
+ * @brief Check connection to the X11 server
+ *
+ * @param flags library initialization flags, see @ref PFlags
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a bootstrap function.
+ *
+ * We try to open a dummy-connection to the X-server. That
+ * tells us of the X11 system can be used.
+ */
 sint x11_avail(uint flags) {
   Display *disp;
 
@@ -69,7 +93,16 @@ sint x11_avail(uint flags) {
 
 /* ******************************************************************** */
 
-// Bootstrap: Install X11 'device' block
+/**
+ * @ingroup DX11
+ * @brief Create X11 device driver interface
+ *
+ * @returns pointer to device interface, see @ref IDevstructs
+ *
+ * This is a bootstrap function.
+ *
+ * Create the internal data structure and the device interface.
+ */
 oi_device *x11_device() {
   oi_device *dev;
   x11_private *priv;
@@ -110,7 +143,26 @@ oi_device *x11_device() {
 
 /* ******************************************************************** */
 
-// Initialize X11
+/**
+ * @ingroup DX11
+ * @brief Initialize the X11 driver
+ *
+ * @param dev pointer to created device interface
+ * @param window_id window hook parameters, see @ref PWindow
+ * @param flags initialization flags, see @ref PFlags
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Initializes the window hook to the X server and initializes
+ * the private data structure. The latter includes generation
+ * of the invisible mouse cursor and lookup of variable
+ * key modifier masks. Also, the protocol atom for "close window"
+ * is fetched, so window-manager close events can be catched.
+ *
+ * The X11 keymap is also read, and a full reset is performed
+ * in order to sync states between X11 and OpenInput.
+ */
 sint x11_init(oi_device *dev, char *window_id, uint flags) {
   x11_private *priv;
 
@@ -154,7 +206,18 @@ sint x11_init(oi_device *dev, char *window_id, uint flags) {
 
 /* ******************************************************************** */
 
-// Clear X11 'device' block
+/**
+ * @ingroup DX11
+ * @brief Destroy the X11 device driver
+ *
+ * @param dev pointer to device interface
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Shutdown the X11 driver by releasing all
+ * allocated memory and the hidden cursor.
+ */
 sint x11_destroy(oi_device *dev) {
   x11_private *priv;
 
@@ -181,7 +244,18 @@ sint x11_destroy(oi_device *dev) {
 
 /* ******************************************************************** */
 
-// Pump event into the queue
+/**
+ * @ingroup DX11
+ * @brief Process events
+ *
+ * @param dev pointer to device interface
+ *
+ * This is a device interface function.
+ *
+ * Process pending X11 events, and pump these
+ * into the OpenInput queue. The real functionality
+ * is handled in the dispatcher.
+ */
 void x11_process(oi_device *dev) {
   x11_private *priv;
 
@@ -195,7 +269,19 @@ void x11_process(oi_device *dev) {
 
 /* ******************************************************************** */
 
-// Grab (lock) mouse/keyboard in window
+/**
+ * @ingroup DX11
+ * @brief Grab/release mouse and keyboard
+ *
+ * @param dev pointer to device interface.
+ * @param on true (1) turns on grab, false (0) releases grab
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Grab or release input (keyboard) and pointer (mouse) inside
+ * the hook-window.
+ */
 sint x11_grab(oi_device *dev, sint on) {
   x11_private *priv;
   int i;
@@ -241,7 +327,21 @@ sint x11_grab(oi_device *dev, sint on) {
 
 /* ******************************************************************** */
 
-// Show/hide mouse cursor
+/**
+ * @ingroup DX11
+ * @brief Show/hide mouse pointer
+ *
+ * @param dev pointer to device interface.
+ * @param on true (1) hides cursor, false (0) shows cursor
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * If we're to hide the cursor, switch the current cursor
+ * in the hook-window to the invisible one (which is to be
+ * found in the private data). Otherwise, we simply revert
+ * to the default X pointer.
+ */
 sint x11_hidecursor(oi_device *dev, sint on) {
   x11_private *priv;
 
@@ -265,7 +365,20 @@ sint x11_hidecursor(oi_device *dev, sint on) {
 
 /* ******************************************************************** */
 
-// Warp mouse
+/**
+ * @ingroup DX11
+ * @brief Warp mouse pointer
+ *
+ * @param dev pointer to device interface.
+ * @param x pointer to horizontal position
+ * @param y pointer to vertical position
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Warp (move) the mouse pointer to the given
+ * absolute coordinate within the hook-window.
+ */
 sint x11_warp(oi_device *dev, sint x, sint y) {
   x11_private *priv;
 
@@ -280,7 +393,20 @@ sint x11_warp(oi_device *dev, sint x, sint y) {
 
 /* ******************************************************************** */
 
-// Get window sizes
+/**
+ * @ingroup DX11
+ * @brief Get window size
+ *
+ * @param dev pointer to device interface.
+ * @param w pointer to horizontal size
+ * @param h pointer to vertical size
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Read the current size of the hook-window, update
+ * the internal state and return the width and height.
+ */
 sint x11_winsize(oi_device *dev, sint *w, sint *h) {
   x11_private *priv;
   XWindowAttributes attr;
@@ -301,25 +427,57 @@ sint x11_winsize(oi_device *dev, sint *w, sint *h) {
 
 /* ******************************************************************** */
 
-// X11 error
+/**
+ * @ingroup DX11
+ * @brief X11 non-fatal error handler
+ *
+ * @param d display handle
+ * @param e pointer to X11 error
+ * @returns ignored
+ *
+ * Reports non-fatal errors to standard-error when
+ * OpenInput is compiled in debug-mode.
+ */
 sint x11_error(Display *d, XErrorEvent *e) {
   debug("x11_error: code %u", e->error_code);
-
-  return OI_ERR_OK;
+ 
+  return 0;
 }
 
 /* ******************************************************************** */
 
-// X11 fatal I/O error
+/**
+ * @ingroup DX11
+ * @brief X11 fatal I/O error handler
+ *
+ * @param d display handle
+ * @returns ignored
+ *
+ * Called on fatal X errors - this is typically due to a lost
+ * connection to the X server, in which case the application
+ * should terminate.
+ */
 sint x11_fatal(Display *d) {
   debug("x11_fatal: fatal I/O error");
 
+  //FIXME: Send a quit-event
+
   return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
 
-// Make 'empty' mouse cursor
+/**
+ * @ingroup DX11
+ * @brief Create the invisible pointer
+ *
+ * @param d display handle
+ * @param w window handle
+ * @returns pointer handle
+ *
+ * Create an X pointer from a on-the-fly generated blank
+ * pixmap.
+ */
 Cursor x11_mkcursor(Display *d, Window w) {
   Pixmap pixmap;
   XColor color;

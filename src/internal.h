@@ -27,13 +27,14 @@
 /* ******************************************************************** */
 
 /**
- * @ingroup ITypes
- * @defgroup IDevstruct Device abstraction interface
+ * @ingroup IDevstructs
  * @brief Device driver abstraction interface
  *
  * This is the primary device abstraction layer and entry point for
  * OpenInput to access the drivers capabilities. This should be created
- * dynamically from the bootstrap create function
+ * dynamically from the bootstrap create function.
+ *
+ * The fields with a "fcnptr" note are function pointers.
  */
 typedef struct oi_device {
   sint index;                                                        /**< Device index */
@@ -41,30 +42,32 @@ typedef struct oi_device {
   char *desc;                                                        /**< Description of device */
   uint provides;                                                     /**< Provide-flag */
   void *private;                                                     /**< Private data */
-  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device */
-  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device */
-  void (*process)(struct oi_device *dev);                            /**< Pump events into queue */
-  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus */
-  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor */
-  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor */
-  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size */
+  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (fcnptr) */
+  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (fcnptr) */
+  void (*process)(struct oi_device *dev);                            /**< Pump events into queue (fcnptr) */
+  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (fcnptr) */
+  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (fcnptr) */
+  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (fcnptr) */
+  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (fcnptr) */
 } oi_device;
 
 /**
- * @ingroup ITypes
- * @defgroup IDevboot Device bootstrap interface
+ * @ingroup IDevstructs
  * @brief Device driver bootstrap interface
  *
  * Static structure used to kickstart device drivers when the
- * library is initialized
+ * library is initialized.
+ *
+ * The fields with a "fcnptr" note are function pointers.
  */
 typedef struct oi_bootstrap {
   char *name;                                                        /**< Short device name */
   char *desc;                                                        /**< Device description */
   sint provides;                                                     /**< Device provide-flag */
-  sint (*avail)(uint flags);                                         /**< Is device available */
-  struct oi_device *(*create)();                                     /**< Return device structure */
+  sint (*avail)(uint flags);                                         /**< Is device available (fcnptr) */
+  struct oi_device *(*create)();                                     /**< Return device structure (fcnptr) */
 } oi_bootstrap;
+
 
 /* ******************************************************************** */
 
@@ -150,6 +153,10 @@ void debug(char *format, ...);
 /**
  * @ingroup ITypes
  * @defgroup IConsts Internal constants
+ *
+ * Various constants for the internal workings of
+ * OpenInput.
+ *
  * @{
  */
 #define OI_MAX_DEVICES 64                                           /**< Max number of attached devices */

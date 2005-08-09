@@ -38,7 +38,14 @@ static oi_key x11_miscmap[256];
 
 /* ******************************************************************** */
 
-// Initialize X11 -> OI keymapper
+/**
+ * @ingroup DX11
+ * @brief Initialize the X11 to OpenInput keymap table
+ *
+ * To be able to do constant-time translations form X
+ * keyboard button names to OpenInput symbolic keys,
+ * we prepare two lookup-tables in this function.
+ */
 void x11_initkeymap() {
   int i;
 
@@ -146,7 +153,20 @@ void x11_initkeymap() {
 
 /* ******************************************************************** */
 
-// Perform a full keyboard state update
+/**
+ * @ingroup DX11
+ * @brief Perform a full keyboard state update
+ *
+ * @param dev pointer to device interface
+ * @param d display handle
+ * @param keyvec X keyboard vector
+ *
+ * When OpenInput starts, and when the hook-window
+ * receives focus, the keyboard state is unknown since
+ * other applications may have altered things.
+ * Because of this, we have to sync the OpenInput state
+ * with the X server. It's cumbersome, but required!
+ */
 void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
   char keyret[32];
   KeyCode xcode[OIK_LAST];
@@ -277,7 +297,22 @@ void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
 
 /* ******************************************************************** */
 
-// Translate X11 keysym to OI keysym
+/**
+ * @ingroup DX11
+ * @brief Translate X11 keysym to OpenInput keysym
+ *
+ * @param d display handle
+ * @param xkey X keyboard event
+ * @param kc X keycode
+ * @param keysym OpenInput symbolic key
+ * @returns OpenInput symbolic key
+ *
+ * Here's where the X key is translate to the corresponding
+ * OpenInput keysym. Since we use lookup-tables, it's
+ * actually quite fast (and easy), though it requires some
+ * deep knowledge of how X keycodes and X keysyms are
+ * composed (eg. that X has a different keymaps).
+ */
 inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
 				  KeyCode kc, oi_keysym *keysym) {
   KeySym xsym;
@@ -351,7 +386,17 @@ inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
 
 /* ******************************************************************** */
 
-// Get masks of modifiers
+/**
+ * @ingroup DX11
+ * @brief Query the X server for various modifier keys
+ *
+ * @param d display handle
+ * @param dev pointer to device interface
+ *
+ * Apparantly, the bitmasks of certain modifier keys (shift, meta, etc.)
+ * are variable. Because of this, we have to find out which modifier
+ * corresponds to which bit.
+ */
 void x11_modmasks(Display *d, oi_device *dev) {
   XModifierKeymap *xmods;
   int i;

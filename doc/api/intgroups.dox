@@ -11,6 +11,8 @@ available only when hacking the OpenInput library itself
 @}
 */
 
+// --------------------------------------------------
+
 /**
 @defgroup ITypes Types, structures and constants
 @brief Type definitions and constants
@@ -25,6 +27,8 @@ for library internals.
 @}
 */
 
+// --------------------------------------------------
+
 /**
 @defgroup IMain Library interface
 @brief OpenInput miscellaneous internal functions
@@ -38,6 +42,8 @@ Global constants and miscellaneous functions
 @}
 */
 
+// --------------------------------------------------
+
 /**
 @defgroup IDevice Device driver interface
 @brief Device driver interface
@@ -50,6 +56,8 @@ API used internally by device drivers
 /**
 @}
  */
+
+// --------------------------------------------------
 
 /**
 @defgroup IKeyboard Keyboard state manager
@@ -66,6 +74,8 @@ into OpenInput
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup IMouse Mouse state manager
 @brief Generic mouse button and movement handling and state managment
@@ -79,6 +89,8 @@ button presses into the OpenInput system
 /**
 @}
  */
+
+// --------------------------------------------------
 
 /**
 @defgroup IQueue Event queue
@@ -96,6 +108,8 @@ state managers, see @ref IKeyboard @ref IMouse and @ref IAppstate
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup IAppstate Application state
 @brief Application interface for window handling
@@ -110,6 +124,8 @@ like resize, expose, iconify and close events
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup IAction Action mapper
 @brief Action mapper setup and translation interface
@@ -123,3 +139,48 @@ using a user-defined table
 /**
 @}
  */
+
+// --------------------------------------------------
+
+/**
+@defgroup Drivers Device drivers
+@brief Device drivers
+
+This module contains all device drivers for OpenInput.
+Device drivers use the @ref Internal to expose events
+to the users of the library (who use the @ref Public).
+
+@{
+ */
+/**
+@}
+ */
+
+// --------------------------------------------------
+
+/**
+@defgroup IDevstructs Device driver interfaces
+@ingroup ITypes
+@brief Device driver abstration interfaces
+
+All device drivers use two structures as an API
+between the platform/device specific code and
+OpenInput itself: The bootstrap interface and
+the actual device driver interface.
+
+The bootstrap interface is a static structure, which
+is used by the library initialization code to check
+if the device is actually present.
+
+If the device is present, the driver will be asked
+to create the driver interface, which is a structure
+containing function pointers to the required (and optional)
+functionality devices can do.
+
+@{
+ */
+/**
+@}
+ */
+
+// --------------------------------------------------

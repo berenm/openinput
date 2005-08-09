@@ -33,7 +33,22 @@
 
 /* ******************************************************************** */
 
-// Relative mouse motion (grabbed and hidden)
+/**
+ * @ingroup DX11
+ * @brief Handle relative mouse movement
+ *
+ * @param dev pointer to device interface
+ * @param xev X mouse motion event
+ * 
+ * When the mouse is grabbed and the cursor is hidden we
+ * are in "relative mouse motion mode", as the user expects
+ * the mouse to generate events even if the window border is hit
+ * as she can't see that the border is actually hit...
+ *
+ * The trick is to make the cursor stay in the middle of
+ * the window (using warp) and eating the extra X motion
+ * events.
+ */
 inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
   x11_private *priv;
   int deltax;
@@ -90,7 +105,18 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
 
 /* ******************************************************************** */
 
-// Check for pending events without going into a long-time blocking call
+/**
+ * @ingroup DX11
+ * @brief Check for pending X events
+ *
+ * @param d display handle
+ * @returns true (1) if events are pending, false (0) otherwise
+ *
+ * Use this function to check for pending events from the
+ * X server without going into a long-time blocking call.
+ * The block is avoided using a "select attack" on the
+ * X-server - this technique was borrowed from SDL. Thanks!
+ */
 inline sint x11_pending(Display *d) {
   // Flush to pump the X pipeline
   XFlush(d);
@@ -123,7 +149,17 @@ inline sint x11_pending(Display *d) {
 
 /* ******************************************************************** */
 
-// Cancel repeated keys (lifted from SDL who lifted it from GGI - thanks!)
+/**
+ * @ingroup DX11
+ * @brief Cancel repeated key events
+ *
+ * @param d display handle
+ * @param evt X event
+ *
+ * Make sure that the repeated key-down events from 
+ * the X server is thrown away. OpenInput has it's internal
+ * keyrepeat system if you want repeat-events.
+ */
 inline schar x11_keyrepeat(Display *d, XEvent *evt) {
   XEvent pev;
   schar rep;
@@ -149,7 +185,24 @@ inline schar x11_keyrepeat(Display *d, XEvent *evt) {
 
 /* ******************************************************************** */
 
-// Dispatch a pending X11 event into the OI event queue
+/**
+ * @ingroup DX11
+ * @brief X11 event dispatcher
+ *
+ * @param dev pointer to device interface
+ * @param d display handle
+ *
+ * This is where the real X action is! When this function
+ * is called, a least a single event must be pending to
+ * avoid a long-time block.
+ *
+ * What we do is fetch the X event, check the type and
+ * convert it to the corresponding OpenInput event.
+ * For the most part, this is handled in the
+ * state managers (ie. keyboard, mouse, appstate, etc.)
+ * For the keyboard events, we first translate the
+ * X11 scancode into a OpenInput symbolic key.
+ */
 inline void x11_dispatch(oi_device *dev, Display *d) {
   XEvent xev;
   

@@ -31,6 +31,17 @@
 #include "bootstrap.h"
 #include "foo.h"
 
+/**
+ * @ingroup Drivers
+ * @defgroup DFoo Foo test driver
+ *
+ * The foo test driver can be used to test some
+ * basic functionality of OpenInput. Under normal
+ * circumstances you really do NOT want to compile
+ * this driver--the default is not to use the foo
+ * device driver test.
+ */
+
 // Bootstrap global
 oi_bootstrap foo_bootstrap = {
   "foo",
@@ -40,17 +51,20 @@ oi_bootstrap foo_bootstrap = {
   foo_device
 };
 
-// Private data
-typedef struct foo_private {
-  sint grabstatus;
-  sint cursorstatus;
-  sint x;
-  sint y;
-} foo_private;
 
 /* ******************************************************************** */
  
-// Check availablity of foo
+/**
+ * @ingroup DFoo
+ * @brief Check availablity of foo device
+ *
+ * @param flags initialization flags, see @ref PFlags
+ * @returns true (1) if device is present, false (0) otherwise
+ *
+ * This is a bootstrap function.
+ *
+ * The foo device driver always exists (if compiled in).
+ */
 sint foo_avail(uint flags) {
   debug("foo_avail");
 
@@ -59,7 +73,17 @@ sint foo_avail(uint flags) {
 
 /* ******************************************************************** */
 
-// Install foo 'device' block
+/**
+ * @ingroup DFoo
+ * @brief Create foo device structure
+ *
+ * @returns pointer to allocated device interface
+ *
+ * This is a bootstrap function.
+ * 
+ * Alloc and initialize the device driver abstration
+ * interface.
+ */
 oi_device *foo_device() {
   oi_device *dev;
   foo_private *priv;
@@ -100,7 +124,20 @@ oi_device *foo_device() {
 
 /* ******************************************************************** */
 
-// Initialize foo
+/**
+ * @ingroup DFoo
+ * @brief Initialize the foo test driver
+ *
+ * @param dev pointer to device interface
+ * @param window_id window hook paramaters, see @ref PWindow
+ * @param flags initialization flags, see @ref PFlags
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Initialize the foo test driver - initializes 
+ * the private structure and other states.
+ */
 sint foo_init(oi_device *dev, char *window_id, uint flags) {
   uint val;
   foo_private *priv;
@@ -129,7 +166,17 @@ sint foo_init(oi_device *dev, char *window_id, uint flags) {
 
 /* ******************************************************************** */
 
-// Free foo device structure
+/**
+ * @ingroup DFoo
+ * @brief Shutdown the foo device
+ *
+ * @param dev pointer to device interface
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Close down driver freeing any allocated memory.
+ */
 sint foo_destroy(oi_device *dev) {
   debug("foo_destroy");
   
@@ -148,7 +195,20 @@ sint foo_destroy(oi_device *dev) {
 
 /* ******************************************************************** */
 
-// Pump events into event queue
+/**
+ * @ingroup DFoo
+ * @brief Process events
+ *
+ * @param dev pointer to device interface
+ *
+ * This is a device interface function.
+ *
+ * Pump events into the OpenInput library. As this
+ * is a test device, only a few hardcoded events
+ * are inserted - all state managers should have an
+ * event injected, and a direct queue insertion should
+ * also be performed.
+ */
 void foo_process(oi_device *dev) {
   static oi_event ev;
 
@@ -173,7 +233,20 @@ void foo_process(oi_device *dev) {
 
 /* ******************************************************************** */
 
-// Pump events into event queue
+/**
+ * @ingroup DFoo
+ * @brief Grab/release pointer
+ *
+ * @param dev pointer to device interface
+ * @param on true (1) turns on grab, false (0) releases grab
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Since the foo device is a virtual test device, this function
+ * does not perform any real grabbing. A state is flipped, and
+ * in debug-mode, the state change can be verified.
+ */
 sint foo_grab(oi_device *dev, sint on) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
@@ -185,7 +258,21 @@ sint foo_grab(oi_device *dev, sint on) {
 
 /* ******************************************************************** */
 
-// Show/hide pointer cursor
+
+/**
+ * @ingroup DFoo
+ * @brief Show/hide pointer
+ *
+ * @param dev pointer to device interface
+ * @param on true (1) hides cursor, false (0) shows cursor
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Since the foo device is a virtual test device, this function
+ * does not perform any real hide/show of the pointer. A state is flipped,
+ * and in debug-mode, the state change can be verified.
+ */
 sint foo_hidecursor(oi_device *dev, sint on) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
@@ -197,7 +284,21 @@ sint foo_hidecursor(oi_device *dev, sint on) {
 
 /* ******************************************************************** */
 
-// Warp pointer
+/**
+ * @ingroup DFoo
+ * @brief Warp pointer
+ *
+ * @param dev pointer to device interface
+ * @param x pointer to horizontal position
+ * @param y pointer to vertical position
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Since the foo device is a virtual test device, this function
+ * does not perform any cursor movement. The internal state
+ * is changed, and can be verified in debug-mode.
+ */
 sint foo_warp(oi_device *dev, sint x, sint y) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
@@ -210,7 +311,21 @@ sint foo_warp(oi_device *dev, sint x, sint y) {
 
 /* ******************************************************************** */
 
-// Window size notifier
+/**
+ * @ingroup DFoo
+ * @brief Get window size
+ *
+ * @param dev pointer to device interface
+ * @param w pointer to horizontal size
+ * @param h pointer to vertical size
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Since the foo device is a virtual test device, this function
+ * does not return the window size. Instead, it returns the
+ * virtual mouse pointer coordinate (set using the warp function).
+ */
 sint foo_winsize(oi_device *dev, sint *w, sint *h) {
   foo_private *priv;
   priv = (foo_private*)dev->private;
