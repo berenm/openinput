@@ -13,6 +13,17 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LIBTOOL
 
+dnl Doxygen
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(OpenInput, [doc/doxygen/Doxyfile], [doc/api/])
+
 dnl Debugging mode
 AC_ARG_ENABLE(debug,
    AS_HELP_STRING([--enable-debug], [enable extra debugging in the binary (default=no)]),
@@ -93,10 +104,11 @@ AC_SUBST(TESTPRGS)
 AC_SUBST(PLATDIRS)
 AC_SUBST(PLATLIBS)
 
+dnl 	doc/Doxyfile \
+
 dnl Makefiles to be generated
 AC_CONFIG_FILES([
 	openinput.pc \
-	doc/Doxyfile \
 	Makefile \
 	include/Makefile \
 	test/Makefile \

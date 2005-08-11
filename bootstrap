@@ -12,9 +12,8 @@ export WANT_AUTOMAKE='1.6'
 export WANT_AUTOCONF_2_5=1
 
 echo Bootstrapping...
-aclocal && \
-libtoolize --force && \
-aclocal $ACLOCAL_FLAGS && \
+libtoolize && \
+aclocal -I scripts $ACLOCAL_FLAGS && \
 autoheader && \
 autoconf && \
 automake --add-missing --gnu
