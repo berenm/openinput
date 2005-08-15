@@ -46,7 +46,7 @@ typedef signed int                sint;    /**< Signed int */
 
 /**
  * @ingroup PTypes
- * @defgroup PBool Tri-state
+ * @defgroup PBool Tri-state type
  * @brief Enable, disable or query
  * @{
  */
