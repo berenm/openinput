@@ -34,10 +34,10 @@ static uchar *action_state;
 static sint action_count;
 
 // Lookup table for keyboard
-static uint action_keyboard[OIK_LAST];
+static oi_aclink *action_keyboard[OIK_LAST];
 
 // Lookup table for mouse
-static uint action_mouse[OIP_LAST];
+static oi_aclink *action_mouse[OIP_LAST];
 
 /* ******************************************************************** */
 
@@ -73,6 +73,7 @@ sint oi_action_install(oi_actionmap *map, sint num) {
   sint i;
   sint j;
   sint big;
+  oi_aclink *last;
 
   debug("oi_action_install");
 
@@ -81,22 +82,15 @@ sint oi_action_install(oi_actionmap *map, sint num) {
     return OI_ERR_PARAM;
   }
 
-  // Scan for uniqueness of actionid (asume unsorted set)
+  // Get largest action id
   big = 0;
   for(i=0; i<num; i++) {
-    for(j=i+1; j<num; j++) {
-      if(map[i].actionid == map[j].actionid) {
-	return OI_ERR_NOT_UNIQUE;
-      }
-    }
-
-    // We also need the biggest actionid
     if(map[i].actionid > big) {
       big = map[i].actionid;
     }
   }
 
-  debug("oi_action_install: map is unique, biggest id: %i", big);
+  debug("oi_action_install: highest action id: %i", big);
 
   // Validate elements
   for(i=0; i<num; i++) {
@@ -108,8 +102,8 @@ sint oi_action_install(oi_actionmap *map, sint num) {
   debug("oi_action_install: map is valid");
 
   // Clean lookup tables
-  memset(action_keyboard, 0, TABLESIZE(action_keyboard));
-  memset(action_mouse, 0, TABLESIZE(action_mouse));
+  action_cleartable(action_keyboard, OIK_LAST);
+  action_cleartable(action_mouse, OIP_LAST);
 
   // Free old state table
   if(action_count > 0) {
@@ -121,26 +115,62 @@ sint oi_action_install(oi_actionmap *map, sint num) {
   action_state = (uchar*)malloc(big);
   memset(action_state, 0, big);
 
-  // Parse event and fill the lookup tables
+  /* Parse event and fill the lookup tables
+   * The tables are arrays of linked lists. Actions can be triggered
+   * by multiple devices, and can therefore belong to more tables
+   *
+   */
   for(i=0; i<num; i++) {
+
     // Action is keyboard
     if((j = oi_key_getcode(map[i].name))) {
-      action_keyboard[j] = map[i].actionid;
+
+      // Alloc new tail and fill it
+      last = action_tail(&action_keyboard[j], TRUE);
+      last->action = map[i].actionid;
+      last->device = map[i].device;
 
       debug("oi_action_install: keyboard action:\t id:%u name:'%s'",
 	    map[i].actionid, map[i].name);
     }
 
     // Action is mouse
-    else if((j = oi_mouse_getcode(map[i].name))) {
-      action_mouse[j] = map[i].actionid;
+    if((j = oi_mouse_getcode(map[i].name))) {
+      
+      // Alloc new tail and fill it
+      last = action_tail(&action_mouse[j], TRUE);
+      last->action = map[i].actionid;
+      last->device = map[i].device;
 
       debug("oi_action_install: mouse action:\t id:%u name:'%s'",
 	    map[i].actionid, map[i].name);
     }
 
-    // Add more lookup tables here
+    //FIXME Add more lookup tables here
   }
+
+#ifdef DEBUG
+ {
+   debug("oi_action_install: begin action table printout");
+   for(i=0; i<OIK_LAST; i++) {
+     last = action_keyboard[i];
+     while(last != NULL) {
+       debug("keyboard \t id:%i \t dev:%i \t action:%i",
+	     i, last->device, last->action);
+       last = last->next;
+     }
+   }
+   for(i=0; i<OIP_LAST; i++) {
+     last = action_mouse[i];
+     while(last != NULL) {
+       debug("mouse \t id:%i \t dev:%i \t action:%i",
+	     i, last->device, last->action);
+       last = last->next;
+     }
+   }
+   debug("oi_action_install: end action table printout");
+ }
+#endif
 
   return OI_ERR_OK;
 }
@@ -159,7 +189,10 @@ sint oi_action_install(oi_actionmap *map, sint num) {
  * check that the event name exists
  */
 sint oi_action_validate(oi_actionmap *map) {
-  // Check the basic of the structure
+  uint u;
+  int i;
+
+  // Simple checks
   if(map == NULL) {
     return OI_ERR_PARAM;
   }
@@ -169,14 +202,40 @@ sint oi_action_validate(oi_actionmap *map) {
   if(map->name == NULL) {
     return OI_ERR_PARAM;
   }
+
+  // Range checks
+  if((map->device != 0) && (device_get(map->device) == NULL)) {
+    return OI_ERR_NO_DEVICE;
+  }
   if((strlen(map->name) < OI_MIN_KEYLENGTH) ||
      (strlen(map->name) > OI_MAX_KEYLENGTH)) {
     return OI_ERR_PARAM;
   }
 
-  // Does event name exist? Simply ask all managers
-  if((oi_key_getcode(map->name) == OIK_UNKNOWN) &&
-     (oi_mouse_getcode(map->name) == OIP_UNKNOWN)) {
+  // Bound to a specific device, does name exist?
+  if(map->device != 0) {
+    // Get device provide flags
+    u = device_get(map->device)->provides;
+    i = FALSE;
+
+    // Test provide flags
+    if(u & OI_PRO_KEYBOARD) {
+      i |= (oi_key_getcode(map->name) != OIK_UNKNOWN);
+    }
+    if(u & OI_PRO_MOUSE) {
+      i |= (oi_mouse_getcode(map->name) != OIP_UNKNOWN);
+    }
+    //FIXME add more code-lookups here
+
+    // If noone knew about the key, bail
+    if(i == FALSE) {
+      return OI_ERR_NO_NAME;
+    }
+  }
+
+  // Generic device - ask all if key exists
+  else if((oi_key_getcode(map->name) == OIK_UNKNOWN) &&
+	  (oi_mouse_getcode(map->name) == OIP_UNKNOWN)) {
     return OI_ERR_NO_NAME;
   }
   
@@ -216,10 +275,10 @@ uchar *oi_action_actionstate(sint *num) {
  * the action event. The action event is automatically
  * injected into the queue.
  */
-inline void action_process(oi_event *evt) {
+void action_process(oi_event *evt) {
   static oi_event act;
+  oi_aclink *link;
   int i;
-  int state = 0;
 
   // Dummy check
   if((action_state == NULL) || (action_count <= 0)) {
@@ -233,25 +292,45 @@ inline void action_process(oi_event *evt) {
   act.action.data2 = 0;
   act.action.data3 = 0;
 
-  /* We handle the discrete events first (ie. buttons) to allow
+  /**
+   * @note
+   * We handle the discrete events first (ie. buttons) to allow
    * for the simple "if {} else if {}" optimization.
-   * After that, the 'real' events are handled, as these require
+   * After that, the 'real' (axis) events are handled, as these require
    * zero'ing the state table even if event does not match
+   *
+   * The angle of attack when analysing an event is as follows
+   * @li Check event type (evt->type)
+   * @li Calculate table offset (keysym/button index)
+   * @li Get table entry, which is a linked list (action_manager[index])
+   * @li Parse linked list (while(item != NULL))
+   * @li Check each list item for device index (zero or match the event poster)
+   * @li Setup the action event structure and post it
+   *
+   * The above list assumes that all steps are successfull, ie. that
+   * types and indexes match etc.
    */
 
   // Discrete: Keyboard
   if((evt->type == OI_KEYUP) ||
      (evt->type == OI_KEYDOWN)) {
 
-    i = evt->key.keysym.sym;
-    
     // Check trigger
-    if(action_keyboard[i] != 0) {
-      act.action.device = evt->key.device;
-      act.action.actionid = action_keyboard[i];
-      act.action.state = (evt->type == OI_KEYDOWN);
+    i = evt->key.keysym.sym;
+    link = action_keyboard[i];
+    while(link != NULL) {
 
-      debug("action_process: %u (keyboard)", act.action.actionid);
+      // Match device
+      if((link->device == 0) || (link->device == evt->key.device)) {
+	act.action.device = evt->key.device;
+	act.action.actionid = link->action;
+	act.action.state = (evt->type == OI_KEYDOWN);
+	action_statepost(&act);
+	debug("action_process: %u (keyboard)", act.action.actionid);
+      }
+      
+      // Next item
+      link = link->next;
     }
   }
 
@@ -260,60 +339,171 @@ inline void action_process(oi_event *evt) {
 	  (evt->type == OI_MOUSEBUTTONDOWN)) {
 
     i = evt->button.button;
+    link = action_mouse[i];
+    while(link != NULL) {
 
-    // Mouse wheel is discrete
-    if(((i == OIP_WHEEL_UP) && (action_mouse[i] != 0)) ||
-       ((i == OIP_WHEEL_DOWN) && (action_mouse[i] != 0))) {
-
-      // Only trigger on the down-event
-      if(evt->type == OI_MOUSEBUTTONDOWN) {
-
+      /* Special handling for mouse scroll wheels!
+       * We only want a single event, and that's the button-down
+       * Otherwise, do the standard match device etc.
+       */
+      if(((i == OIP_WHEEL_UP) || (i == OIP_WHEEL_DOWN)) && 
+	 (evt->type == OI_MOUSEBUTTONDOWN) &&
+	 ((link->device == 0) || (link->device == evt->button.device))) {
 	act.action.device = evt->button.device;
-	act.action.actionid = action_mouse[i];
+	act.action.actionid = link->action;
 	act.action.state = TRUE;
-	
+	action_statepost(&act);
 	debug("action_process: %u (mouse wheel)", act.action.actionid);
+      }    
+      // Normal event, match device
+      else if((link->device == 0) || (link->device == evt->button.device)) { 
+	act.action.device = evt->button.device;
+	act.action.actionid = link->action;
+	act.action.state = (evt->type == OI_MOUSEBUTTONDOWN);
+	action_statepost(&act);
+	debug("action_process: %u (mouse button)", act.action.actionid);
       }
-    }
 
-    // Standard trigger check
-    else if(action_mouse[i] != 0) {
-      
-      act.action.device = evt->button.device;
-      act.action.actionid = action_mouse[i];
-      act.action.state = (evt->type == OI_MOUSEBUTTONDOWN);
-      
-      debug("action_process: %u (mouse button)", act.action.actionid);
+      // Next item
+      link = link->next;
     }
   }
 
   // Real: Mouse move
-  if((evt->type == OI_MOUSEMOVE) &&
-     (action_mouse[OIP_MOTION] != 0)) {
-    
-    act.action.device = evt->move.device;
-    act.action.actionid = action_mouse[OIP_MOTION];
-    act.action.state = TRUE;
-    act.action.data1 = evt->move.relx;
-    act.action.data2 = evt->move.rely;
+  if(evt->type == OI_MOUSEMOVE) {
 
-    debug("action_process: %u (mouse motion)", act.action.actionid);
+    link = action_mouse[OIP_MOTION];
+
+    // Parse actions
+    while(link != NULL) {
+      // Match device
+      if((link->device == 0) || (link->device == evt->move.device)) {
+	act.action.device = evt->move.device;
+	act.action.actionid = link->action;
+	act.action.state = TRUE;
+	act.action.data1 = evt->move.relx;
+	act.action.data2 = evt->move.rely;
+	action_statepost(&act);
+	debug("action_process: %u (mouse motion)", act.action.actionid);
+      }
+
+      // Next item
+      link = link->next;
+    }
   }
   else {
-    // Make sure state table is zero'ed
-    action_state[action_mouse[OIP_MOTION]] = FALSE;
+    // Zero state table for mouse movement
+    link = action_mouse[OIP_MOTION];
+    while(link != NULL) {
+      if((link->device == 0) || (link->device == evt->move.device)) {
+	action_state[link->action] = FALSE;	
+      }
+      link = link->next;
+    }    
+  }
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IAction
+ * @brief Clear lookup link table
+ *
+ * @param tab pointer to table (array of linked-list heads)
+ * @param num number of elements in list
+ *
+ * Free an entire mouse/keyboard/whatever list-link table
+ * by parsing every list entry: Each list entry is the head
+ * in a linked list, in which all elements are freed
+ */
+void action_cleartable(oi_aclink *tab[], uint num) {
+  oi_aclink *prev;
+  oi_aclink *next;
+  uint i;
+
+  // Parse array of linked lists
+  for(i=0; i<num; i++) {
+    prev = tab[i];
+    while(prev != NULL) {
+      next = prev->next;
+      free(prev);
+      prev = next;
+    }
+  }
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IAction
+ * @brief Find last element in linked list
+ *
+ * @param head pointer to head of linked list
+ * @param alloc true (1) if returned item should be newly allocated tail,
+ *   false (0) otherwise
+ * @returns tail of linked list or newly allocated tail (see alloc parameter)
+ *
+ * Scan linked list, and return tail element
+ */
+oi_aclink *action_tail(oi_aclink **head, uint alloc) {
+  oi_aclink *last;
+
+  // Find tail
+  last = *head;
+  if(last != NULL) {
+    while(last->next != NULL) {
+      last = last->next;
+    }
   }
 
-  // If nothing was changed, the device index is zero
-  if(act.action.device == 0) {
+  // Should we alloc a new one?
+  if(alloc) {
+    // Tail was also head
+    if(last == NULL) {
+      last = (oi_aclink*)malloc(sizeof(oi_aclink));
+      *head = last;
+      debug("action_tail: tail created");
+    }
+
+    // Tail was an element, increment
+    else {
+      last->next = (oi_aclink*)malloc(sizeof(oi_aclink));
+      last = last->next;
+      debug("action_tail: tail appended");
+    }
+
+    // Be nice and clear members
+    last->action = 0;
+    last->device = 0;
+    last->next = NULL;
+  }
+
+  return last;
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IAction
+ * @brief Update action state table and post event
+ *
+ * @param evt pointer to event
+ *
+ * Since a single event can create multiple actions, the
+ * state table may need multiple updates for each event.
+ * Also, each action event must be posted into the queue.
+ */
+inline void action_statepost(oi_event *evt) {
+  // Dummy check
+  if(evt->type != OI_ACTION) {
     return;
   }
 
   // Update state table
-  action_state[act.action.actionid] = state;
+  action_state[evt->action.actionid] = evt->action.state;
 
   // Post the action event
-  queue_add(&act);
+  queue_add(evt);
 }
 
 /* ******************************************************************** */

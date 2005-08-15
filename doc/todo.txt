@@ -15,6 +15,11 @@ correct/shorten variable types
 - masks -> uint
 - document the types and common variables
 
+documentation
+- move stuff in "internal.txt" and "public.txt" into
+  the doxygen documentation
+- manpages (doxygen'ed?)
+
 threading
 - is it really needed?
 
@@ -22,7 +27,7 @@ joystick support
 - event based
 - state manager
 
-other-wierd-kind-of-input-device-support
+other-wierd-kind-of-input-device-support ("HID")
 - tablets
 - touchscreen
 - 3d pointer devices

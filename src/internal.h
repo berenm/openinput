@@ -125,9 +125,26 @@ inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
 
 /* ******************************************************************** */
 
+/**
+ * @ingroup IAction
+ * @brief Action mapper linked list item
+ *
+ * Action map link list item for event. This is used to determine
+ * which devices that generate specific events or to allow
+ * keypresses to generate multiple events (or even a combo).
+ */
+typedef struct oi_aclink {
+  uint action;                                                       /**< Action id */
+  uchar device;                                                      /**< Device index */
+  struct oi_aclink *next;                                            /**< Next pointer */
+} oi_aclink;
+
 // Action state
 sint action_init();
-inline void action_process(oi_event *evt);
+void action_process(oi_event *evt);
+void action_cleartable(oi_aclink *tab[], uint num);
+oi_aclink *action_tail(oi_aclink **head, uint alloc);
+inline void action_statepost(oi_event *evt);
 
 /* ******************************************************************** */
 

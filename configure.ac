@@ -1,12 +1,12 @@
 dnl Autoconf
 AC_PREREQ(2.59)
-AC_INIT([OpenInput], 0.0.1, [makob@makob.dk], [openinput])
+AC_INIT([OpenInput], 0.1.0, [makob@makob.dk], [openinput])
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 dnl Checks for programs.
-CFLAGS="-g -O0 -Wall"
+CFLAGS="-g -O0 -Wall -Werror"
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_LN_S
@@ -41,7 +41,7 @@ AC_ARG_ENABLE(unixsignal,
    [], enable_unixsignal=yes)
 
 dnl Check for libraries and header files
-AC_CHECK_LIB(pthread, main)
+AC_CHECK_LIB(main)
 AC_PATH_X
 AC_PATH_XTRA
 AC_HEADER_DIRENT

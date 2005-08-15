@@ -120,7 +120,6 @@ typedef enum {
 #define OI_ERR_DEV_EXIST        5 /**< Device already initialized */
 #define OI_ERR_PARAM            6 /**< Invalid parameter */
 #define OI_ERR_NO_NAME          7 /**< No such event name exists */
-#define OI_ERR_NOT_UNIQUE       8 /**< Index was not unique */
 /** @} */
  
 /* ******************************************************************** */

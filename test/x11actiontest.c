@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define NUM_MAPS 5
+#define NUM_MAPS 6
 
 /* ******************************************************************** */
 
@@ -42,19 +42,29 @@ void test() {
   map = (oi_actionmap*)malloc(sizeof(oi_actionmap) * NUM_MAPS);
 
   map[0].actionid = 1;
+  map[0].device = 0;
   map[0].name = "key_space";
 
+  // Note that we add two key_a's with different actionids
   map[1].actionid = 2;
+  map[1].device = 0;
   map[1].name = "key_a";
 
-  map[2].actionid = 3;
-  map[2].name = "mouse_motion";
+  map[2].actionid = 6;
+  map[2].device = 0;
+  map[2].name = "key_a";
 
-  map[3].actionid = 4;
-  map[3].name = "mouse_button_left";
+  map[3].actionid = 3;
+  map[3].device = 0;
+  map[3].name = "mouse_motion";
 
-  map[4].actionid = 5;
-  map[4].name = "mouse_wheel_up";
+  map[4].actionid = 4;
+  map[4].device = 0;
+  map[4].name = "mouse_button_left";
+
+  map[5].actionid = 5;
+  map[5].device = 0;
+  map[5].name = "mouse_wheel_up";
 
   // Print validation codes
   for(i=0; i<NUM_MAPS; i++) {
