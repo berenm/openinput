@@ -1,6 +1,8 @@
 /**
 @mainpage OpenInput API reference
 
+@image html banner.png 
+
 @section Introduction
 
 This is the API reference documentation for OpenInput, the
@@ -19,6 +21,8 @@ ignore it. The same is true for the device drivers, which you can't
 access directly as a user of the library.
 
 You can find the official OpenInput homepage at
-http://openinput.dotsrc.org
+http://openinput.dotsrc.org on which you can find news,
+download the newest version, visit the forums and get
+help for any problem you may encounter using OpenInput.
 
 */
