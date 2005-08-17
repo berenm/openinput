@@ -41,7 +41,6 @@ AC_ARG_ENABLE(unixsignal,
    [], enable_unixsignal=yes)
 
 dnl Check for libraries and header files
-AC_CHECK_LIB(main)
 AC_PATH_X
 AC_PATH_XTRA
 AC_HEADER_DIRENT
@@ -61,7 +60,6 @@ AC_CHECK_TYPES([ptrdiff_t])
 dnl Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_ERROR_AT_LINE
-AC_REPLACE_FNMATCH
 AC_HEADER_MAJOR
 AC_FUNC_MALLOC
 AC_FUNC_MEMCMP

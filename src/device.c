@@ -41,6 +41,51 @@ static int num_devices = 0;
 /* ******************************************************************** */
 
 /**
+ * @ingroup PDevice
+ * @brief Get information about a device
+ *
+ * @param dev index of device to get info about
+ * @param name pointer to string with device name
+ * @param desc pointer to string with device description
+ * @param provide pointer to provide flags, see @ref PProvide
+ * @returns errorcode, see @ref PErrors
+ *
+ * Use this function to obtain some basic information about
+ * an initialized device driver. The device index (parameter "dev")
+ * can be obtained from most event structures, and in particular
+ * via the discovery events.
+ *
+ * @note
+ * The pointers you receive may NOT be freed, as
+ * they are internal OpenInput library data!
+ */
+sint oi_device_info(uchar dev, char **name, char **desc, uint *provide) {
+  oi_device *dev;
+
+  // Dummy checks
+  if(dev > OI_MAX_DEVICES) {
+    return OI_ERR_INDEX;
+  }
+  if((*name == NULL) || (*desc == NULL)) {
+    return OI_ERR_PARAM;
+  }
+  
+  // Get device
+  dev = device_get(dev);
+  if(dev == NULL) {
+    return OI_ERR_NO_DEVICE;
+  }
+
+  // Ok, fill
+  *name = dev->name;
+  *desc = dev->desc;
+  *provide = dev->provide;
+  return OI_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+/**
  * @ingroup IDevice
  * @brief Register new device via bootstrap
  *

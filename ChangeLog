@@ -1,3 +1,20 @@
-2005-06-21 23:46	makob
+SVN head
 
-	* Initial version
+	* ...
+
+Version 0.1.0 - 2005-08-17
+
+	* Added: Action mapper API and state manager
+
+Version 0.0.1 - 2005-06-21
+
+	* Added: Doxygen documentation
+	* Added: Keyboard state manager
+	* Added: Mouse state manager
+	* Added: Application window state manager
+	* Added: X11 keyboard/mouse/window input driver
+	* Added: POSIX signal input driver
+
+Version 0.0.0 - 2005-06-21
+
+	* Project startup

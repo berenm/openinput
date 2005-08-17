@@ -12,6 +12,8 @@ public API, which is exposed applications which use the library
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup PTypes Types, structures and constants
 @brief Type definitions and constants
@@ -27,6 +29,25 @@ flags, masks, event structures and much more.
 @}
  */
 
+// --------------------------------------------------
+
+/**
+@defgroup PDevice Device drivers
+@brief Device drivers
+@ingroup Public
+
+Use these functions to control some basic
+device driver parameters and get information
+about the devices which provides the input.
+
+@{
+ */
+/**
+@}
+ */
+
+// --------------------------------------------------
+
 /**
 @defgroup PMain Library interface
 @brief OpenInput library initialization and friends
@@ -40,18 +61,7 @@ Interface to initialize or close the OpenInput library
 @}
  */
 
-/**
-@defgroup PDevice Device driver interface
-@brief Device driver interface
-@ingroup Public
-
-Obtain information about the present input devices
-
-@{
- */
-/**
-@}
- */
+// --------------------------------------------------
 
 /**
 @defgroup PKeyboard Keyboard state manager
@@ -67,6 +77,8 @@ are buttons up or down
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup PMouse Mouse state manager
 @brief Mouse state managment
@@ -81,6 +93,8 @@ how far did the mouse travel (relative position)
 /**
 @}
  */
+
+// --------------------------------------------------
 
 /**
 @defgroup PEvent Event handling
@@ -98,6 +112,8 @@ your own events into the event queue
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup PAppstate Application state
 @brief Window state managment
@@ -111,6 +127,8 @@ focus and hide or show the mouse cursor
 /**
 @}
  */
+
+// --------------------------------------------------
 
 /**
 @defgroup PAction Action mapper
@@ -128,6 +146,8 @@ such that you can listen for "jump" or "fire" instead of "space" or
 @}
  */
 
+// --------------------------------------------------
+
 /**
 @defgroup PEventStructs Event structures
 @brief Event structures
@@ -142,3 +162,5 @@ but are otherwise different from each other.
 /**
 @}
  */
+
+// --------------------------------------------------

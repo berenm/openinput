@@ -38,6 +38,11 @@ sint oi_close();
 
 /* ******************************************************************** */
 
+// Get device information (errorcode)
+sint oi_device_info(uchar dev, char **name, char **desc, uint provide);
+
+/* ******************************************************************** */
+
 // Look at event without removing it from queue (number_returned)
 sint oi_events_peep(oi_event *evts, sint num);
 
