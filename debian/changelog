@@ -1,3 +1,10 @@
+libopeninput (0.1.0.svn60-1) unstable; urgency=low
+
+  * Added more documentation to the docs
+  * Added conflict with old libsinp
+
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Mon, 22 Aug 2005 17:49:49 +0200
+
 libopeninput (0.1.0.svn59-1) unstable; urgency=low
 
   * New upstream release

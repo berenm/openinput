@@ -9,6 +9,7 @@ Package: libopeninput-dev
 Section: libdevel
 Architecture: any
 Depends: libopeninput (= ${Source-Version})
+Conflicts: libsinp-dev
 Description: input library
  Simple input library
 
@@ -16,6 +17,7 @@ Package: libopeninput-dbg
 Section: libdevel
 Architecture: any
 Depends: libopeninput (= ${Source-Version})
+Conflicts: libsinp-dbg
 Description: input library
  Simple input library
 
@@ -23,5 +25,6 @@ Package: libopeninput
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Conflicts: libsinp
 Description: input library
  Simple input library
