@@ -97,7 +97,7 @@ how far did the mouse travel (relative position)
 // --------------------------------------------------
 
 /**
-@defgroup PEvent Event handling
+@defgroup PEvents Event handling
 @brief Event handling interface
 @ingroup Public
 

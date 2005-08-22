@@ -51,9 +51,9 @@ typedef signed int                sint;    /**< Signed int */
  * @{
  */
 typedef enum {
-  OI_ENABLE,                      /**< True/enable */
-  OI_DISABLE,                     /**< False/disable */
-  OI_QUERY                        /**< Don't change, return current */
+  OI_DISABLE                      = 0,    /**< False/disable */
+  OI_ENABLE                       = 1,    /**< True/enable */
+  OI_QUERY                        = 2     /**< Don't change, return current */
 } oi_bool;
 /** @} */
 
@@ -76,12 +76,12 @@ typedef enum {
  * @brief Device provide flags
  * @{
  */
-#define OI_PRO_UNKNOWN          1 /**< Unknown/test type device */
-#define OI_PRO_WINDOW           2 /**< Window stuff (move/state/size) */
-#define OI_PRO_SYSTEM           4 /**< System events (segfault/interrupt/etc) */
-#define OI_PRO_KEYBOARD         8 /**< Keyboard input device */
-#define OI_PRO_MOUSE           16 /**< Pointer input device (mouse) */
-#define OI_PRO_JOYSTICK        32 /**< Joystick input device */
+#define OI_PRO_UNKNOWN           1 /**< Unknown/test type device */
+#define OI_PRO_WINDOW            2 /**< Window stuff (move/state/size) */
+#define OI_PRO_SYSTEM            4 /**< System events (segfault/interrupt/etc) */
+#define OI_PRO_KEYBOARD          8 /**< Keyboard input device */
+#define OI_PRO_MOUSE            16 /**< Pointer input device (mouse) */
+#define OI_PRO_JOYSTICK         32 /**< Joystick input device */
 /** @} */
 
 
@@ -120,6 +120,7 @@ typedef enum {
 #define OI_ERR_DEV_EXIST        5 /**< Device already initialized */
 #define OI_ERR_PARAM            6 /**< Invalid parameter */
 #define OI_ERR_NO_NAME          7 /**< No such event name exists */
+#define OI_ERR_INTERNAL         8 /**< Fatal internal error */
 /** @} */
  
 /* ******************************************************************** */

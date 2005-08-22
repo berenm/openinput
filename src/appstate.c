@@ -202,8 +202,8 @@ sint oi_app_focus() {
  * @ingroup PAppstate
  * @brief Hide or display the mouse cursor
  *
- * @param q new cursor state or query
- * @returns state of cursor visiblity
+ * @param q new cursor state or query, see @ref PBool
+ * @returns state of cursor visiblity, OI_QUERY on error
  *
  * Show or hide the mouse cursor. The state can also
  * be queried using #OI_QUERY
@@ -252,8 +252,7 @@ oi_bool oi_app_cursor(oi_bool q) {
   
   // Remember mode
   cursor = hide;
-
-  return OI_QUERY;
+  return q;
 }
 
 /* ******************************************************************** */
@@ -262,13 +261,13 @@ oi_bool oi_app_cursor(oi_bool q) {
  * @ingroup PAppstate
  * @brief Grab or release the mouse cursor
  * 
- * @param q enable/disable/query grabbing
- * @returns state of grabbing
+ * @param q enable/disable/query grabbing, see @ref PBool
+ * @returns state of grabbing, OI_QUERY on error
  *
  * Grab or release the mouse cursor. The grab state can
  * also be queried using #OI_QUERY
  */
-sint oi_app_grab(oi_bool q) {
+oi_bool oi_app_grab(oi_bool q) {
   int eat;
   
   switch(q) {
@@ -304,8 +303,7 @@ sint oi_app_grab(oi_bool q) {
   
   // Remember mode
   grab = eat;
-
-  return OI_QUERY;
+  return q;
 }
 
 /* ******************************************************************** */

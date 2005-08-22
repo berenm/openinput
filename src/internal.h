@@ -34,7 +34,7 @@
  * OpenInput to access the drivers capabilities. This should be created
  * dynamically from the bootstrap create function.
  *
- * The fields with a "fcnptr" note are function pointers.
+ * The fields with a "fcnptr"-note are function pointers.
  */
 typedef struct oi_device {
   sint index;                                                        /**< Device index */
@@ -58,7 +58,7 @@ typedef struct oi_device {
  * Static structure used to kickstart device drivers when the
  * library is initialized.
  *
- * The fields with a "fcnptr" note are function pointers.
+ * The fields with a "fcnptr"-note are function pointers.
  */
 typedef struct oi_bootstrap {
   char *name;                                                        /**< Short device name */
@@ -89,13 +89,14 @@ sint queue_peep(oi_event *evts, sint num, uint mask, sint remove);
 /* ******************************************************************** */
 
 // Device handling
-sint device_register(struct oi_bootstrap *boot);
-void device_bootstrap(uint flags);
-sint device_init(sint index, char *window_id, uint flags);
+sint device_init();
+void device_bootstrap(char *window_id, uint flags);
+sint device_register(oi_bootstrap *boot, char *window_id, uint flags);
 oi_device *device_get(sint index);
 inline void device_pumpall();
 uint device_windowid(char *str, char tok);
 sint device_destroy(sint index);
+void device_moreavail(sint more);
 
 /* ******************************************************************** */
 

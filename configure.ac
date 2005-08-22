@@ -39,6 +39,9 @@ AC_ARG_ENABLE(x11,
 AC_ARG_ENABLE(unixsignal,
    AS_HELP_STRING([--enable-unixsignal], [enable UNIX signal handler (default=yes)]),
    [], enable_unixsignal=yes)
+AC_ARG_ENABLE(linuxjoy,
+   AS_HELP_STRING([--enable-linuxjoy], [enable GNU/Linux joystick driver (default=yes)]),
+   [], enable_linuxjoy=yes)
 
 dnl Check for libraries and header files
 AC_PATH_X
@@ -98,13 +101,18 @@ if test "x$enable_unixsignal" = xyes; then
    PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
 fi
 
+if test "x$enable_linuxjoy" = xyes; then
+   AC_DEFINE([ENABLE_LINUXJOY], [1], [GNU/Linux joystick driver])
+   PLATDIRS="$PLATDIRS linuxjoy"
+   PLATLIBS="$PLATLIBS linuxjoy/liblinuxjoy.la"
+fi
+
+dnl Make variables available
 AC_SUBST(TESTPRGS)
 AC_SUBST(PLATDIRS)
 AC_SUBST(PLATLIBS)
 
-dnl 	doc/Doxyfile \
-
-dnl Makefiles to be generated
+dnl Makefiles et al to be generated
 AC_CONFIG_FILES([
 	openinput.pc \
 	Makefile \
@@ -113,7 +121,8 @@ AC_CONFIG_FILES([
 	src/Makefile \
 	src/x11/Makefile \
 	src/unixsignal/Makefile \
-	src/foo/Makefile])
+	src/foo/Makefile \
+	src/linuxjoy/Makefile])
 
 dnl Finish
 AC_OUTPUT

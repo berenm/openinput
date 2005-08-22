@@ -39,7 +39,10 @@ sint oi_close();
 /* ******************************************************************** */
 
 // Get device information (errorcode)
-sint oi_device_info(uchar dev, char **name, char **desc, uint provide);
+sint oi_device_info(uchar index, char **name, char **desc, uint *provides);
+
+// Enable/disable device event pumping (state)
+oi_bool oi_device_enable(uchar index, oi_bool q);
 
 /* ******************************************************************** */
 
@@ -107,7 +110,7 @@ sint oi_app_focus();
 oi_bool oi_app_cursor(oi_bool q);
 
 // Grab/ungrab input (state)
-sint oi_app_grab(oi_bool q);
+oi_bool oi_app_grab(oi_bool q);
 
 /* ******************************************************************** */
 

@@ -47,8 +47,8 @@ static sint oi_running;
  *
  * When invoked, the following happens:
  * -# the event queue is initialized
- * -# all devices are bootstrapped
- * -# available devices are initialized
+ * -# the device manager is initialized
+ * -# all devices are bootstrapped (avail, create, init)
  * -# the application state manager is initialized
  * -# the mouse state manager is initialized
  * -# the keyboard state manager is initialized
@@ -57,42 +57,31 @@ static sint oi_running;
  * -# you're good to go! ;-)
  */
 sint oi_init(char *window_id, uint flags) {
-  int i;
-  int e;
-
   debug("oi_init");
 
-  // Initialize queue
+  // Initialize queue and device manager
   oi_running = FALSE;
-  queue_init();
-
-  // Bootstrap all devices
-  device_bootstrap(flags);
-
-  // Parse all devices
-  e = 0;
-  i = 1;
-  while(device_get(i) != NULL) {
-
-    // Initialize device
-    if(device_init(i, window_id, flags) != OI_ERR_OK) {
-      // Error initializing, count
-      e++;
-    }
-
-    i++;
+  if((queue_init() != OI_ERR_OK) ||
+     (device_init() != OI_ERR_OK)) {
+    return OI_ERR_INTERNAL;
   }
 
+  // Bootstrap all devices
+  device_bootstrap(window_id, flags);
+
   // Initialize state managers
-  appstate_init();
-  mouse_init();
-  keyboard_init();
-  action_init();
+  if((appstate_init() != OI_ERR_OK) ||
+     (mouse_init() != OI_ERR_OK) ||
+     (keyboard_init() != OI_ERR_OK) ||
+     (action_init() != OI_ERR_OK)) {
+    return OI_ERR_INTERNAL;
+  }
 
   // Set running flag
   oi_running = TRUE;
+  debug("oi_init: entered run mode");
     
-  return e;
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

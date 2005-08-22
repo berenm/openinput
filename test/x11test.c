@@ -48,8 +48,25 @@ void help() {
   printf("c => toggle cursor\n");
   printf("w => warp to 10,10\n");
   printf("m => print mouse state\n");
+  printf("e => toggle device 2 on/off\n");
   printf("q => quit\n");
   printf("\n");
+}
+
+/* ******************************************************************** */
+
+// Some device debugging for discovery events
+void debug_discovery(uint index) {
+  char *name;
+  char *desc;
+  uint pro;
+
+  // Fetch info
+  oi_device_info(index, &name, &desc, &pro);
+  printf("*** device info for device index %u\n", index);
+  printf("    name:     '%s'\n", name);
+  printf("    desc:     '%s'\n", desc);
+  printf("    provides: '0x%X'\n", pro);
 }
 
 /* ******************************************************************** */
@@ -61,6 +78,7 @@ void test(Display *d, Window w, uint scrn) {
   char csw[100];
   int sgrab;
   int scursor;
+  int senable;
 
   // Init OI
   sprintf(csw, "c:%u s:%u w:%u", (uint)d, (uint)scrn, (uint)w);
@@ -72,6 +90,7 @@ void test(Display *d, Window w, uint scrn) {
   // States
   sgrab = 1;
   scursor = 1;
+  senable = 1;
 
   // Print something
   help();
@@ -155,6 +174,14 @@ void test(Display *d, Window w, uint scrn) {
       case OIK_Q:
 	// Quit
 	e = 0;
+     	printf("*** quit!\n");
+	break;
+
+      case OIK_E:
+	// Enable/disable device index 2
+	toggle(&senable);
+	oi_device_enable(2, senable);
+     	printf("*** device 2 state %i\n", senable);
 	break;
 
       default:
@@ -180,6 +207,7 @@ void test(Display *d, Window w, uint scrn) {
 
       case OI_DISCOVERY:
 	printf("--- discovery event\n");
+	debug_discovery(ev.discover.device);
 	break;
 
       default:
