@@ -1,25 +1,25 @@
-Source: libsinp
+Source: libopeninput
 Priority: optional
 Maintainer: Kresten Kjeldgaard <gathond@laptop.gathond.dk>
-Build-Depends: debhelper (>= 4.0.0), autotools-dev, libx11-dev, libc6-dev
+Build-Depends: debhelper (>= 4.0.0), autotools-dev, libx11-dev, libc6-dev, doxygen
 Standards-Version: 3.6.1
 Section: libs
 
-Package: libsinp-dev
+Package: libopeninput-dev
 Section: libdevel
 Architecture: any
-Depends: libsinp (= ${Source-Version})
+Depends: libopeninput (= ${Source-Version})
 Description: input library
  Simple input library
 
-Package: libsinp-dbg
+Package: libopeninput-dbg
 Section: libdevel
 Architecture: any
-Depends: libsinp (= ${Source-Version})
+Depends: libopeninput (= ${Source-Version})
 Description: input library
  Simple input library
 
-Package: libsinp
+Package: libopeninput
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}

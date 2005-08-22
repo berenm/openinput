@@ -1,4 +1,4 @@
 #
-# Regular cron jobs for the libsinp package
+# Regular cron jobs for the libopeninput package
 #
-0 4	* * *	root	libsinp_maintenance
+0 4	* * *	root	libopeninput_maintenance

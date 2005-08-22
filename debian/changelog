@@ -1,24 +1,24 @@
-libsinp (0.0.0.svn42-1) unstable; urgency=low
+libopeninput (0.1.0.svn59-1) unstable; urgency=low
 
   * New upstream release
 
- -- Kresten Kjeldgaard <gathond@gathond.dk>  Fri, 29 Jul 2005 01:52:04 +0200
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Mon, 22 Aug 2005 14:17:30 +0200
 
-libsinp (0.0.0.svn29-3) unstable; urgency=low
+libopeninput (0.0.0.svn29-3) unstable; urgency=low
 
   * Added running bootstrap to the debian/rules file, as well as new upstream
     version
 
  -- Kresten Kjeldgaard <gathond@gathond.dk>  Thu, 28 Jul 2005 23:55:11 +0200
 
-libsinp (0.0.0.svn20-2) unstable; urgency=low
+libopeninput (0.0.0.svn20-2) unstable; urgency=low
 
   * Added Build dependencies and generally cleaned up in lintian errors.
   * Added -dbg package to the build
 
  -- Kresten Kjeldgaard <gathond@laptop.gathond.dk>  Fri, 15 Jul 2005 14:37:19 +0200
 
-libsinp (0.0.0.svn20-1) unstable; urgency=low
+libopeninput (0.0.0.svn20-1) unstable; urgency=low
 
   * Initial release Closes: #nnnn  (nnnn is the bug number of your ITP)
 

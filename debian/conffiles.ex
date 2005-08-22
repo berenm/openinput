@@ -4,4 +4,4 @@
 # See the policy manual
 #
 # for example:
-# /etc/libsinp/libsinp.conf
+# /etc/libopeninput/libopeninput.conf

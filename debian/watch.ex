@@ -8,15 +8,15 @@ version=3
 
 # Uncomment to examine a Webpage 
 # <Webpage URL> <string match>
-#http://www.example.com/downloads.php libsinp-(.*)\.tar\.gz
+#http://www.example.com/downloads.php libopeninput-(.*)\.tar\.gz
 
 # Uncomment to examine a Webserver directory
-#http://www.example.com/pub/libsinp-(.*)\.tar\.gz
+#http://www.example.com/pub/libopeninput-(.*)\.tar\.gz
 
 # Uncommment to examine a FTP server
-#ftp://ftp.example.com/pub/libsinp-(.*)\.tar\.gz debian uupdate
+#ftp://ftp.example.com/pub/libopeninput-(.*)\.tar\.gz debian uupdate
 
 # Uncomment to use Roland's hack for sourceforge based projects - YMMV!
-#http://people.debian.org/~lolando/sfdlr.php?project=libsinp libsinp-([\d.]*).tar.gz
+#http://people.debian.org/~lolando/sfdlr.php?project=libopeninput libopeninput-([\d.]*).tar.gz
 
 

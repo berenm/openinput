@@ -37,7 +37,7 @@ and docbook-xsl in your Build-Depends control field.
   <!ENTITY dhemail     "<email>gathond@laptop.gathond.dk</email>">
   <!ENTITY dhusername  "Kresten Kjeldgaard">
   <!ENTITY dhucpackage "<refentrytitle>LIBSINP</refentrytitle>">
-  <!ENTITY dhpackage   "libsinp">
+  <!ENTITY dhpackage   "libopeninput">
 
   <!ENTITY debian      "<productname>Debian</productname>">
   <!ENTITY gnu         "<acronym>GNU</acronym>">

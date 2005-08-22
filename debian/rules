@@ -78,7 +78,7 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	
 	#Ensure buggy permission 755 is corrected
-	chmod 644 $(CURDIR)/debian/tmp/usr/lib/libsinp.so.0.0.0
+	chmod 644 $(CURDIR)/debian/tmp/usr/lib/libopeninput.so.0.0.0
 
 # Build architecture-independent files here.
 binary-indep: build install
@@ -111,7 +111,7 @@ binary-arch: build install
 #	dh_makeshlibs
 	dh_makeshlibs
 	dh_movefiles
-	dh_strip --dbg-package=libsinp
+	dh_strip --dbg-package=libopeninput
 	dh_installdeb
 	dh_shlibdeps
 	dh_gencontrol

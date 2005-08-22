@@ -1,6 +1,6 @@
-# Defaults for libsinp initscript
-# sourced by /etc/init.d/libsinp
-# installed at /etc/default/libsinp by the maintainer scripts
+# Defaults for libopeninput initscript
+# sourced by /etc/init.d/libopeninput
+# installed at /etc/default/libopeninput by the maintainer scripts
 
 #
 # This is a POSIX shell fragment

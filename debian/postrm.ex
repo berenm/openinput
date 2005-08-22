@@ -1,5 +1,5 @@
 #! /bin/sh
-# postrm script for libsinp
+# postrm script for libopeninput
 #
 # see: dh_installdeb(1)
 

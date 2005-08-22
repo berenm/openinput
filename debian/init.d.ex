@@ -11,15 +11,15 @@
 #
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON=/usr/sbin/libsinp
-NAME=libsinp
-DESC=libsinp
+DAEMON=/usr/sbin/libopeninput
+NAME=libopeninput
+DESC=libopeninput
 
 test -x $DAEMON || exit 0
 
-# Include libsinp defaults if available
-if [ -f /etc/default/libsinp ] ; then
-	. /etc/default/libsinp
+# Include libopeninput defaults if available
+if [ -f /etc/default/libopeninput ] ; then
+	. /etc/default/libopeninput
 fi
 
 set -e
