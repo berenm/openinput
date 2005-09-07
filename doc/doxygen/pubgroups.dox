@@ -7,10 +7,10 @@ input devices such as mice, keyboards and joysticks. This is the
 public API, which is exposed applications which use the library
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -24,10 +24,10 @@ for library internals. This includes errorcodes,
 flags, masks, event structures and much more.
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -41,10 +41,10 @@ device driver parameters and get information
 about the devices which provides the input.
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -56,10 +56,10 @@ about the devices which provides the input.
 Interface to initialize or close the OpenInput library
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -72,10 +72,10 @@ Information about the state of present keyboard. That is,
 are buttons up or down
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -89,10 +89,29 @@ which buttons are up or down, what is the absolute position and
 how far did the mouse travel (relative position)
 
 @{
- */
+*/
 /**
 @}
- */
+*/
+
+// --------------------------------------------------
+
+/**
+@defgroup PJoystick Joystick state manager
+@brief Joystick state managment
+@ingroup Public
+
+Joystick handling. Joysticks traditionally consists
+of a number of axes (sticks) and buttons. Modern joysticks
+might also have hats and trackballs. These functions lets
+you obtain information about both axes, buttons, hats
+and balls.
+
+@{
+*/
+/**
+@}
+*/
 
 // --------------------------------------------------
 
@@ -107,10 +126,10 @@ application. You can wait or poll for events, filter them or inject
 your own events into the event queue
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -123,10 +142,10 @@ Get the size of the current window, grab mouse and keyboard
 focus and hide or show the mouse cursor
 
 @{
- */
+*/
 /**
 @}
- */
+*/
 
 // --------------------------------------------------
 
@@ -141,26 +160,9 @@ such that you can listen for "jump" or "fire" instead of "space" or
 "pagedown"
 
 @{
- */
+*/
 /**
 @}
- */
-
-// --------------------------------------------------
-
-/**
-@defgroup PEventStructs Event structures
-@brief Event structures
-@ingroup PTypes
-
-Depending on which device that generates an event, different
-event structures are used. All events contain a "type" field,
-but are otherwise different from each other.
-
-@{
- */
-/**
-@}
- */
+*/
 
 // --------------------------------------------------

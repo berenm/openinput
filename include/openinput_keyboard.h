@@ -31,10 +31,10 @@
 /* ******************************************************************** */
 
 /**
- * @ingroup PTypes
  * @defgroup PKeyname Keyboard button definitons
- * @brief Keyboard button definitions
- *
+ * @brief Definition of keyboard button names.
+ * @ingroup PTypes
+ * 
  * The lengthy definition of keyboard buttons
  * for use in your event handler. Each key also have a 
  * "symbolic" string name.
@@ -301,7 +301,9 @@ typedef enum {
  * @defgroup PModname Keyboard modifier definitons
  * @brief Keyboard modifier bit definitions
  *
- * Modifier keys bitmasks. Usually or'ed together.
+ * Modifiers are reported on keyboard events using
+ * a bitmask.
+ *
  * @{
  */
 #define OIM_NONE         0x0000 /**< Nothing */

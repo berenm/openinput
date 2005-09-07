@@ -111,6 +111,7 @@ oi_device *unixsignal_device() {
   dev->hide = NULL;
   dev->warp = NULL;
   dev->winsize = NULL;
+  dev->reset = unixsignal_reset;
   dev->private = NULL;
   
   // Done
@@ -215,6 +216,27 @@ void unixsignal_process(oi_device *dev) {
 
 /**
  * @ingroup DUnix
+ * @brief Reset internal state
+ *
+ * @param dev pointer to device interface
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Reset pending flag.
+ */
+sint unixsignal_reset(oi_device *dev) {
+  debug("unixsignal_reset");
+
+  pendingsignal = FALSE;
+
+  return OI_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup DUnix
  * @brief The POSIX signal handler
  *
  * @param signum signal code
@@ -225,9 +247,12 @@ void unixsignal_process(oi_device *dev) {
  */
 void unixsignal_handler(int signum) {
 
+  if(!pendingsignal) {
+    debug("unixsignal_handler: signal %d received", signum);
+  }
+
   // Ok, we've fetched a signal
   pendingsignal = TRUE;
-  debug("unixsignal_handler: signal %d received", signum);  
 }
 
 /* ******************************************************************** */

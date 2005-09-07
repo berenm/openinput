@@ -29,37 +29,42 @@
 #endif
 
 /**
- * @ingroup PEventStructs
- * @brief Event types
+ * @ingroup PTypes
+ * @defgroup PEventStructs Event structures
+ * @brief Event structures
  *
- * Definition of the event types.
+ * Depending on which device that generates an event, different
+ * event structures are used. All events contain a "type" field,
+ * but are otherwise different from each other.
  */
 typedef enum {
   OI_NOEVENT                    = 0,  /**< No event */
   OI_KEYUP                      = 1,  /**< Key released */
   OI_KEYDOWN                    = 2,  /**< Key pressed */
   OI_MOUSEMOVE                  = 3,  /**< Mouse motion */
-  OI_MOUSEBUTTONUP              = 4,  /**< Button pressed */
-  OI_MOUSEBUTTONDOWN            = 5,  /**< Button released */
+  OI_MOUSEBUTTONUP              = 4,  /**< Button released */
+  OI_MOUSEBUTTONDOWN            = 5,  /**< Button pressed */
   OI_ACTIVE                     = 6,  /**< App. focus gain/loss */
   OI_RESIZE                     = 7,  /**< App. window resize */
   OI_EXPOSE                     = 8,  /**< App. needs redraw */
   OI_QUIT                       = 9,  /**< Quit requested */
   OI_DISCOVERY                  = 10, /**< Device driver available */
-  OI_ACTION                     = 11  /**< Action event (actionmap) */
+  OI_ACTION                     = 11, /**< Action event (actionmap) */
+  OI_JOYAXIS                    = 12, /**< Joystick axis */
+  OI_JOYBUTTONUP                = 13, /**< Joystick button released */
+  OI_JOYBUTTONDOWN              = 14, /**< Joystick button pressed */
+  OI_JOYBALL                    = 15  /**< Joystick trackball */
 } oi_type;
+
   
 /**
  * @ingroup PTypes
  * @defgroup PEventmask Event masks
  * @brief Definition of event masks
- *
- * Events masks are used to filter our certain types of events
- * that you are not interested in
  * @{
  */
-#define OI_EVENT_MASK(x) (1<<(x))
-#define OI_MASK_ALL 0xffffffff
+#define OI_EVENT_MASK(x) (1<<(x))                                 /**< Mask generator */
+#define OI_MASK_ALL 0xffffffff                                    /**< Match all masks */
 #define OI_MASK_KEYUP           OI_EVENT_MASK(OI_KEYUP)           /**< Key up */
 #define OI_MASK_KEYDOWN         OI_EVENT_MASK(OI_KEYDOWN)         /**< Key down */
 #define OI_MASK_MOUSEMOVE       OI_EVENT_MASK(OI_MOUSEMOVE)       /**< Mouse motion */
@@ -73,6 +78,7 @@ typedef enum {
 #define OI_MASK_QUIT            OI_EVENT_MASK(OI_QUIT)            /**< Application quit */
 #define OI_MASK_WINDOW          (OI_EVENT_MASK(OI_ACTIVE) | OI_EVENT_MASK(OI_RESIZE) | OI_EVENT_MASK(OI_EXPOSE)) /**< Focus, resize, expose */
 #define OI_MASK_MOUSE           (OI_EVENT_MASK(OI_MOUSEMOVE) | OI_EVENT_MASK(OI_MOUSEBUTTONUP) | OI_EVENT_MASK(OI_MOUSEBUTTONDOWN)) /**< Mouse button and motion */
+#define OI_MASK_JOYSTICK        (OI_EVENT_MASK(OI_JOYAXIS) | OI_EVENT_MASK(OI_JOYBUTTONUP) | OI_EVENT_MASK(OI_JOYBUTTONDOWN) | OI_EVENT_MASK(OI_JOYBALL)) /**< Joystick axes, buttons and trackballs */
 /** @} */
 
 
@@ -83,11 +89,11 @@ typedef enum {
  * Sent when device drivers are registered and ready for use
  */
 typedef struct oi_discovery_event {
-  uchar type;               // OI_DISCOVERY
-  uchar device;             // Device index
-  char *name;               // Short name
-  char *description;        // Long description
-  uint provides;            // Provide mask
+  uchar type;                       /**< OI_DISCOVERY  */
+  uchar device;                     /**< Device index  */
+  char *name;                       /**< Short name  */
+  char *description;                /**< Long description  */
+  uint provides;                    /**< Provide mask  */
 } oi_discovery_event;
 
 
@@ -99,10 +105,10 @@ typedef struct oi_discovery_event {
  * @ref PFocus
  */
 typedef struct oi_active_event {
-  uchar type;               // OI_ACTIVE
-  uchar device;             // Device index
-  uchar gain;               // Focus was 0:lost 1:gained
-  uint state;               // Mask of focus state
+  uchar type;                       /**< OI_ACTIVE  */
+  uchar device;                     /**< Device index  */
+  uchar gain;                       /**< Focus was 0:lost 1:gained */
+  uint state;                       /**< Bitmask of focus state  */
 } oi_active_event;
 
 
@@ -113,10 +119,10 @@ typedef struct oi_active_event {
  * Sent when keyboard keys are pressed or released
  */
 typedef struct oi_keyboard_event {
-  uchar type;               // OI_KEYUP or OI_KEYDOWN
-  uchar device;             // Device index
-  uchar state;              // Key is 0:up 1:down
-  oi_keysym keysym;       // Key symbol
+  uchar type;                       /**< OI_KEYUP or OI_KEYDOWN  */
+  uchar device;                     /**< Device index  */
+  uchar state;                      /**< Key is 0:up 1:down  */
+  oi_keysym keysym;                 /**< Key symbol  */
 } oi_keyboard_event;
 
 
@@ -127,13 +133,13 @@ typedef struct oi_keyboard_event {
  * Sent when the mouse moves
  */
 typedef struct oi_mousemove_event {
-  uchar type;               // OI_MOUSEMOVE
-  uchar device;             // Device index
-  uchar state;              // Button states
-  ushort x;                 // Absolute x coordinate
-  ushort y;                 // Absolute y coordinate
-  sshort relx;              // Relative x movement
-  sshort rely;              // Relative y movement
+  uchar type;                       /**< OI_MOUSEMOVE */
+  uchar device;                     /**< Device index */
+  uchar state;                      /**< Button state bitmask */
+  ushort x;                         /**< Absolute x coordinate */
+  ushort y;                         /**< Absolute y coordinate */
+  sshort relx;                      /**< Relative x movement */
+  sshort rely;                      /**< Relative y movement */
 } oi_mousemove_event;
 
 
@@ -144,12 +150,12 @@ typedef struct oi_mousemove_event {
  * Sent when mouse buttons are pressed or released
  */
 typedef struct oi_mousebutton_event {
-  uchar type;               // OI_MOUSEBUTTONUP or OI_MOUSEBUTTONDOWN
-  uchar device;             // Device index
-  uchar button;             // Mouse button index
-  uchar state;              // Button states
-  ushort x;                 // Absolute x coordinate at event time
-  ushort y;                 // Absolute y coordinate at event time
+  uchar type;                       /**< OI_MOUSEBUTTONUP or OI_MOUSEBUTTONDOWN */
+  uchar device;                     /**< Device index */
+  uchar button;                     /**< Mouse button index */
+  uchar state;                      /**< Button state bitmask */
+  ushort x;                         /**< Absolute x coordinate at event time */
+  ushort y;                         /**< Absolute y coordinate at event time */
 } oi_mousebutton_event;
 
 
@@ -160,10 +166,10 @@ typedef struct oi_mousebutton_event {
  * Sent when the size of the application window changes
  */
 typedef struct oi_resize_event {
-  uchar type;               // OI_RESIZE
-  uchar device;             // Device index
-  uint width;               // New window width
-  uint height;              // New window height
+  uchar type;                       /**< OI_RESIZE */
+  uchar device;                     /**< Device index */
+  uint width;                       /**< New window width */
+  uint height;                      /**< New window height */
 } oi_resize_event;
 
 
@@ -174,7 +180,7 @@ typedef struct oi_resize_event {
  * Sent when application window is shown
  */
 typedef struct oi_expose_event {
-  uchar type;               // OI_EXPOSE
+  uchar type;                       /**< OI_EXPOSE */
 } oi_expose_event;
 
 
@@ -187,7 +193,7 @@ typedef struct oi_expose_event {
  * window, or when system error occurs
  */
 typedef struct oi_quit_event {
-  uchar type;               // OI_QUIT
+  uchar type;                       /**< OI_QUIT */
 } oi_quit_event;
 
 
@@ -198,14 +204,60 @@ typedef struct oi_quit_event {
  * Sent when an action map has been triggered
  */
 typedef struct oi_action_event {
-  uchar type;               // OI_ACTION
-  uchar device;             // Device index
-  uint actionid;            // User-defined actionid
-  uchar state;              // State (pressed/released)
-  sint data1;               // Default data slot   (1d device: x coord)
-  sint data2;               // Secondary data slot (2d device: y coord)
-  sint data3;               // Tertiary data slot  (3d device: z coord)
+  uchar type;                       /**< OI_ACTION */
+  uchar device;                     /**< Device index */
+  uint actionid;                    /**< User-defined actionid */
+  uchar state;                      /**< State (pressed/released) */
+  sint data1;                       /**< Default data slot   (1d device: x coord) */
+  sint data2;                       /**< Secondary data slot (2d device: y coord) */
+  sint data3;                       /**< Tertiary data slot  (3d device: z coord) */
 } oi_action_event;
+
+
+/**
+ * @ingroup PEventStructs
+ * @brief Joystick axis event
+ *
+ * Sent when an axis (stick/throttle/whatever)
+ * changes position
+ */
+typedef struct oi_joyaxis_event {
+  uchar type;                       /**< OI_JOYAXIS */
+  uchar device;                     /**< Device index */
+  uchar axis;                       /**< Axis index */
+  uchar kind;                       /**< Axis type, see @ref PJoyTypes */
+  sint value;                       /**< Axis position or relative movement */
+} oi_joyaxis_event;
+
+
+/**
+ * @ingroup PEventStructs
+ * @brief Joystick button event
+ *
+ * Sent when a button on a joystick
+ * is pressed or released
+ */
+typedef struct oi_joybutton_event {
+  uchar type;                       /**< OI_JOYBUTTONUP or OI_JOYBUTTONDOWN */
+  uchar device;                     /**< Device index */
+  uchar button;                     /**< Button index */
+  uint state;                       /**< Buttons state bitmask */
+} oi_joybutton_event;
+
+
+/**
+ * @ingroup PEventStructs
+ * @brief Joystick trackball event
+ *
+ * Sent when an joystick trackball moves
+ */
+typedef struct oi_joyball_event {
+  uchar type;                       /**< OI_JOYBALL */
+  uchar device;                     /**< Device index */
+  uchar ball;                       /**< Trackball index */
+  sshort relx;                      /**< Relative x movement */
+  sshort rely;                      /**< Relative y movement */
+} oi_joyball_event;
 
 
 /**
@@ -216,16 +268,19 @@ typedef struct oi_action_event {
  * to determine what kind of event you're dealing with.
  */
 typedef union {
-  uchar type;
-  oi_active_event active;
-  oi_keyboard_event key;
-  oi_mousemove_event move;
-  oi_mousebutton_event button;
-  oi_resize_event resize;
-  oi_expose_event expose;
-  oi_quit_event quit;
-  oi_discovery_event discover;
-  oi_action_event action;
+  uchar type;                       /**< Event type */
+  oi_active_event active;           /**< OI_ACTIVE */
+  oi_keyboard_event key;            /**< OI_KEYUP or OI_KEYDOWN */
+  oi_mousemove_event move;          /**< OI_MOUSEMOVE */
+  oi_mousebutton_event button;      /**< OI_MOUSEBUTTONUP or OI_MOUSEBUTTONDOWN */
+  oi_resize_event resize;           /**< OI_RESIZE */
+  oi_expose_event expose;           /**< OI_EXPOSE */
+  oi_quit_event quit;               /**< OI_QUIT */
+  oi_discovery_event discover;      /**< OI_DISCOVERY */
+  oi_action_event action;           /**< OI_ACTION */
+  oi_joyaxis_event joyaxis;         /**< OI_JOYAXIS */
+  oi_joybutton_event joybutton;     /**< OI_JOYBUTTONUP or OI_JOYBUTTONDOWN */
+  oi_joyball_event joyball;         /**< OI_JOYBALL */
 } oi_event;
 
 

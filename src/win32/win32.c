@@ -1,5 +1,5 @@
 /*
- * foo.c : Foo (test) utility functions (bootstrapping, etc.)
+ * win32.h : Microsoft Windows input device driver
  *
  * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -23,78 +23,72 @@
 
 // Includes
 #include "config.h"
-#include "openinput.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
+#include "openinput.h"
 #include "internal.h"
 #include "bootstrap.h"
-#include "foo.h"
+#include "win32.h"
 
 /**
  * @ingroup Drivers
- * @defgroup DFoo Foo test driver
+ * @defgroup DWin32 Microsoft Windows input driver
  *
- * The foo test driver can be used to test some
- * basic functionality of OpenInput. Under normal
- * circumstances you really do NOT want to compile
- * this driver--the default is not to use the foo
- * device driver test.
+ * @todo Document this!
  */
 
 // Bootstrap global
-oi_bootstrap foo_bootstrap = {
-  "foo",
-  "Foo test system",
-  OI_PRO_UNKNOWN,
-  foo_avail,
-  foo_device
+oi_bootstrap win32_bootstrap = {
+  "win32",
+  "Microsoft Windows input system",
+  OI_PRO_MOUSE | OI_PRO_KEYBOARD,
+  win32_avail,
+  win32_device
 };
 
 
 /* ******************************************************************** */
  
 /**
- * @ingroup DFoo
- * @brief Check availablity of foo device
+ * @ingroup DWin32
+ * @brief Check availablity of win32 device
  *
  * @param flags initialization flags, see @ref PFlags
  * @returns true (1) if device is present, false (0) otherwise
  *
  * This is a bootstrap function.
  *
- * The foo device driver always exists (if compiled in).
+ * @todo Document this!
  */
-sint foo_avail(uint flags) {
-  debug("foo_avail");
+sint win32_avail(uint flags) {
+  debug("win32_avail");
 
-  return TRUE;
+  return FALSE;
 }
 
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
- * @brief Create foo device structure
+ * @ingroup DWin32
+ * @brief Create win32 device structure
  *
  * @returns pointer to allocated device interface
  *
  * This is a bootstrap function.
  * 
- * Alloc and initialize the device driver abstration
- * interface.
+ * @todo Document this!
  */
-oi_device *foo_device() {
+oi_device *win32_device() {
   oi_device *dev;
-  foo_private *priv;
+  win32_private *priv;
 
-  debug("foo_device");
+  debug("win32_device");
 
   // Alloc device and private data
   dev = (oi_device*)malloc(sizeof(oi_device));
-  priv = (foo_private*)malloc(sizeof(foo_private));
+  priv = (win32_private*)malloc(sizeof(win32_private));
   if((dev == NULL) || (priv == NULL)) {
-    debug("foo_device: device creation failed");
+    debug("win32_device: device creation failed");
     if(dev) {
       free(dev);
     }
@@ -106,17 +100,17 @@ oi_device *foo_device() {
 
   // Clear structures
   memset(dev, 0, sizeof(oi_device));
-  memset(priv, 0, sizeof(foo_private));
+  memset(priv, 0, sizeof(win32_private));
 
   // Set members
-  dev->init = foo_init;
-  dev->destroy = foo_destroy;
-  dev->process = foo_process;  
-  dev->grab = foo_grab;
-  dev->hide = foo_hidecursor;
-  dev->warp = foo_warp;
-  dev->winsize = foo_winsize;
-  dev->reset = foo_reset;
+  dev->init = win32_init;
+  dev->destroy = win32_destroy;
+  dev->process = win32_process;  
+  dev->grab = win32_grab;
+  dev->hide = win32_hidecursor;
+  dev->warp = win32_warp;
+  dev->winsize = win32_winsize;
+  dev->reset = win32_reset;
   dev->private = priv;
   
   // Done
@@ -126,8 +120,8 @@ oi_device *foo_device() {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
- * @brief Initialize the foo test driver
+ * @ingroup DWin32
+ * @brief Initialize the win32 test driver
  *
  * @param dev pointer to device interface
  * @param window_id window hook paramaters, see @ref PWindow
@@ -136,31 +130,27 @@ oi_device *foo_device() {
  *
  * This is a device interface function.
  *
- * Initialize the foo test driver - initializes 
- * the private structure and other states.
+ * @todo Document this!
  */
-sint foo_init(oi_device *dev, char *window_id, uint flags) {
+sint win32_init(oi_device *dev, char *window_id, uint flags) {
   uint val;
-  foo_private *priv;
+  win32_private *priv;
 
-  debug("foo_init: window '%s', flags %i", window_id, flags);
+  debug("win32_init: window '%s', flags %i", window_id, flags);
   
   // Sniff the handles
   val = device_windowid(window_id, OI_I_CONN);
-  debug("foo_init: conn (c) parameter %i", val);
+  debug("win32_init: conn (c) parameter %i", val);
 
   val = device_windowid(window_id, OI_I_SCRN);
-  debug("foo_init: scrn (s) parameter %i", val);
+  debug("win32_init: scrn (s) parameter %i", val);
 
   val = device_windowid(window_id, OI_I_WINID);
-  debug("foo_init: winid (w) parameter %i", val);
+  debug("win32_init: winid (w) parameter %i", val);
 
   // Set some stupid private values
-  priv = (foo_private*)dev->private;
-  priv->grabstatus = FALSE;
-  priv->cursorstatus = FALSE;
+  priv = (win32_private*)dev->private;
   priv->x = 0;
-  priv->y = 0;
 
   return OI_ERR_OK;
 }
@@ -168,18 +158,18 @@ sint foo_init(oi_device *dev, char *window_id, uint flags) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
- * @brief Shutdown the foo device
+ * @ingroup DWin32
+ * @brief Shutdown the win32 device
  *
  * @param dev pointer to device interface
  * @returns errorcode, see @ref PErrors
  *
  * This is a device interface function.
  *
- * Close down driver freeing any allocated memory.
+ * @todo Document this!
  */
-sint foo_destroy(oi_device *dev) {
-  debug("foo_destroy");
+sint win32_destroy(oi_device *dev) {
+  debug("win32_destroy");
   
   // Free device
   if(dev) {
@@ -197,26 +187,22 @@ sint foo_destroy(oi_device *dev) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Process events
  *
  * @param dev pointer to device interface
  *
  * This is a device interface function.
  *
- * Pump events into the OpenInput library. As this
- * is a test device, only a few hardcoded events
- * are inserted - all state managers should have an
- * event injected, and a direct queue insertion should
- * also be performed.
+ * @todo Document this!
  */
-void foo_process(oi_device *dev) {
+void win32_process(oi_device *dev) {
   static oi_event ev;
 
-  debug("foo_process");
+  debug("win32_process");
 
   if(!oi_runstate()) {
-    debug("foo_process: oi_running false");
+    debug("win32_process: oi_running false");
     return;
   }
 
@@ -235,7 +221,7 @@ void foo_process(oi_device *dev) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Grab/release pointer
  *
  * @param dev pointer to device interface
@@ -244,15 +230,12 @@ void foo_process(oi_device *dev) {
  *
  * This is a device interface function.
  *
- * Since the foo device is a virtual test device, this function
- * does not perform any real grabbing. A state is flipped, and
- * in debug-mode, the state change can be verified.
+ * @todo Document this!
  */
-sint foo_grab(oi_device *dev, sint on) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
-  priv->grabstatus = on;
+sint win32_grab(oi_device *dev, sint on) {
+  win32_private *priv;
+  priv = (win32_private*)dev->private;
+  debug("win32_grab");
 
   return OI_ERR_OK;
 }
@@ -261,7 +244,7 @@ sint foo_grab(oi_device *dev, sint on) {
 
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Show/hide pointer
  *
  * @param dev pointer to device interface
@@ -270,15 +253,12 @@ sint foo_grab(oi_device *dev, sint on) {
  *
  * This is a device interface function.
  *
- * Since the foo device is a virtual test device, this function
- * does not perform any real hide/show of the pointer. A state is flipped,
- * and in debug-mode, the state change can be verified.
+ * @todo Document this!
  */
-sint foo_hidecursor(oi_device *dev, sint on) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
-  priv->cursorstatus = on;
+sint win32_hidecursor(oi_device *dev, sint on) {
+  win32_private *priv;
+  priv = (win32_private*)dev->private;
+  debug("win32_hidecursor");
   
   return OI_ERR_OK;
 }
@@ -286,7 +266,7 @@ sint foo_hidecursor(oi_device *dev, sint on) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Warp pointer
  *
  * @param dev pointer to device interface
@@ -296,16 +276,12 @@ sint foo_hidecursor(oi_device *dev, sint on) {
  *
  * This is a device interface function.
  *
- * Since the foo device is a virtual test device, this function
- * does not perform any cursor movement. The internal state
- * is changed, and can be verified in debug-mode.
+ * @todo Document this!
  */
-sint foo_warp(oi_device *dev, sint x, sint y) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_warp: warp pointer to %i, %i", x, y);
-  priv->x = x;
-  priv->y = y;
+sint win32_warp(oi_device *dev, sint x, sint y) {
+  win32_private *priv;
+  priv = (win32_private*)dev->private;
+  debug("win32_warp");
 
   return OI_ERR_OK;
 }
@@ -313,7 +289,7 @@ sint foo_warp(oi_device *dev, sint x, sint y) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Get window size
  *
  * @param dev pointer to device interface
@@ -323,18 +299,12 @@ sint foo_warp(oi_device *dev, sint x, sint y) {
  *
  * This is a device interface function.
  *
- * Since the foo device is a virtual test device, this function
- * does not return the window size. Instead, it returns the
- * virtual mouse pointer coordinate (set using the warp function).
+ * @todo Document this!
  */
-sint foo_winsize(oi_device *dev, sint *w, sint *h) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_winsize");
-
-  // Just for fun, return the mouse position
-  *w = priv->x;
-  *h = priv->y;
+sint win32_winsize(oi_device *dev, sint *w, sint *h) {
+  win32_private *priv;
+  priv = (win32_private*)dev->private;
+  debug("win32_winsize");
 
   return OI_ERR_OK;
 }
@@ -342,7 +312,7 @@ sint foo_winsize(oi_device *dev, sint *w, sint *h) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DFoo
+ * @ingroup DWin32
  * @brief Reset internal state
  *
  * @param dev pointer to device interface
@@ -350,18 +320,12 @@ sint foo_winsize(oi_device *dev, sint *w, sint *h) {
  *
  * This is a device interface function.
  *
- * Reset/sync the internal states. Since this is
- * a test device, simply just reset the coordinates etc.
+ * @todo Document this!
  */
-sint foo_reset(oi_device *dev) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_reset");
-
-  priv->grabstatus = FALSE;
-  priv->cursorstatus = FALSE;
-  priv->x = 0;
-  priv->y = 0;
+sint win32_reset(oi_device *dev) {
+  win32_private *priv;
+  priv = (win32_private*)dev->private;
+  debug("win32_reset");
 
   return OI_ERR_OK;
 }

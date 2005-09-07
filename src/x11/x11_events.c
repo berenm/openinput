@@ -64,7 +64,7 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
   priv->lasty = xev->xmotion.y;
 
   // Post it
-  mouse_move(deltax, deltay, TRUE, dev->index);
+  mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
 
   // Only warp mouse if we're near the edge of the window
   if((xev->xmotion.x < SX11_FUDGE) ||
@@ -81,7 +81,7 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
       priv->lasty = xev->xmotion.y;
 
       // Post it
-      mouse_move(deltax, deltay, TRUE, dev->index);
+      mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
     }
 
     // Center (warp) mouse
@@ -208,10 +208,9 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
   
   // Fetch the event
   XNextEvent(d, &xev);
-  
+
   // Handle
   switch(xev.type) {
-  
     
     // Mouse enters/leaves window
   case EnterNotify:
@@ -224,12 +223,13 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
       
       // Move if grabbed, otherwise change focus
       if(oi_app_grab(OI_QUERY) == OI_ENABLE) {
-	mouse_move(xev.xcrossing.x, xev.xcrossing.y, FALSE, dev->index);
+	mouse_move(dev->index, xev.xcrossing.x, xev.xcrossing.y, FALSE, TRUE);
       }
       else {
-	appstate_focus(OI_FOCUS_MOUSE,
+	appstate_focus(dev->index,
+		       OI_FOCUS_MOUSE,
 		       xev.type == EnterNotify,
-		       dev->index);
+		       TRUE);
       }
     }
     break;
@@ -239,9 +239,10 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
   case FocusIn:
   case FocusOut:
     debug("x11_dispatch: focus_in/out (in/down:%i)", xev.type == FocusIn);
-    appstate_focus(OI_FOCUS_INPUT,
+    appstate_focus(dev->index,
+		   OI_FOCUS_INPUT,
 		   xev.type == FocusIn,
-		   dev->index);
+		   TRUE);
     break;
 
     
@@ -260,7 +261,7 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
       x11_relative_mouse(dev, &xev);
     }
     else {
-      mouse_move(xev.xmotion.x, xev.xmotion.y, FALSE, dev->index);
+      mouse_move(dev->index, xev.xmotion.x, xev.xmotion.y, FALSE, TRUE);
     }
 
     break;
@@ -270,9 +271,10 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
   case ButtonPress:
   case ButtonRelease:
     debug("x11_dispatch: button_press/release (in/down:%i)", xev.type == ButtonPress);
-    mouse_button(xev.xbutton.button,
+    mouse_button(dev->index,
+		 xev.xbutton.button,
 		 xev.type == ButtonPress,
-		 dev->index);
+		 TRUE);
     break;
 
 
@@ -294,9 +296,10 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
 		      &xev.xkey,
 		      xev.xkey.keycode,
 		      &keysym);
-	keyboard_update(&keysym,
+	keyboard_update(dev->index, 
+			&keysym,
 			xev.type == KeyPress,
-			dev->index);
+			TRUE);
       }
     }
     break;
@@ -305,21 +308,21 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
     // Window gets iconified
   case UnmapNotify:
     debug("x11_dispatch: unmap_notify");
-    appstate_focus(FALSE, OI_FOCUS_INPUT | OI_FOCUS_VISIBLE, dev->index);
+    appstate_focus(dev->index, FALSE, OI_FOCUS_INPUT | OI_FOCUS_VISIBLE, TRUE);
     break;
 
 
     // Window gets restored (uniconified)
   case MapNotify:
     debug("x11_dispatch: map_notify");
-    appstate_focus(TRUE, OI_FOCUS_VISIBLE, dev->index);
+    appstate_focus(dev->index, TRUE, OI_FOCUS_VISIBLE, TRUE);
     break;
 
 
     // Window was resized or moved
   case ConfigureNotify:
     debug("x11_dispatch: configure_notify");
-    appstate_resize(xev.xconfigure.width, xev.xconfigure.height, dev->index);		    
+    appstate_resize(dev->index, xev.xconfigure.width, xev.xconfigure.height, TRUE);
     ((x11_private*)dev->private)->width = xev.xconfigure.width;
     ((x11_private*)dev->private)->height = xev.xconfigure.height;
     break;

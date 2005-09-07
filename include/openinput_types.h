@@ -29,6 +29,7 @@
 #endif
 
 /* ******************************************************************** */
+
 /**
  * @ingroup PTypes
  * @defgroup PNumerics Basic numerical types

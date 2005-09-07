@@ -25,16 +25,10 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "openinput.h"
 #include "internal.h"
-
-// Globals
-static oi_device *mousedev;
-static sint crd_x;
-static sint crd_y;
-static sint rel_x;
-static sint rel_y;
-static sint button;
+#include "private.h"
 
 /* ******************************************************************** */
 
@@ -48,30 +42,7 @@ static sint button;
  * the mouse manager for use.
  */
 sint mouse_init() {
-  int i;
-
-  // Set globals
-  crd_x = 0;
-  crd_y = 0;
-  rel_x = 0;
-  rel_y = 0;
-  button = 0;
-
-  // Find default/first mouse device
-  i = 1;
-  while((mousedev = device_get(i)) != NULL) {
-    if((mousedev->provides & OI_PRO_MOUSE) == OI_PRO_MOUSE) {
-      break;
-    }
-    i++;
-  }
-
-  // We really want a device
-  if(mousedev == NULL) {
-    return OI_ERR_NO_DEVICE;
-  }
-
-  debug("mouse_init: mouse device is '%s'", mousedev->name);
+  debug("mouse_init");
 
   // Done
   return OI_ERR_OK;
@@ -81,13 +52,53 @@ sint mouse_init() {
 
 /**
  * @ingroup IMouse
+ * @brief Allocate and prepare private managment data
+ *
+ * @param mouse pointer to the address of the private mouse data
+ * @param provide provide mask, see @ref PProvide
+ *
+ * @pre This function is called during "device_register" where
+ * the base device->managment structure has been allocated and
+ * initialized
+ *
+ * This function (possible) allocates and initializes the mouse
+ * per-device private managment data, ie. absolute and relative
+ * motion of the mouse and the button state
+ *
+ * The structure might also not be created, depending on whether
+ * the device provides a mice as determined by the provide-mask
+ */
+void mouse_manage(oi_privmouse **mouse, uint provide) {
+  // Only care about keyboard
+  if(!(provide & OI_PRO_MOUSE)) {
+    return;
+  }
+  
+  // Allocate
+  *mouse = (oi_privmouse*)malloc(sizeof(oi_privmouse));
+  
+  // Clear state
+  (*mouse)->button = OI_BUTTON_MASK(OIP_UNKNOWN);
+  (*mouse)->absx = 0;
+  (*mouse)->absy = 0;
+  (*mouse)->relx = 0;
+  (*mouse)->rely = 0;
+
+  debug("mouse_manage: manager data installed");
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IMouse
  * @brief Mouse motion update
  *
+ * @param index device index
  * @param x horizontal position/movement
  * @param y vertical position/movement
  * @param relative false (0) if x,y is absolute coordinate, true
  *   if x,y is relative movement
- * @param postdev device index of sender, 0 disables posting
+ * @param post trur (1) to send event, false (0) otherwise
  *
  * Inject absolute and relative mouse movement into the mouse
  * state manager. The x,y parameters should both be in pixels.
@@ -95,18 +106,25 @@ sint mouse_init() {
  * Device drivers which resembles pointer devices probably wants
  * to use this function to inject events into the library.
  */
-void mouse_move(sint x, sint y, sint relative, uchar postdev) {
+void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
+  oi_privmouse *priv;
   sint nx;
   sint ny;
   sint rx;
   sint ry;
 
+  // Get private per-device data
+  priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
+  if(!priv) {
+    return;
+  }
+
   // Always make x,y absolute
   rx = x;
   ry = y;
   if(relative) {
-    x = crd_x + x;
-    y = crd_y + y;
+    x = priv->absx + x;
+    y = priv->absy + y;
   }
 
   // Check absolute position of mouse wrt. window size
@@ -131,27 +149,27 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
   }
 
   // Calculate relative motion, but only if inside window
-  if(!relative && (crd_x >= 0) && (crd_y >= 0)) {
-    rx = nx - crd_x;
-    ry = ny - crd_y;
+  if(!relative && (priv->absx >= 0) && (priv->absy >= 0)) {
+    rx = nx - priv->absx;
+    ry = ny - priv->absy;
   }
   
   // Ok, everything calculated - set global state
-  crd_x = nx;
-  crd_y = ny;
-  rel_x += rx;
-  rel_y += ry;
+  priv->absx = nx;
+  priv->absy = ny;
+  priv->relx += rx;
+  priv->rely += ry;
 
   //FIXME some platforms may need manual pushing of cursor
   
   // Postal services
-  if(postdev) {
+  if(post) {
     oi_event ev;
     ev.type = OI_MOUSEMOVE;
-    ev.move.device = postdev;
-    ev.move.state = button;
-    ev.move.x = crd_x;
-    ev.move.y = crd_y;
+    ev.move.device = index;
+    ev.move.state = priv->button;
+    ev.move.x = priv->absx;
+    ev.move.y = priv->absy;
     // Only send relative, not cummulative, ticks (thanks discipline!)
     ev.move.relx = rx;
     ev.move.rely = ry;
@@ -166,17 +184,25 @@ void mouse_move(sint x, sint y, sint relative, uchar postdev) {
  * @ingroup IMouse
  * @brief Mouse button update
  *
+ * @param index device index
  * @param btn button index
  * @param state pressed (true) or released (false)
- * @param postdev device index of sender, 0 disables posting
+ * @param post true (1) to send event, false (0) otherwise
  *
  * Feed mouse button press/release into mouse state manager.
  */
-void mouse_button(oi_mouse btn, sint state, uchar postdev) {
+void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
+  oi_privmouse *priv;
   oi_mouse newbutton;
   uchar type;
 
-  newbutton = button;
+  // Get per-device private data
+  priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
+  if(!priv) {
+    return;
+  }
+
+  newbutton = priv->button;
 
   if(state) {
     // Down
@@ -190,22 +216,22 @@ void mouse_button(oi_mouse btn, sint state, uchar postdev) {
   }
 
   // If nothing changed, bail out
-  if(newbutton == button) {
+  if(newbutton == priv->button) {
     return;
   }
 
   // Store state
-  button = newbutton;
+  priv->button = newbutton;
   
   // Postal services
-  if(postdev) {
+  if(post) {
     oi_event ev;
     ev.type = type;
-    ev.button.device = postdev;
+    ev.button.device = index;
     ev.button.button = btn;
-    ev.button.state = button;
-    ev.button.x = crd_x;
-    ev.button.y = crd_y;
+    ev.button.state = priv->button;
+    ev.button.x = priv->absx;
+    ev.button.y = priv->absy;
     queue_add(&ev);
   }
 }
@@ -216,6 +242,7 @@ void mouse_button(oi_mouse btn, sint state, uchar postdev) {
  * @ingroup PMouse
  * @brief Get absolute position of mouse pointer
  *
+ * @param index device index, 0 for default mouse
  * @param x pointer to horizontal position
  * @param y pointer to vertical position
  * @returns mouse button mask, see @ref PMouseMask
@@ -224,25 +251,53 @@ void mouse_button(oi_mouse btn, sint state, uchar postdev) {
  * (stored in the integer pointers) and the current
  * button state as a button mask.
  */
-sint oi_mouse_absolute(sint *x, sint *y) {
-  // Check current position
-  if(crd_x < 0) {
-    crd_x = 0;
+sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
+  oi_privmouse *priv;
+  uchar i;
+
+  // Default coordinates
+  *x = 0;
+  *y = 0;
+
+  // Get device index
+  i = index;
+  if(i == 0) {
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+      if(device_priv(i, OI_PRO_MOUSE)) {
+	break;
+      }
+    }
+
+    // End reached
+    if(i==OI_MAX_DEVICES) {
+      return OIP_UNKNOWN;
+    }
   }
-  if(crd_y < 0) {
-    crd_y = 0;
+
+  // Get device data
+  priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
+  if(!priv) {
+    return OIP_UNKNOWN;
+  }
+  
+  // Check current position
+  if(priv->absx < 0) {
+    priv->absx = 0;
+  }
+  if(priv->absy < 0) {
+    priv->absy = 0;
   }  
 
   // Set data
   if(x) {
-    *x = crd_x;
+    *x = priv->absx;
   }
   if(y) {
-    *y = crd_y;
+    *y = priv->absy;
   }
 
   // Return button state
-  return button;
+  return priv->button;
 }
 
 /* ******************************************************************** */
@@ -251,6 +306,7 @@ sint oi_mouse_absolute(sint *x, sint *y) {
  * @ingroup PMouse
  * @brief Get relative mouse motion
  *
+ * @param index device index, 0 for default mouse
  * @param x pointer to horizontal motion
  * @param y pointer to vertical motion
  * @returns mouse button mask, see @ref PMouseMask
@@ -258,21 +314,49 @@ sint oi_mouse_absolute(sint *x, sint *y) {
  * Get the relative mouse motion since last call
  * to this function (ie. it is cummulative).
  */
-sint oi_mouse_relative(sint *x, sint *y) {
+sint oi_mouse_relative(uchar index, sint *x, sint *y) {
+  oi_privmouse *priv;
+  uchar i;
+
+  // Default coordinates
+  *x = 0;
+  *y = 0;
+
+  // Get device index
+  i = index;
+  if(i == 0) {
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+      if(device_priv(i, OI_PRO_MOUSE)) {
+	break;
+      }
+    }
+
+    // End reached
+    if(i==OI_MAX_DEVICES) {
+      return OIP_UNKNOWN;
+    }
+  }
+
+  // Get device data
+  priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
+  if(!priv) {
+    return OIP_UNKNOWN;
+  }
+
   // Set data
   if(x) {
-    *x = rel_x;
+    *x = priv->relx;
   }
   if(y) {
-    *y = rel_y;
+    *y = priv->rely;
   }
 
   // Reset deltas
-  rel_x = 0;
-  rel_y = 0;
+  priv->relx = 0;
+  priv->rely = 0;
 
   // Return button state
-  return button;
+  return priv->button;
 }
 
 /* ******************************************************************** */
@@ -281,6 +365,7 @@ sint oi_mouse_relative(sint *x, sint *y) {
  * @ingroup PMouse
  * @brief Warp (move) mouse pointer
  *
+ * @param index device index, use 0 to warp all mice
  * @param x absolute horizontal position of cursor
  * @param y absolute vertical position of cursor
  * @returns errorcode, see @ref PErrors
@@ -289,41 +374,57 @@ sint oi_mouse_relative(sint *x, sint *y) {
  * position. The function generates a mouse
  * movement event.
  */
-sint oi_mouse_warp(sint x, sint y) {
+sint oi_mouse_warp(uchar index, sint x, sint y) {
+  oi_device *dev;
+  uchar i;
   int e;
 
-  // Dummy checking
+  // Clip coordinates
   if(x < 0) {
     x = 0;
   }
   else if(x > appstate_width()) {
     x = appstate_width() -1;
-  }
-
+  } 
   if(y < 0) {
     y = 0;
   }
   else if(y > appstate_height()) {
     y = appstate_height() - 1;
   }
+  e = OI_ERR_NO_DEVICE;
+  
+  // Parse all devices
+  for(i=1; i<OI_MAX_DEVICES; i++) {  
 
-  // If mouse is hidden and grabbed, don't physically move it
-  if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
-     (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
-    mouse_move(x, y, FALSE, mousedev->index);  
-    e = OI_ERR_OK;
+    // Only touch a single device?
+    if(index != 0) {
+      i = index;
+    }
+
+    // Get device
+    dev = device_get(i);
+    if(dev && (dev->provides & OI_PRO_MOUSE)) {
+      
+      // If mouse is hidden and grabbed, don't physically move it
+      if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
+	 (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
+	mouse_move(x, y, FALSE, FALSE, i);  
+      }
+      
+      // Warp default mouse device - driver must generate motion event!
+      else if(dev->warp) {
+	e = dev->warp(dev, x, y);
+      }
+    }
+
+    // Only touch a single device?
+    if(index != 0) {
+      return e;
+    }
   }
 
-  // Warp default mouse device - driver must generate motion event!
-  else if(mousedev->warp) {
-    e = mousedev->warp(mousedev, x, y);
-  }
-
-  // No default device to perform the warp!
-  else {
-    e = OI_ERR_NO_DEVICE;
-  }
-
+  // Done, return whatever
   return e;
 }
 

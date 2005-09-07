@@ -40,6 +40,7 @@ sint x11_grab(oi_device *dev, sint on);
 sint x11_hidecursor(oi_device *dev, sint on);
 sint x11_warp(oi_device *dev, sint x, sint y);
 sint x11_winsize(oi_device *dev, sint *w, sint *h);
+sint x11_reset(oi_device *dev);
 
 /* ******************************************************************** */
 

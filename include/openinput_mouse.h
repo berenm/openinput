@@ -35,20 +35,24 @@
  * @defgroup PMousename Mouse button definitions
  * @brief Mouse buttons
  *
- * Definition of mouse buttons
+ * Mice typically have three buttons and a scroll-wheel.
+ * Each of these are defined here with their human readable
+ * string-counterpart.
+ *
+ * @{
  */
 typedef enum {
-  OIP_UNKNOWN            = 0,
-  OIP_FIRST              = 0,
-  OIP_BUTTON_LEFT        = 1,
-  OIP_BUTTON_MIDDLE      = 2,
-  OIP_BUTTON_RIGHT       = 3,
-  OIP_WHEEL_UP           = 4,
-  OIP_WHEEL_DOWN         = 5,
-  OIP_MOTION             = 6,
-  OIP_LAST
+  OIP_UNKNOWN            = 0, /**< mouse_unknown */
+  OIP_FIRST              = 0, /**< mouse_unknown */
+  OIP_BUTTON_LEFT        = 1, /**< mouse_left */
+  OIP_BUTTON_MIDDLE      = 2, /**< mouse_middle */
+  OIP_BUTTON_RIGHT       = 3, /**< mouse_right */
+  OIP_WHEEL_UP           = 4, /**< mouse_wheel_up */
+  OIP_WHEEL_DOWN         = 5, /**< mouse_wheel_down */
+  OIP_MOTION             = 6, /**< mouse_motion */
+  OIP_LAST                    /**< mouse_unknown */
 } oi_mouse;
-
+/** @} */
 
 /**
  * @ingroup PTypes
@@ -56,6 +60,7 @@ typedef enum {
  * @brief Definition of mouse button masks
  *
  * Mouse button bits used in state parameters.
+ *
  * @{
  */
 #define OI_BUTTON_MASK(x) (1<<(x))

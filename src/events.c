@@ -126,8 +126,11 @@ void oi_events_pump() {
   device_pumpall();
 
   // Handle keyboard repeats
-  keyboard_dorepeat();
-  
+  keyboard_dorepeat();  
+
+  // Inject pending joystick events
+  joystick_pump();
+
   queue_unlock();  
 }
 

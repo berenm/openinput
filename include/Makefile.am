@@ -1,11 +1,14 @@
+DIST_EXTRA = \
+	openinput_h_version.in
+
 openinputincludedir = \
-${includedir}/openinput
+	${includedir}/openinput
 
 openinputinclude_HEADERS = \
-openinput.h \
-openinput_api.h \
-openinput_events.h \
-openinput_types.h \
-openinput_keyboard.h \
-openinput_mouse.h \
-openinput_action.h
+	openinput.h \
+	openinput_api.h \
+	openinput_events.h \
+	openinput_types.h \
+	openinput_keyboard.h \
+	openinput_mouse.h \
+	openinput_action.h

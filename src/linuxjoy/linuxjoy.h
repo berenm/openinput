@@ -37,6 +37,7 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags);
 sint linuxjoy_enable(oi_device *dev, sint on);
 sint linuxjoy_destroy(oi_device *dev);
 void linuxjoy_process(oi_device *dev);
+sint linuxjoy_reset(oi_device *dev);
 
 /* ******************************************************************** */
 

@@ -149,6 +149,7 @@ oi_device *linuxjoy_device() {
   dev->hide = NULL;
   dev->warp = NULL;
   dev->winsize = NULL;
+  dev->reset = linuxjoy_reset;
   
   // Done
   return dev;
@@ -381,6 +382,29 @@ int linuxjoy_getfd(uchar num) {
   // Make path and open it
   sprintf(path, "/dev/input/js%u", num);
   return open(path, O_RDONLY | O_NONBLOCK, 0);
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup DLinuxjoy
+ * @brief Reset internal state
+ *
+ * @param dev pointer to device interface
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Resync the driver-device states.
+ */
+sint linuxjoy_reset(oi_device *dev) {
+  linuxjoy_private *priv;
+  priv = (linuxjoy_private*)dev->private;
+  debug("linuxjoy_reset");
+
+  // Fixme
+
+  return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

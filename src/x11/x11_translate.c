@@ -178,6 +178,8 @@ void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
   uchar newstate[OIK_LAST];
   uchar *curstate;
   
+  debug("x11_keystate");
+
   // Fetch pressed keys from X if not supplied
   if(!keyvec) {
     XQueryKeymap(d, keyret);
@@ -205,7 +207,7 @@ void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
 
   // Prepare new and current keystates
   memset(newstate, 0, sizeof(newstate));
-  curstate = oi_key_keystate(NULL);
+  curstate = oi_key_keystate(dev->index, NULL);
 
   // Check each bit in the 32 bytes of the X keystate
   for(i=0; i<32; i++) {
@@ -292,7 +294,7 @@ void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
     curstate[OIK_NUMLOCK] = FALSE;
   }
 
-  keyboard_setmodifier(mod);
+  keyboard_setmodifier(dev->index, mod);
 }
 
 /* ******************************************************************** */

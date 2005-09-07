@@ -89,15 +89,16 @@ sint appstate_init() {
  * @ingroup IAppstate
  * @brief Update focus state
  *
+ * @param index device index
  * @param gain focus gained:1 or lost:0
  * @param state type of focus gained/lost
- * @param postdev device index of sender, 0 disables event posting
+ * @param post true (1) to send event, false (0) otherwise
  *
  * Update the focus state of the application (ie. window).
  * Rhree types of focus exists: #OI_FOCUS_MOUSE #OI_FOCUS_INPUT and
  * #OI_FOCUS_VISIBLE
  */
-void appstate_focus(sint gain, sint state, uchar postdev) {
+void appstate_focus(uchar index, sint gain, sint state, uchar post) {
   sint newfocus;
 
   // Loose or gain
@@ -118,10 +119,10 @@ void appstate_focus(sint gain, sint state, uchar postdev) {
   focus = newfocus;
 
   // Postal services
-  if(postdev) {
+  if(post) {
     oi_event ev;
     ev.type = OI_ACTIVE;
-    ev.active.device = postdev;
+    ev.active.device = index;
     ev.active.gain = gain & TRUE;
     ev.active.state = state;
     queue_add(&ev);
@@ -135,22 +136,23 @@ void appstate_focus(sint gain, sint state, uchar postdev) {
  * @ingroup IAppstate
  * @brief Update application window size state
  *
+ * @param index device index
  * @param w width of window
  * @param h height of window
- * @param postdev device index of sender, 0 disables event posting
+ * @param post true (1) to send event, false (0) otherwise
  *
  * Update the window size state.
  */
-void appstate_resize(sint w, sint h, uchar postdev) {
+void appstate_resize(uchar index, sint w, sint h, uchar post) {
   // Store state
   win_width = w;
   win_height = h;
 
   // Postal services
-  if(postdev) {
+  if(post) {
     oi_event ev;
     ev.type = OI_RESIZE;
-    ev.resize.device = postdev;
+    ev.resize.device = index;
     ev.resize.width = w;
     ev.resize.height = h;
     queue_add(&ev);
@@ -243,7 +245,7 @@ oi_bool oi_app_cursor(oi_bool q) {
       if(!hide && dev->warp) {
 	sint x;
 	sint y;
-	oi_mouse_absolute(&x, &y);
+	oi_mouse_absolute(0, &x, &y);
 	dev->warp(dev, x, y);
       }
       i++;

@@ -93,6 +93,24 @@ button presses into the OpenInput system
 // --------------------------------------------------
 
 /**
+@defgroup IJoystick Joystick state manager
+@brief Generic joystick handling and state managment
+@ingroup Internal
+
+Helper functions for joysticks. Use the functions here
+to inject joystick events into the library. Currently, four
+distinct type of joystick events are handled: Axes (sticks),
+buttons, hats and balls.
+
+@{
+ */
+/**
+@}
+ */
+
+// --------------------------------------------------
+
+/**
 @defgroup IQueue Event queue
 @brief Events are placed in a generic queue accessible in this API
 @ingroup Internal
@@ -178,9 +196,27 @@ containing function pointers to the required (and optional)
 functionality devices can do.
 
 @{
- */
+*/
 /**
 @}
- */
+*/
+
+// --------------------------------------------------
+
+/**
+@ingroup ITypes
+@defgroup IPrivate Per-device management data
+@brief Private per-device data for managers
+
+This module contains the structures for private
+manager data. Note that this data should not
+be used by drivers, but only by the higher-level
+library functions.
+
+@{
+*/
+/**
+@}
+*/
 
 // --------------------------------------------------

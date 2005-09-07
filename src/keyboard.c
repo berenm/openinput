@@ -28,21 +28,12 @@
 #include <string.h>
 #include "openinput.h"
 #include "internal.h"
+#include "private.h"
 
 // Globals
-static oi_device *keydev;
-static uchar keystate[OIK_LAST];
-static uint modstate;
 static char *keynames[OIK_LAST];
-
-// Key repeat
-static struct {
-  uchar first;
-  sint delay;
-  sint interval;
-  uint timestamp;
-  oi_event ev;
-} keyboard_keyrep;
+static sint rep_interval;
+static sint rep_delay;
 
 /* ******************************************************************** */
 
@@ -55,34 +46,12 @@ static struct {
  * Must be called on library initialization.
  */
 sint keyboard_init() {
-  int i;
-
-  // Clear tables
-  memset(keystate, FALSE, TABLESIZE(keystate));
-  memset(keynames, 0, TABLESIZE(keynames));
-  modstate = OIM_NONE;
-
   // Disable key-repeat
   oi_key_repeat(0, 0);
 
   // Fill keyboard names
+  memset(keynames, 0, TABLESIZE(keynames));
   keyboard_fillnames(keynames);
-
-  // Find default/first mouse device
-  i = 1;
-  while((keydev = device_get(i)) != NULL) {
-    if((keydev->provides & OI_PRO_KEYBOARD) == OI_PRO_KEYBOARD) {
-      break;
-    }
-    i++;
-  }
-
-  // We really, really want a keyboard!
-  if(keydev == NULL) {
-    return OI_ERR_NO_DEVICE;
-  }
-
-  debug("keyboard_init: keyboard device is '%s'", keydev->name);
 
   return OI_ERR_OK;
 }
@@ -91,11 +60,50 @@ sint keyboard_init() {
 
 /**
  * @ingroup IKeyboard
+ * @brief Allocate and prepare private managment data
+ *
+ * @param key pointer to the address of the keyboard data
+ * @param provide provide mask, see @ref PProvide
+ *
+ * @pre This function is called during "device_register" where
+ * the base device->managment structure has been allocated and
+ * initialized
+ *
+ * This function (possible) allocates and initializes the keyboard
+ * per-device private managment data, ie. the modifier and button-down
+ * state tables.
+ *
+ * The structure might also not be created, depending on whether
+ * the device provides keyboard as determined by the provide-mask
+ */
+void keyboard_manage(oi_privkey **key, uint provide) {
+  // Only care about keyboard
+  if(!(provide & OI_PRO_KEYBOARD)) {
+    return;
+  }
+  
+  // Allocate
+  *key = (oi_privkey*)malloc(sizeof(oi_privkey));
+
+  // Clear state
+  memset((*key)->keystate, FALSE, TABLESIZE((*key)->keystate));
+  (*key)->modstate = OIM_NONE;
+  (*key)->rep_first = FALSE;
+  (*key)->rep_time = 0;
+
+  debug("keyboard_manage: manager data installed");
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IKeyboard
  * @brief Update keyboard button state
  *
+ * @param index device index
  * @param keysym keyboard symbol structure
  * @param state state, ie. pressed or released
- * @param postdev device index of sender, 0 disables posting
+ * @param post true (1) to post event, false (0) otherwise
  *
  * Device drivers should use this function to generate keyboard
  * events and update the internal keyboard state table.
@@ -103,14 +111,21 @@ sint keyboard_init() {
  * modifier-masks and handles the lock-button: CapsLock, NumLock
  * and ScrollLock.
  */
-void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
+void keyboard_update(uchar index, oi_keysym *keysym, sint state, uchar post) {
+  oi_privkey *priv;
   oi_type type;
   oi_event ev;
   uint newmod;
   uchar repeat;
   
+  // Get private per-device data
+  priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
+  if(!priv) {
+    return;
+  }
+
   // Temporary new modifier state
-  newmod = modstate;
+  newmod = priv->modstate;
   repeat = FALSE;
   
   // Check for modifier updates
@@ -252,36 +267,36 @@ void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
     type = OI_KEYUP;
 
     // Disable repeat if key matches
-    if(keyboard_keyrep.timestamp &&
-       (keyboard_keyrep.ev.key.keysym.sym == keysym->sym)) {
-      keyboard_keyrep.timestamp = 0;
+    if(priv->rep_time &&
+       (priv->rep_ev.key.keysym.sym == keysym->sym)) {
+      priv->rep_time = 0;
     }
   }
 
   // If key state didn't change, bail out
-  if(keystate[keysym->sym] == state) {
+  if(priv->keystate[keysym->sym] == state) {
     return;
   }
   
   // Store new states
-  keystate[keysym->sym] = state;
-  modstate = newmod;
+  priv->keystate[keysym->sym] = state;
+  priv->modstate = newmod;
 
   // Setup event
   ev.type = type;
-  ev.key.device = postdev;
+  ev.key.device = index;
   ev.key.state = state;
   ev.key.keysym = *keysym;
 
   // Update key-repeat if enabled and repeatable key
-  if(repeat && (keyboard_keyrep.delay > 0)) {
-    keyboard_keyrep.ev = ev;
-    keyboard_keyrep.first = TRUE;
-    keyboard_keyrep.timestamp = oi_getticks();
+  if(repeat && (rep_delay > 0)) {
+    priv->rep_ev = ev;
+    priv->rep_first = TRUE;
+    priv->rep_time = oi_getticks();
   }
 
   // Postal services
-  if(postdev) {
+  if(post) {
     queue_add(&ev);
   }
 }
@@ -301,30 +316,48 @@ void keyboard_update(oi_keysym *keysym, sint state, uchar postdev) {
  * should not be invoked from elsewhere
  */
 void keyboard_dorepeat() {
+  uchar i;
+  oi_privkey *priv;
   uint now;
   sint interval;
 
-  // Available?
-  if(keyboard_keyrep.timestamp) {
-    now = oi_getticks();
-    interval = now - keyboard_keyrep.timestamp;
+  return;
 
-    // New keypress?
-    if(keyboard_keyrep.first) {
+  // Perform repeating for all keyboards
+  for(i=0; i<OI_MAX_DEVICES; i++) {
 
-      // Wait for delay to expire
-      if(interval > keyboard_keyrep.delay) {
-	keyboard_keyrep.first = FALSE;
-	keyboard_keyrep.timestamp = now;
+    // Speed-checking of keyboard
+    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+    if(priv) {
+
+      // Available?
+      if(priv->rep_time) {
+	now = oi_getticks();
+	interval = now - priv->rep_time;
+	
+	// New keypress?
+	if(priv->rep_first) {
+	  
+	  // Wait for delay to expire
+	  if(interval > rep_delay) {
+	    priv->rep_first = FALSE;
+	    priv->rep_time = now;
+	  }
+	}
+	
+	// Really, do a repeat by sending an event
+	else if(interval > rep_interval) {
+	  priv->rep_time = now;
+	  queue_add(&priv->rep_ev);
+	}
       }
+      // End timestamp
+     
     }
+    // End valid priv
 
-    // Really, do a repeat by sending an event
-    else if(interval > keyboard_keyrep.interval) {
-      keyboard_keyrep.timestamp = now;
-      queue_add(&keyboard_keyrep.ev);
-    }
   }
+  // End for-loop
 }
 
 /* ******************************************************************** */
@@ -333,12 +366,19 @@ void keyboard_dorepeat() {
  * @ingroup IKeyboard
  * @brief Set keyboard modifier
  *
+ * @param index device index
  * @param newmod modifier mask
  *
  * Set new keyboard modifier mask.
  */
-void keyboard_setmodifier(uint newmod) {
-  modstate = newmod;
+void keyboard_setmodifier(uchar index, uint newmod) {
+  oi_privkey *priv;
+
+  // Only set modifier for known keyboard
+  priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
+  if(priv) {
+    priv->modstate = newmod;
+  }
 }
 
 /* ******************************************************************** */
@@ -347,14 +387,38 @@ void keyboard_setmodifier(uint newmod) {
  * @ingroup PKeyboard
  * @brief Get keyboard modifier state
  *
+ * @param index device index, 0 for default keyboard
  * @returns modifier mask
  *
  * Return the current keyboard modifier state, ie.
  * which modifiers (alt, shift, meta, etc.) are down.
  * See @ref PModname for modifier definitions.
  */
-uint oi_key_modstate() {
-  return modstate;
+uint oi_key_modstate(uchar index) {
+  oi_privkey *priv;
+  uchar i;
+
+  // Find first keyboard if index is zero
+  i = index;
+  if(i == 0) {
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+      if(device_priv(index, OI_PRO_KEYBOARD)) {
+	break;
+      }
+    }
+    
+    // No keyboard found
+    return OIM_NONE;
+  }  
+
+  // Get private data, gracefull value return
+  priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+  if(priv) {
+    return priv->modstate;
+  }
+  else {
+    return OIM_NONE;
+  }
 }
 
 /* ******************************************************************** */
@@ -363,8 +427,9 @@ uint oi_key_modstate() {
  * @ingroup PKeyboard
  * @brief Get key state table
  *
+ * @param index device index, 0 for default keyboard
  * @param num pointer to size of table
- * @returns pointer to keyboard state table
+ * @returns pointer to keyboard state table or NULL if invalid device
  *
  * Return the internal keyboard state table, which can be
  * parsed to determine which keys are down using the keycode
@@ -375,11 +440,36 @@ uint oi_key_modstate() {
  * NULL, it will be filled with the number of available elements
  * in the state table.
  */
-uchar *oi_key_keystate(sint *num) {
+uchar *oi_key_keystate(uchar index, sint *num) {
+  oi_privkey *priv;
+  uchar i;
+
+  // Find first keyboard if index is zero
+  i = index;
+  if(i == 0) {
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+      if(device_priv(index, OI_PRO_KEYBOARD)) {
+	break;
+      }
+    }
+    
+    // No keyboard found
+    return NULL;
+  }
+
+  // Set number of keys
   if(num != NULL) {
     *num = OIK_LAST;
   }
-  return keystate;
+
+  // Get private data, gracefull value return
+  priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+  if(priv) {
+    return priv->keystate;
+  }
+  else {
+    return NULL;
+  }
 }
 
 /* ******************************************************************** */
@@ -583,16 +673,26 @@ oi_key oi_key_getcode(char *name) {
  * Both delay and interval are "ms" (1/1000 second).
  */
 sint oi_key_repeat(sint delay, sint interval) {
+  oi_privkey *priv;
+  uchar i;
+
   // Dummy check
   if((delay < 0) || (interval < 0)) {
     return OI_ERR_PARAM;
   }
 
   // Setup
-  keyboard_keyrep.first = FALSE;
-  keyboard_keyrep.delay = delay;
-  keyboard_keyrep.interval = interval;
-  keyboard_keyrep.timestamp = 0;
+  rep_delay = delay;
+  rep_interval = interval;
+
+  // Reset all keyboard repeat states
+  for(i=1; i<OI_MAX_DEVICES; i++) {
+    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+    if(priv) {
+      priv->rep_first = FALSE;
+      priv->rep_time = 0;      
+    }
+  }
   
   return OI_ERR_OK;
 }

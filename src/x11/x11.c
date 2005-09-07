@@ -201,6 +201,8 @@ sint x11_init(oi_device *dev, char *window_id, uint flags) {
   priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
   XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);  
 
+  debug("x11_init: initialized");
+
   return OI_ERR_OK;
 }
 
@@ -387,6 +389,8 @@ sint x11_warp(oi_device *dev, sint x, sint y) {
   // Simply go to warp speed
   XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
   XSync(priv->disp, False);
+  priv->lastx = x;
+  priv->lasty = y;
 
   return OI_ERR_OK;
 }
@@ -415,13 +419,54 @@ sint x11_winsize(oi_device *dev, sint *w, sint *h) {
   
   XGetWindowAttributes(priv->disp, priv->win, &attr);
 
-  *w = attr.width;
-  *h = attr.height;
+  if(w) {
+    *w = attr.width;
+  }
+  if(h) {
+    *h = attr.height;
+  }
   priv->width = *w;
   priv->height = *h;
 
   debug("x11_winsize: width:%i height:%i", *w, *h);
   
+  return OI_ERR_OK;
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup DFoo
+ * @brief Reset internal state
+ *
+ * @param dev pointer to device interface
+ * @returns errorcode, see @ref PErrors
+ *
+ * This is a device interface function.
+ *
+ * Force full resync the driver and device state.
+ */
+sint x11_reset(oi_device *dev) {
+  x11_private *priv;
+  priv = (x11_private*)dev->private;
+  debug("x11_reset");
+  
+  // Show cursor, grab off
+  x11_grab(dev, FALSE);
+  x11_hidecursor(dev, FALSE);
+
+  // Query for modifiers
+  x11_modmasks(priv->disp, dev);
+
+  // Sync keyboard state
+  x11_keystate(dev, priv->disp, NULL);
+
+  // Window size
+  x11_winsize(dev, NULL, NULL);
+
+  // Center mouse cursor
+  x11_warp(dev, priv->height/2, priv->width/2);
+
   return OI_ERR_OK;
 }
 

@@ -100,6 +100,8 @@ void test(Display *d, Window w, uint scrn) {
   while(e) {
     oi_events_wait(&ev);
 
+    printf("--- got event\n");
+
     // Quit
     if(ev.type == OI_QUIT) {
       e = 0;
@@ -158,16 +160,16 @@ void test(Display *d, Window w, uint scrn) {
 	// Print mouse state
 	{
 	  int x,y;
-	  oi_mouse_absolute(&x, &y);
+	  oi_mouse_absolute(0, &x, &y);
 	  printf("*** mouse absolute: %i,%i\n", x, y);
-	  oi_mouse_relative(&x, &y);
+	  oi_mouse_relative(0, &x, &y);
 	  printf("*** mouse relative: %i,%i\n", x, y);
 	}
 	break;
 
       case OIK_W:
 	// Warp
-	oi_mouse_warp(10, 10);
+	oi_mouse_warp(0, 10, 10);
      	printf("*** warped\n");
 	break;
 

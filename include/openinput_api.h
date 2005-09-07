@@ -73,10 +73,10 @@ uint oi_events_getmask();
 sint oi_key_repeat(sint delay, sint interval);
 
 // Get key state table and set num to number of elements (pointer)
-uchar *oi_key_keystate(sint *num);
+uchar *oi_key_keystate(uchar index, sint *num);
 
 // Return modifier mask (modifier_mask)
-uint oi_key_modstate();
+uint oi_key_modstate(uchar index);
 
 // Get name of key (string)
 char *oi_key_getname(oi_key key);
@@ -87,13 +87,13 @@ oi_key oi_key_getcode(char *name);
 /* ******************************************************************** */
 
 // Get absolute position of mouse (button_mask)
-sint oi_mouse_absolute(sint *x, sint *y);
+sint oi_mouse_absolute(uchar index, sint *x, sint *y);
 
 // Get relative position of mouse (button_mask)
-sint oi_mouse_relative(sint *x, sint *y);
+sint oi_mouse_relative(uchar index, sint *x, sint *y);
 
 // Warp mouse cursor position (errorcode)
-sint oi_mouse_warp(sint x, sint y);
+sint oi_mouse_warp(uchar index, sint x, sint y);
 
 // Get name of mouse button (string)
 char *oi_mouse_getname(oi_mouse button);

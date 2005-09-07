@@ -1,5 +1,5 @@
 /*
- * unixsignal.h : UNIX signal handler (intr, sigsev, etc.)
+ * win32.h : Microsoft Windows input device driver
  *
  * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -21,24 +21,37 @@
 
 /* ******************************************************************** */
 
-#ifndef _OPENINPUT_UNIXSIGNAL_H_
-#define _OPENINPUT_UNIXSIGNAL_H_
+#ifndef _OPENINPUT_WIN32_H_
+#define _OPENINPUT_WIN32_H_
 
 /* ******************************************************************** */
 
 // Bootstrap
-sint unixsignal_avail();
-oi_device *unixsignal_device();
+sint win32_avail();
+oi_device *win32_device();
 
 // Device
-sint unixsignal_init(oi_device *dev, char *window_id, uint flags);
-sint unixsignal_enable(oi_device *dev, sint on);
-sint unixsignal_destroy(oi_device *dev);
-void unixsignal_process(oi_device *dev);
-sint unixsignal_reset(oi_device *dev);
+sint win32_init(oi_device *dev, char *window_id, uint flags);
+sint win32_destroy(oi_device *dev);
+void win32_process(oi_device *dev);
+sint win32_grab(oi_device *dev, sint on);
+sint win32_hidecursor(oi_device *dev, sint on);
+sint win32_warp(oi_device *dev, sint x, sint y);
+sint win32_winsize(oi_device *dev, sint *w, sint *h);
+sint win32_reset(oi_device *dev);
 
-// Handler
-void unixsignal_handler(int signum);
+/* ******************************************************************** */
+
+/**
+ * @ingroup DWin32
+ * @brief Foo driver private instance data
+ *
+ * Private data is private for the particular
+ * instance of the device driver.
+ */
+typedef struct win32_private {
+  sint x;            /**< Cursor horizontal position */
+} win32_private;
 
 /* ******************************************************************** */
 

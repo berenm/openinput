@@ -28,9 +28,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include "internal.h"
+#include "private.h"
 
 // Globals
 static oi_device *devices[OI_MAX_DEVICES];
+static oi_private *private[OI_MAX_DEVICES];
 static uchar devices_run[OI_MAX_DEVICES];
 static uint num_devices;
 static sint more_avail;
@@ -52,10 +54,11 @@ static sint more_avail;
  * device manager before devices are booted and initialized.
  */
 sint device_init() {
-  uint i;
+  uchar i;
 
   for(i=0; i<OI_MAX_DEVICES; i++) {
     devices[i] = NULL;
+    private[i] = NULL;
     devices_run[i] = FALSE;
   }
   num_devices = 0;
@@ -97,7 +100,7 @@ void device_bootstrap(char *window_id, uint flags) {
   for(i=0; bootstrap[i]; i++) {
     debug("device_bootstrap: checking bootstrap entry %u", i, bootstrap[i]->name);
     
-    // Some drivers may control more devices, allow them using the more_avail
+    // Some drivers may control more devices, allow them using the more_avail callback
     more_avail = FALSE;
     do {
       // Be pessimistic
@@ -168,6 +171,15 @@ sint device_register(oi_bootstrap *boot, char *window_id, uint flags) {
   devices[num_devices]->desc = boot->desc;
   devices[num_devices]->provides = boot->provides;
   
+  // Allocate managment data placeholder
+  private[num_devices] = (oi_private*)malloc(sizeof(oi_private));
+  memset(private[num_devices], 0, sizeof(oi_private));
+
+  // Initialize managment data
+  keyboard_manage(&(private[num_devices]->key), boot->provides);
+  mouse_manage(&(private[num_devices]->mouse), boot->provides);
+  joystick_manage(&(private[num_devices]->joy), boot->provides);
+
   // Ok, initialize the device
   if(devices[num_devices]->init(devices[num_devices], window_id, flags) != OI_ERR_OK) {
 
@@ -186,7 +198,7 @@ sint device_register(oi_bootstrap *boot, char *window_id, uint flags) {
   
   // Enable device for event pumping
   devices_run[num_devices] = TRUE;
-  debug("device_bootstrap: device '%s' (%s) added at index %i",
+  debug("device_bootstrap: device '%s' (%s) added as index %i",
 	devices[num_devices]->name, devices[num_devices]->desc, num_devices+1);
   
   // Ok, we're done
@@ -212,8 +224,22 @@ sint device_destroy(sint index) {
 
   // Dummy check
   dev = device_get(index);
-  if(dev == NULL) {
+  if(!dev) {
     return OI_ERR_INDEX;
+  }
+
+  // Free private manager data
+  if(private[index-1]) {
+    if(private[index-1]->joy) {
+      free(private[index-1]->joy);
+    }
+    if(private[index-1]->key) {
+      free(private[index-1]->key);
+    }
+    if(private[index-1]->mouse) {
+      free(private[index-1]->mouse);
+    }
+    free(private[index-1]);
   }
 
   // Kill device
@@ -263,10 +289,50 @@ void device_moreavail(sint more) {
 oi_device *device_get(sint index) {
   // Dummy check
   if((index < 1) || (index > num_devices)) {
+    // debug("device_get: no device, index %i", index);
     return NULL;
   }
   
   return devices[index-1];
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IDevice
+ * @brief Get private managment data
+ *
+ * @param index device index
+ * @param man manager-structure to return identified by the provide codes,
+ *    see @ref PProvide
+ * @returns pointer to management structure, or NULL if not found
+ *
+ * Get pointer to one of the private managment structures in
+ * a safe way. You'll have to throw in a typecast since we
+ * return a void-pointer to make the function versatile.
+ */
+void *device_priv(sint index, uint man) {
+
+  // Dummy check
+  if(!private[index-1]) {
+    // debug("device_priv: no private struct, index %i", index);    
+    return NULL;
+  }
+
+  // Return the manager data
+  switch(man) {
+  case OI_PRO_KEYBOARD:
+    return private[index-1]->key;
+
+  case OI_PRO_MOUSE:
+    return private[index-1]->mouse;
+
+  case OI_PRO_JOYSTICK:
+    return private[index-1]->joy;
+
+  default:
+    return NULL;
+  }
 }
 
 /* ******************************************************************** */
@@ -284,13 +350,13 @@ inline void device_pumpall() {
   for(i=0; i<num_devices; i++) {
     // Only pump devices if it's there and enabled!
     if(devices[i] && (devices_run[i] == TRUE)) {
+      // debug("device_pumpall: now pumping device index %i", i);
       devices[i]->process(devices[i]);
     }
   }
 }
 
 /* ******************************************************************** */
-
 
 /**
  * @ingroup IDevice
@@ -304,12 +370,11 @@ inline void device_pumpall() {
  * this is just an advanced atoi-function.
  */
 uint device_windowid(char *str, char tok) {
-  char *match;
+  char match[5];
   char *sub;
   int e;
   uint val;
   
-  match = malloc(5);
   memset(match, 0, 5);
 
   // Set token to find, and scan
@@ -321,7 +386,6 @@ uint device_windowid(char *str, char tok) {
   else {
     e = 0;
   }
-  free(match);
   
   if(e != 1) {
     debug("device_windowid: parameter not found");
@@ -344,6 +408,8 @@ uint device_windowid(char *str, char tok) {
  * Use this function to turn a device on or off. Devices that are
  * off do not generate events and do not update the state managers.
  * All devices defaults to "on".
+ *
+ * Enabling/disabling a device will force a full driver resynchronization.
  */
 oi_bool oi_device_enable(uchar index, oi_bool q) {
   uchar enable;
@@ -369,6 +435,11 @@ oi_bool oi_device_enable(uchar index, oi_bool q) {
     else {
       return OI_DISABLE;
     }
+  }
+
+  // Reset driver
+  if(devices[index-1] && devices[index-1]->reset) {
+    devices[index-1]->reset(devices[index-1]);
   }
   
   // Set new device state

@@ -1,9 +1,13 @@
 Loose ends and suggestions for improvements
 -------------------------------------------
 
+library close->reopen
+- does it work?
+- memory leaks
+
 could-be bugs
-- concurrently number of pressed keys limited to 3-5 (hw?)
-- no keyboard on fullscreen (even with grab on?)
+- number of concurrently pressed keys limited to 3-5 (hw?)
+- no keyboard focus on fullscreen (even with grab on?)
 
 ogre integration
 - write small howto (the glxwindowinterface)
@@ -11,21 +15,36 @@ ogre integration
 correct/shorten variable types
 - device-index -> uchar
 - event_type -> enum
-- x,y,width,height,deltas -> sshort
+- x,y,relx,rely,width,height,deltas -> u/sshort
 - masks -> uint
 - document the types and common variables
+- event structure members -> use correct/strict types
+- manager "event injectors" should have both "post" and
+  "index" passed along in order to find device structure
+  even if not posting
+- parameter default ordering, ie. "index" first, then "post",
+  etc.
+
+generic private data
+- all devices should have both driver and state private data
+- generic interface
+- missing for keyboard and mouse manager
 
 documentation
-- move stuff in "internal.txt" and "public.txt" into
-  the doxygen documentation
 - manpages (doxygen'ed?)
+- enable/disble some pages?
 
 threading
 - is it really needed?
 
 joystick support
-- event based
-- state manager
+- events
+- general state manager
+- per-device state managment in manager, not driver
+- full axes/button/hat/ball/throttle/rudder mapping support
+- absolute/relative axes handling
+- come up with a good code/string naming scheme (joy1_button2?)
+- extended joystick information and user-joystick-map setup
 
 other-wierd-kind-of-input-device-support ("HID")
 - tablets

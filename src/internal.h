@@ -26,6 +26,16 @@
 
 /* ******************************************************************** */
 
+// Forward definitions
+struct oi_joyconfig;
+struct oi_aclink;
+struct oi_privmouse;
+struct oi_privkey;
+struct oi_privjoy;
+
+/* ******************************************************************** */
+
+
 /**
  * @ingroup IDevstructs
  * @brief Device driver abstraction interface
@@ -34,22 +44,30 @@
  * OpenInput to access the drivers capabilities. This should be created
  * dynamically from the bootstrap create function.
  *
- * The fields with a "fcnptr"-note are function pointers.
+ * The following notations are used:
+ * - F: Function pointer, device driver entry function
+ * - D: Driver data, driver-supplied data
+ * - M: Managment data, library data used by mouse/keyboard/etc. managers
+ * - A: Automatically set during stage 2 bootstrap (before device->init)
+ * - O: Optional, set to NULL to disable usage
  */
 typedef struct oi_device {
-  sint index;                                                        /**< Device index */
-  char *name;                                                        /**< Short device name */
-  char *desc;                                                        /**< Description of device */
-  uint provides;                                                     /**< Provide-flag */
-  void *private;                                                     /**< Private data */
-  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (fcnptr) */
-  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (fcnptr) */
-  void (*process)(struct oi_device *dev);                            /**< Pump events into queue (fcnptr) */
-  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (fcnptr) */
-  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (fcnptr) */
-  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (fcnptr) */
-  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (fcnptr) */
+  sint index;                                                        /**< Device index (M,A) */
+  char *name;                                                        /**< Short device name (D,A) */
+  char *desc;                                                        /**< Description of device (D,A) */
+  uint provides;                                                     /**< Provide-flag (D,A) */
+  void *private;                                                     /**< Private driver data (D,O) */
+  struct oi_joyconfig *joyconfig;                                    /**< Joystick configuration (D,O) */
+  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (F) */
+  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (F) */
+  void (*process)(struct oi_device *dev);                            /**< Pump events into queue (F) */
+  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (F,O) */
+  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (F,O) */
+  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (F,O) */
+  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (F,O) */
+  sint (*reset)(struct oi_device *dev);                              /**< Reset internal state (F,O) */
 } oi_device;
+
 
 /**
  * @ingroup IDevstructs
@@ -85,7 +103,6 @@ sint queue_cut(ushort where);
 sint queue_add(oi_event *evt);
 sint queue_peep(oi_event *evts, sint num, uint mask, sint remove);
 
-
 /* ******************************************************************** */
 
 // Device handling
@@ -97,34 +114,80 @@ inline void device_pumpall();
 uint device_windowid(char *str, char tok);
 sint device_destroy(sint index);
 void device_moreavail(sint more);
+void *device_priv(sint index, uint man);
 
 /* ******************************************************************** */
 
 // Application state
 sint appstate_init();
-void appstate_focus(sint gain, sint state, uchar post);
+void appstate_focus(uchar index, sint gain, sint state, uchar post);
+void appstate_resize(uchar index, sint w, sint h, uchar post);
 inline sint appstate_width();
 inline sint appstate_height();
-void appstate_resize(sint w, sint h, uchar postdev);
 
 /* ******************************************************************** */
 
 // Mouse state
 sint mouse_init();
-void mouse_move(sint x, sint y, sint relative, uchar postdev);
-void mouse_button(oi_mouse btn, sint state, uchar postdev);
+void mouse_manage(struct oi_privmouse **mouse, uint provide);
+void mouse_move(uchar index, sint x, sint y, sint relative, uchar post);
+void mouse_button(uchar index, oi_mouse btn, sint state, uchar post);
 
 /* ******************************************************************** */
 
 // Keyboard state
 sint keyboard_init();
+void keyboard_manage(struct oi_privkey **key, uint provide);
 sint keyboard_fillnames(char **kn);
-void keyboard_update(oi_keysym *keysym, sint state, uchar postdev);
+void keyboard_update(uchar index, oi_keysym *keysym, sint state, uchar post);
 void keyboard_dorepeat();
-void keyboard_setmodifier(uint newmod);
+void keyboard_setmodifier(uchar index, uint newmod);
 inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
 
 /* ******************************************************************** */
+
+// Joystick state
+sint joystick_init();
+void joystick_manage(struct oi_privjoy **joy, uint provide);
+void joystick_axis(uchar index, uchar axis, sint value, uchar post);
+void joystick_button(uchar index, uchar btn, uchar state, uchar post);
+sint joystick_hatpos(sint x, sint y);
+void joystick_pump();
+
+/**
+ * @ingroup IJoystick
+ * @brief Joystick device configuration
+ *
+ * Joystick configuration structure. This struct is used
+ * for setting up axes mappings and for general information
+ * about joysticks like number of buttonts etc.
+ *
+ * The "kind[index]" number should be looked up in as oi_joyaxis
+ * to determine which type of axis it is. Counting these 
+ * axis-ids is also the correct way  to determine number of
+ * sticks/throttles/etc. There may be OI_AXIS_NONE types anywere
+ * in the array.
+ *
+ * To pair two-axes sticks, trackballs and hats, the "pair[index]"
+ * number can be used to find the twin-brother. A pair-number of
+ * zero denotes a no-pair. Not all platforms may need pairing.
+ * So far, Linux does as balls and hats are two-axis
+ */
+typedef struct oi_joyconfig {
+  char *name;                              /**< Name of joystick */
+  uchar buttons;                           /**< Number of buttons */
+  uchar kind[OI_JOY_NUM_AXES];             /**< Axis "kind" mapping */
+  uchar pair[OI_JOY_NUM_AXES];             /**< Ball/stick/hat pairing */
+} oi_joyconfig;
+
+/* ******************************************************************** */
+
+// Action state
+sint action_init();
+void action_process(oi_event *evt);
+void action_cleartable(struct oi_aclink *tab[], uint num);
+struct oi_aclink *action_tail(struct oi_aclink **head, uint alloc);
+inline void action_statepost(oi_event *evt);
 
 /**
  * @ingroup IAction
@@ -139,13 +202,6 @@ typedef struct oi_aclink {
   uchar device;                                                      /**< Device index */
   struct oi_aclink *next;                                            /**< Next pointer */
 } oi_aclink;
-
-// Action state
-sint action_init();
-void action_process(oi_event *evt);
-void action_cleartable(oi_aclink *tab[], uint num);
-oi_aclink *action_tail(oi_aclink **head, uint alloc);
-inline void action_statepost(oi_event *evt);
 
 /* ******************************************************************** */
 
@@ -167,14 +223,10 @@ void debug(char *format, ...);
 #define FALSE 0
 #endif
 
-// Misc constants
 /**
  * @ingroup ITypes
  * @defgroup IConsts Internal constants
- *
- * Various constants for the internal workings of
- * OpenInput.
- *
+ * @brief Various constants for internal library use
  * @{
  */
 #define OI_MAX_DEVICES 64                                           /**< Max number of attached devices */

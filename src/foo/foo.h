@@ -38,6 +38,7 @@ sint foo_grab(oi_device *dev, sint on);
 sint foo_hidecursor(oi_device *dev, sint on);
 sint foo_warp(oi_device *dev, sint x, sint y);
 sint foo_winsize(oi_device *dev, sint *w, sint *h);
+sint foo_reset(oi_device *dev);
 
 /* ******************************************************************** */
 
