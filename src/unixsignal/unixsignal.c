@@ -150,7 +150,7 @@ sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
 /* ******************************************************************** */
 
 /**
- * @ingroup DX11
+ * @ingroup DUnix
  * @brief Destroy the UNIX signal device driver
  *
  * @param dev pointer to device interface

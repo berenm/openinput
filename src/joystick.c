@@ -324,7 +324,7 @@ sint joystick_hatpos(sint x, sint y) {
   }
 
   // Ok, now it's just a lookup
-  return hatpos[y][x];
+  return hatpos[cy][cx];
 }
 
 /* ******************************************************************** */
