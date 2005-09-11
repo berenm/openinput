@@ -150,7 +150,7 @@ inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
 sint joystick_init();
 sint joystick_close();
 void joystick_manage(struct oi_privjoy **joy, uint provide);
-void joystick_axis(uchar index, uchar axis, sint value, uchar relative, uchar post);
+void joystick_axis(uchar index, uchar axis, sint value, oi_bool relative, uchar post);
 void joystick_button(uchar index, uchar btn, uchar state, uchar post);
 sint joystick_hatpos(sint x, sint y);
 void joystick_pump();

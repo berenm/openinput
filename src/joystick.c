@@ -143,7 +143,7 @@ void joystick_manage(oi_privjoy **joy, uint provide) {
  * @param index device index
  * @param axis axis index
  * @param value value (position/motion) of axis
- * @param relative true (1) if value is relative motion, false (0) if value is absolute position
+ * @param relative true or false, if set to OI_QUERY, set depending on axis type
  * @param post true (1) to post event, false (0) otherwise
  *
  * Send a joystick axis update into the library. This function
@@ -156,10 +156,11 @@ void joystick_manage(oi_privjoy **joy, uint provide) {
  * "joystick_pump" to combine multi-axes things (balls, sticks, etc.) into
  * a single event.
  */
-void joystick_axis(uchar index, uchar axis, sint value, uchar relative, uchar post) {
+void joystick_axis(uchar index, uchar axis, sint value, oi_bool relative, uchar post) {
   sint corval;
   oi_privjoy *priv;
   oi_joyconfig *conf;
+  uchar rel;
 
   // Get private data or bail
   priv = device_priv(index, OI_PRO_JOYSTICK);
@@ -186,8 +187,21 @@ void joystick_axis(uchar index, uchar axis, sint value, uchar relative, uchar po
     corval = value;
   }
   
+  // Relative or absolute
+  if(relative == OI_ENABLE) {
+    rel = TRUE;
+  }
+  else if(relative == OI_DISABLE) {
+    rel = FALSE;
+  }
+  // Detect relativiness
+  else {
+    // So far, only balls are relative
+    rel = (conf->kind[axis] == OIJ_BALL);
+  }
+
   // Store state for relative update
-  if(relative) {
+  if(rel) {
     priv->insaxes[axis] = corval;
     priv->relaxes[axis] += corval;
     priv->absaxes[axis] += corval;       

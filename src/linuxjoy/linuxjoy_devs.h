@@ -31,25 +31,25 @@
  * @brief Special joysticks
  *
  * Structure to contain information about non-standard joysticks.
+ *
+ * - Name
+ * - Number of buttons
+ * - Axes mapping, see @ref PJoyTypes
+ * - Axes pairing
+ *
+ * Note that the joysticks below have are probably incorrect!
  */
-struct linuxjoy_specials {
-  const char *name;                      /**< Joystick kernel name */
-  uint num_axes;                         /**< Number of axes */
-  uint num_hats;                         /**< Number of hats */
-  uint num_balls;                        /**< Number of trackballs */
-} linuxjoy_specials[] = {
-  //  Name                                               Axes, hats, balls
-  { "MadCatz Panther XL",                                3,    2,    1 },
-  { "SideWinder Precision Pro",                          4,    1,    0 },
-  { "SideWinder 3D Pro",                                 4,    1,    0 },
-  { "Microsoft SideWinder 3D Pro",                       4,    1,    0 },
-  { "Microsoft SideWinder Dual Strike USB version 1.0",  2,    1,    0 },
-  { "WingMan Interceptor",                               3,    3,    0 },
-  { "WingMan Extreme Digital 3D",                        4,    1,    0 },
-  { "Microsoft SideWinder Precision 2 Joystick",         4,    1,    0 },
-  { "Logitech Inc. WingMan Extreme Digital 3D",          4,    1,    0 },
-  { "Saitek Saitek X45",                                 6,    1,    0 }
+const oi_joyconfig linuxjoy_specs[] = {
+  { "MadCatz Panther XL",
+    8,
+    {2, 2, 2, 4, 0, 4, 0, 7},
+    {0, 0, 0, 4, 0, 6} },
+  { "SideWinder Precision Pro",
+    8,
+    {2, 2, 2, 2, 4, 0, 7},
+    {0, 0, 0, 0, 5} }
 };
+
 
 /* ******************************************************************** */
 

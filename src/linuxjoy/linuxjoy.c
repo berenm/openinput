@@ -119,13 +119,15 @@ sint linuxjoy_avail(uint flags) {
 oi_device *linuxjoy_device() {
   oi_device *dev;
   linuxjoy_private *priv;
+  oi_joyconfig *conf;
 
   debug("linuxjoy_device");
 
   // Alloc device data
   dev = (oi_device*)malloc(sizeof(oi_device));
   priv = (linuxjoy_private*)malloc(sizeof(linuxjoy_private));
-  if((dev == NULL) || (priv == NULL)) {
+  conf = (oi_joyconfig*)malloc(sizeof(oi_joyconfig));
+  if(!dev || !priv || !conf) {
     debug("linuxjoy_device: device creation failed");
     if(dev) {
       free(dev);
@@ -133,15 +135,20 @@ oi_device *linuxjoy_device() {
     if(priv) {
       free(priv);
     }
+    if(conf) {
+      free(conf);
+    }
     return NULL;
   }
 
   // Clear structures
   memset(dev, 0, sizeof(oi_device));
   memset(priv, 0, sizeof(linuxjoy_private));
+  memset(conf, 0, sizeof(oi_joyconfig));
 
   // Set members
   dev->private = priv;
+  dev->joyconfig = conf;
   dev->init = linuxjoy_init;
   dev->destroy = linuxjoy_destroy;
   dev->process = linuxjoy_process;  
@@ -173,7 +180,8 @@ oi_device *linuxjoy_device() {
 sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
   sint i;
   sint fd;
-  char *desc;
+  uchar ok;
+  char *name;
   linuxjoy_private *priv;
 
   debug("linuxjoy_init");
@@ -205,60 +213,33 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
   priv->id = i;
   
   // Get description using IOCTL (see linux/Documentation/input/joystick-api.h)
-  desc = (char*)malloc(DLJS_DESC_SIZE);
-  memset(desc, 0, DLJS_DESC_SIZE);
-  if(ioctl(fd, JSIOCGNAME(DLJS_DESC_SIZE), desc) < 0) {
-    sprintf(desc, "Unknown joystick #%u", i);
+  name = (char*)malloc(DLJS_NAME_SIZE);
+  memset(name, 0, DLJS_NAME_SIZE);
+  if(ioctl(fd, JSIOCGNAME(DLJS_NAME_SIZE), name) < 0) {
+    sprintf(name, "Unknown joystick #%u", i);
   }
-  debug("linuxjoy_init: kernel description '%s'", desc);
+  debug("linuxjoy_init: kernel description '%s'", name);
 
-  // Get number of axes using IOCTL
-  if(ioctl(fd, JSIOCGAXES, &priv->num_axes) < 0) {
-    priv->num_axes = 2;
-  }
-  debug("linuxjoy_init: axes '%u'", priv->num_axes);
-  
-  // Get number of buttons using IOCTL
-  if(ioctl(fd, JSIOCGBUTTONS, &priv->num_buttons) < 0) {
-    priv->num_buttons = 2;
-  }
-  debug("linuxjoy_init: buttons '%u'", priv->num_buttons);
-
-  /* See if joystick is run by the  "generic analog" kernel driver.
-   * If so, we can get the number of axes/buttons/hats by decoding
-   * the name. Kernel name is "Analog X-axis Y-button Z-hat".
-   */
-  if((strstr(desc, "Analog")==desc) && strstr(desc, "-hat")) {
-    int nax;
-    int nha;
-    // Try to decode number of axes and hats
-    if(sscanf(desc, "Analog %d-axis %d-button %*d-hat", &nax, &nha) == 2) {
-      priv->num_axes = nax;
-      priv->num_hats = nha;
-    }
-  }
-  
-  /* Next step is to check if the joystick is a special case we know
-   * about
-   */
-  for(i=0; i<TABLESIZE(linuxjoy_specials); i++) {
-    if(strcmp(desc, linuxjoy_specials[i].name) == 0) {
-      // Ok, it matches - transfer the settings
-      priv->num_axes = linuxjoy_specials[i].num_axes;
-      priv->num_hats = linuxjoy_specials[i].num_hats;
-      priv->num_balls = linuxjoy_specials[i].num_balls;
+  // Find joystick
+  ok = FALSE;
+  for(i=0; i<TABLESIZE(linuxjoy_specs); i++) {
+    if(strcmp(name, linuxjoy_specs[i].name) == 0) {
+      // Transfer settings
+      dev->joyconfig->name = linuxjoy_specs[i].name;
+      dev->joyconfig->buttons = linuxjoy_specs[i].buttons;
+      for(i=0; i<OI_JOY_NUM_AXES; i++) {
+	dev->joyconfig->kind[i] = linuxjoy_specs[i].kind[i];
+	dev->joyconfig->pair[i] = linuxjoy_specs[i].pair[i];
+      }
+      ok = TRUE;
+      break;
     }
   }
 
-  // Store device name and description
-  priv->name = (char*)malloc(DLJS_NAME_SIZE);
-  sprintf(priv->name, "linuxjoy%u%u",  priv->id/10, priv->id%10);
-  priv->desc = desc;
-  debug("linuxjoy_init: custom name '%s'", priv->desc);
-
-  // Make the device-structure use the custom name/description
-  dev->name = priv->name;
-  dev->desc = priv->desc;
+  // If joystick was unknown, try the default/fallback handler
+  if(!ok) {
+    linuxjoy_fallback(dev, name, fd);
+  }
 
   // Done at last!
   return OI_ERR_OK;
@@ -266,6 +247,84 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
 
 /* ******************************************************************** */
 
+/**
+ * @ingroup DLinuxjoy
+ * @brief Default fallback kernel driver
+ *
+ * @param dev pointer to device structure
+ * @param name kernel joystick name
+ * @param fd file descriptior for device
+ *
+ * If the joystick is not on the list of special joysticks,
+ * the Linux kernel uses a standard analog driver. Try that
+ * one and fetch info about number of buttons, axes and hats.
+ * If that fails, be very, very, very conservative
+ */
+void linuxjoy_fallback(oi_device *dev, char *name, int fd) {
+  uchar ok;
+  sint noaxes;
+  sint nohats;
+  sint nobtns;
+  sint i;
+  sint j;
+
+  // Conservative defaults
+  ok = FALSE;
+  noaxes = 2;
+  nobtns = 2;
+  nohats = 0;
+
+  /* See if joystick is run by the "generic analog" kernel driver.
+   * If so, we can get the number of axes/buttons/hats by decoding
+   * the name. Kernel name is "Analog X-axis Y-button Z-hat".
+   */
+  if((strstr(name, "Analog")==name) && strstr(name, "-hat")) {
+    // Try to decode number of axes and hats
+    if(sscanf(name, "Analog %d-axis %d-button %d-hat", &noaxes, &nobtns, &nohats) == 3) {
+      debug("linuxjoy_fallback: analog kernel driver axes:%u btns:%u hats:%u",
+	    noaxes, nobtns, nohats);
+      ok = TRUE;
+    }
+  }
+
+  // Non-analog driver, probe kernel for details
+  if(!ok) {
+    // Get number of axes using IOCTL
+    if(ioctl(fd, JSIOCGAXES, &noaxes) < 0) {
+      noaxes = 2;
+    }
+    debug("linuxjoy_init: axes '%u'", noaxes);
+  
+    // Get number of buttons using IOCTL
+    if(ioctl(fd, JSIOCGBUTTONS, &nobtns) < 0) {
+      nobtns = 2;
+    }
+    debug("linuxjoy_init: buttons '%u'", nobtns);
+  }
+
+  // Buttons are easy
+  dev->joyconfig->buttons = nobtns;
+  
+  // Fill axes mapping - under Linux, sticks are always first
+  j = 0;
+  for(i=0; (i<noaxes) && (j<OI_JOY_NUM_AXES); i++) {
+    // Standard stick axis, no pair
+    dev->joyconfig->kind[j] = OIJ_STICK;
+    dev->joyconfig->pair[j] = 0;
+    j++;
+  }
+
+  // Axes after sticks are hats, which are two-axis (ie. paired)
+  for(i=0; (i<nohats) && (j<OI_JOY_NUM_AXES); i++) {
+    dev->joyconfig->kind[j] = OIJ_HAT;
+    dev->joyconfig->pair[j] = j+1;
+    dev->joyconfig->kind[j+1] = OIJ_NONE;
+    dev->joyconfig->pair[j+1] = 0;
+    j += 2;
+  }
+}
+
+/* ******************************************************************** */
 /**
  * @ingroup DLinuxjoy
  * @brief Destroy the joystick device driver
@@ -298,9 +357,11 @@ sint linuxjoy_destroy(oi_device *dev) {
       if(priv->name) {
 	free(priv->name);
       }
-      if(priv->desc) {
-	free(priv->desc);
-      }
+    }
+
+    // Secondly, free the joystick configuration
+    if(dev->joyconfig) {
+      free(dev->joyconfig);
     }
 
     free(dev);
@@ -340,12 +401,14 @@ void linuxjoy_process(oi_device *dev) {
   while((i = read(priv->fd, &jse, sizeof(struct js_event))) > 0) {
     // Button
     if(jse.type & JS_EVENT_BUTTON) {
-      //FIXME inject event into joystick state manager
+      // Inject event into joystick state manager
+      joystick_button(dev->index, jse.number, jse.value, TRUE);
     }
     
     // Axis
     else if(jse.type & JS_EVENT_AXIS) {
-      //FIXME inject event into joystick state manager
+      // Inject event into joystick state manager
+      joystick_axis(dev->index, jse.number, jse.value, OI_QUERY, TRUE);
     }
   }
 

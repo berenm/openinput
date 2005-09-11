@@ -43,6 +43,7 @@ sint linuxjoy_reset(oi_device *dev);
 
 // Misc local functions
 int linuxjoy_getfd(uchar num);
+void linuxjoy_fallback(oi_device *dev, char *name, int fd);
 
 /* ******************************************************************** */
 
@@ -59,12 +60,7 @@ int linuxjoy_getfd(uchar num);
 typedef struct linuxjoy_private {
   sint fd;                       /**< File descriptor */
   uchar id;                      /**< Device index, ie. the X in /dev/input/jsX */
-  char *name;                    /**< Custom device name */
-  char *desc;                    /**< Custom devuce description */
-  uchar num_axes;                /**< Number of 2d-axes */
-  uchar num_buttons;             /**< Number of buttons */
-  uchar num_balls;               /**< Number of trackballs */
-  uchar num_hats;                /**< Number of hats */
+  char *name;                    /**< Kernel device name */
 } linuxjoy_private;
 
 /* ******************************************************************** */
@@ -74,8 +70,7 @@ typedef struct linuxjoy_private {
  * @{
  */
 #define DLJS_MAX_DEVS 32         /**< Max joystick devices */
-#define DLJS_DESC_SIZE 128       /**< Length of a joystick description (kernel) */
-#define DLJS_NAME_SIZE 16        /**< Length of a joystick name */
+#define DLJS_NAME_SIZE 128       /**< Length of a joystick description (kernel) */
 /** @} */
 
 /* ******************************************************************** */
