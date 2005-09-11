@@ -39,6 +39,9 @@ static oi_aclink *action_keyboard[OIK_LAST];
 // Lookup table for mouse
 static oi_aclink *action_mouse[OIP_LAST];
 
+// Lookup table for joystick (2-dim: buttons and axes)
+static oi_aclink *action_joy[2][OIJ_LAST];
+
 /* ******************************************************************** */
 
 /**
@@ -104,6 +107,8 @@ sint oi_action_install(oi_actionmap *map, sint num) {
   // Clean lookup tables
   action_cleartable(action_keyboard, OIK_LAST);
   action_cleartable(action_mouse, OIP_LAST);
+  action_cleartable(action_joy[OI_JOY_TAB_AXES], OIJ_LAST);
+  action_cleartable(action_joy[OI_JOY_TAB_BTNS], OIJ_LAST);
 
   // Free old state table
   if(action_count > 0) {
@@ -115,7 +120,7 @@ sint oi_action_install(oi_actionmap *map, sint num) {
   action_state = (uchar*)malloc(big);
   memset(action_state, 0, big);
 
-  /* Parse event and fill the lookup tables
+  /* Parse map and fill the lookup tables
    * The tables are arrays of linked lists. Actions can be triggered
    * by multiple devices, and can therefore belong to more tables
    *
@@ -146,7 +151,28 @@ sint oi_action_install(oi_actionmap *map, sint num) {
 	    map[i].actionid, map[i].name);
     }
 
-    //FIXME Add more lookup tables here
+    // Action is joystick
+    if((j = (sint)oi_joy_getcode(map[i].name)) != OI_JOY_NONE_CODE) {
+      
+      // An axis
+      if(OI_JOY_DECODE_TYPE((uint)j) != OIJ_GEN_BUTTON) {
+	last = action_tail(&action_joy[OI_JOY_TAB_AXES][OI_JOY_DECODE_INDEX((uint)j)], TRUE);
+	last->action = map[i].actionid;
+	last->device = map[i].device;
+
+	debug("oi_action_install: joystick axis action:\t id:%u name:'%s'",
+	      map[i].actionid, map[i].name);
+      }
+      // A button
+      else {
+	last = action_tail(&action_joy[OI_JOY_TAB_BTNS][OI_JOY_DECODE_INDEX((uint)j)], TRUE);
+	last->action = map[i].actionid;
+	last->device = map[i].device;
+
+	debug("oi_action_install: joystick button action:\t id:%u name:'%s'",
+	      map[i].actionid, map[i].name);
+      }
+    }
   }
 
 #ifdef DEBUG
@@ -168,6 +194,20 @@ sint oi_action_install(oi_actionmap *map, sint num) {
        last = last->next;
      }
    }
+   for(i=0; i<OIJ_LAST; i++) {
+     last = action_joy[OI_JOY_TAB_AXES][i];
+     while(last != NULL) {
+       debug("joyaxis \t id::%i \t dev:%i \t action:%i",
+	     i, last->device, last->action);
+       last = last->next;
+     }
+     last = action_joy[OI_JOY_TAB_BTNS][i];
+     while(last != NULL) {
+       debug("joybutton \t id::%i \t dev:%i \t action:%i",
+	     i, last->device, last->action);
+       last = last->next;
+     }
+   }
    debug("oi_action_install: end action table printout");
  }
 #endif
@@ -177,7 +217,6 @@ sint oi_action_install(oi_actionmap *map, sint num) {
 
 /* ******************************************************************** */
 
-// Validate single actionmap structure (public)
 /**
  * @ingroup PAction
  * @brief Validate a single action map
@@ -225,7 +264,9 @@ sint oi_action_validate(oi_actionmap *map) {
     if(u & OI_PRO_MOUSE) {
       i |= (oi_mouse_getcode(map->name) != OIP_UNKNOWN);
     }
-    //FIXME add more code-lookups here
+    if(u & OI_PRO_JOYSTICK) {
+      i |= (oi_joy_getcode(map->name) != OIJ_NONE);
+    }
 
     // If noone knew about the key, bail
     if(i == FALSE) {
@@ -235,7 +276,8 @@ sint oi_action_validate(oi_actionmap *map) {
 
   // Generic device - ask all if key exists
   else if((oi_key_getcode(map->name) == OIK_UNKNOWN) &&
-	  (oi_mouse_getcode(map->name) == OIP_UNKNOWN)) {
+	  (oi_mouse_getcode(map->name) == OIP_UNKNOWN) &&
+	  (oi_joy_getcode(map->name) == OIJ_NONE)) {
     return OI_ERR_NO_NAME;
   }
   
@@ -294,11 +336,6 @@ void action_process(oi_event *evt) {
 
   /**
    * @note
-   * We handle the discrete events first (ie. buttons) to allow
-   * for the simple "if {} else if {}" optimization.
-   * After that, the 'real' (axis) events are handled, as these require
-   * zero'ing the state table even if event does not match
-   *
    * The angle of attack when analysing an event is as follows
    * @li Check event type (evt->type)
    * @li Calculate table offset (keysym/button index)
@@ -311,7 +348,7 @@ void action_process(oi_event *evt) {
    * types and indexes match etc.
    */
 
-  // Discrete: Keyboard
+  // Keyboard
   if((evt->type == OI_KEYUP) ||
      (evt->type == OI_KEYDOWN)) {
 
@@ -334,10 +371,11 @@ void action_process(oi_event *evt) {
     }
   }
 
-  // Discrete: Mouse button
+  // Mouse button
   else if((evt->type == OI_MOUSEBUTTONUP) ||
 	  (evt->type == OI_MOUSEBUTTONDOWN)) {
 
+    // Check trigger
     i = evt->button.button;
     link = action_mouse[i];
     while(link != NULL) {
@@ -369,13 +407,13 @@ void action_process(oi_event *evt) {
     }
   }
 
-  // Real: Mouse move
-  if(evt->type == OI_MOUSEMOVE) {
+  // Mouse motion
+  else if(evt->type == OI_MOUSEMOVE) {
 
+    // Check trigger
     link = action_mouse[OIP_MOTION];
-
-    // Parse actions
     while(link != NULL) {
+
       // Match device
       if((link->device == 0) || (link->device == evt->move.device)) {
 	act.action.device = evt->move.device;
@@ -391,15 +429,129 @@ void action_process(oi_event *evt) {
       link = link->next;
     }
   }
-  else {
-    // Zero state table for mouse movement
-    link = action_mouse[OIP_MOTION];
+
+  // Joystick button
+  else if((evt->type == OI_JOYBUTTONUP) || 
+	  (evt->type == OI_JOYBUTTONDOWN)) {
+
+    // Check trigger
+    i = OI_JOY_DECODE_INDEX(evt->joybutton.code);
+    link = action_joy[OI_JOY_TAB_BTNS][i];
     while(link != NULL) {
-      if((link->device == 0) || (link->device == evt->move.device)) {
-	action_state[link->action] = FALSE;	
+
+      // Match device
+      if((link->device == 0) || (link->device == evt->joybutton.device)) {
+	act.action.device = evt->joybutton.device;
+	act.action.actionid = link->action;
+	act.action.state = (evt->type == OI_JOYBUTTONDOWN);
+	action_statepost(&act);
+	debug("action_process: %u (joy button)", act.action.actionid);
       }
+      
+      // Next item
       link = link->next;
-    }    
+    }
+  }
+
+  // Joystick hats
+  else if((evt->type == OI_JOYAXIS) &&
+	  (OI_JOY_DECODE_TYPE(evt->joyaxis.code) == OIJ_HAT)) {
+
+    // Check trigger
+    i = OI_JOY_DECODE_INDEX(evt->joyaxis.code);
+    link = action_joy[OI_JOY_TAB_AXES][i];
+    while(link != NULL) {
+
+      // Match device
+      if((link->device == 0) || (link->device == evt->joyaxis.device)) {
+	act.action.device = evt->joyaxis.device;
+	act.action.actionid = link->action;
+	act.action.state = TRUE;
+	act.action.data1 = evt->joyaxis.abs;
+	action_statepost(&act);
+	debug("action_process: %u (joy hat)", act.action.actionid);
+      }
+      
+      // Next item
+      link = link->next;
+    }
+  }
+
+  // Joystick axis motion
+  else if(evt->type == OI_JOYAXIS) {
+
+    // Check trigger
+    i = OI_JOY_DECODE_INDEX(evt->joyaxis.code);
+    link = action_joy[OI_JOY_TAB_AXES][i];
+    while(link != NULL) {
+
+      // Match device
+      if((link->device == 0) || (link->device == evt->joyaxis.device)) {
+	act.action.device = evt->joyaxis.device;
+	act.action.actionid = link->action;
+	act.action.state = TRUE;
+	act.action.data1 = evt->joyaxis.abs;
+	action_statepost(&act);
+	debug("action_process: %u (joy axis)", act.action.actionid);
+      }
+
+      // Next item
+      link = link->next;
+    }
+  }
+  
+  // Joystick trackball motion
+  else if(evt->type == OI_JOYBALL) {
+
+    // Check trigger
+    i = OI_JOY_DECODE_INDEX(evt->joyball.code);
+    link = action_joy[OI_JOY_TAB_AXES][i];
+    while(link != NULL) {
+
+      // Match device
+      if((link->device == 0) || (link->device == evt->joyball.device)) {
+	act.action.device = evt->joyball.device;
+	act.action.actionid = link->action;
+	act.action.state = TRUE;
+	act.action.data1 = evt->joyball.relx;
+	act.action.data2 = evt->joyball.rely;
+	action_statepost(&act);
+	debug("action_process: %u (joy ball)", act.action.actionid);
+      }
+    }
+  }
+
+}
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup IAction
+ * @brief Clear action state for 'real' events
+ *
+ * For analogue events such as mouse motion and joystick axis
+ * the state table must be reset each frame. This is what
+ * this function does. The function is called during the usual
+ * oi_events_pump() procedure.
+ */
+void action_clearreal() {
+  oi_aclink *link;
+  sint i;
+
+  // Mouse movement
+  link = action_mouse[OIP_MOTION];
+  while(link != NULL) {
+    action_state[link->action] = FALSE;	
+    link = link->next;
+  }
+
+  // Joystick axes
+  for(i=0; i<OI_JOY_NUM_AXES; i++) {
+    link = action_joy[OI_JOY_TAB_AXES][i];
+    while(link != NULL) {
+      action_state[link->action] = FALSE;
+      link = link->next;
+    }
   }
 }
 

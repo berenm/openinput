@@ -36,8 +36,7 @@ static char *joynames[2][OIJ_LAST];
 // Joystick string names
 static char *joybases[] = {
   "joy_axis%u",
-  "joy_button%u",
-  "joy_unknown"
+  "joy_button%u"
 };
 
 /* ******************************************************************** */
@@ -60,12 +59,12 @@ sint joystick_init() {
   // Fill symbolic joystick type class names
   for(i=0; i<OIJ_LAST; i++) {
     // Axes
-    sprintf(target, joybases[0], i);
-    strcpy(joynames[0][i], target);
+    sprintf(target, joybases[OI_JOY_TAB_AXES], i);
+    strcpy(joynames[OI_JOY_TAB_AXES][i], target);
 
     // Buttons
-    sprintf(target ,joybases[1], i);
-    strcpy(joynames[1][i], target);
+    sprintf(target ,joybases[OI_JOY_TAB_BTNS], i);
+    strcpy(joynames[OI_JOY_TAB_BTNS][i], target);
   }
 
   // Done
@@ -88,8 +87,8 @@ sint joystick_close() {
 
   // Free symbolic joystick type class names
   for(i=0; i<OIJ_LAST; i++) {
-    free(joynames[0][i]);
-    free(joynames[1][i]);
+    free(joynames[OI_JOY_TAB_AXES][i]);
+    free(joynames[OI_JOY_TAB_BTNS][i]);
   }
 
   // Done
@@ -571,16 +570,16 @@ char *oi_joy_getname(uint code) {
 
   // Dummy checks (return joy_unknown on error)
   if((i >= OIJ_LAST) || (t == 0) || (t >= OI_JOY_NUM_AXES)) {
-    return joybases[2];
+    return "joy_unknown";
   }
 
   // Axes (hats, sticks, rudders, etc.)
   if(t != OIJ_GEN_BUTTON) {
-    return joynames[0][i];
+    return joynames[OI_JOY_TAB_AXES][i];
   }
   // Buttons
   else {
-    return joynames[1][i];
+    return joynames[OI_JOY_TAB_BTNS][i];
   }
 }
 

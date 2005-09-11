@@ -1,5 +1,8 @@
 SVN head
 
+	* Added: action_clearreal() function to reset state of analogue
+	  actions. This is called during the beginning of oi_events_pump
+	* Added: Action manager support for joysticks
 	* Fixed: Pointer safety check in oi_mouse_absolute/relative
 	* Fixed: Doxygen group/brief/description belong-here issues
 	* Changed: Reordered function paramaters: index is always first

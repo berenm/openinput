@@ -108,6 +108,15 @@ sint oi_events_add(oi_event *evts, sint num) {
  * event queue. You should probably NOT use this function
  * as both oi_events_poll and oi_events_wait calls the
  * pump-function automatically
+ *
+ * What happens in this function is:
+ * -# Make sure time has elapsed since last call
+ * -# Lock the queue
+ * -# Clear analogue action manager states
+ * -# Pump all devices
+ * -# Handle repeating keyboard events
+ * -# Re-pump joystick manager to generate collected events
+ * -# Unlock queue
  */
 void oi_events_pump() {
   static uint last = 0;
@@ -120,15 +129,12 @@ void oi_events_pump() {
   }
   last = now;
 
+  // The very essence of OpenInput is the following lines
   queue_lock();
 
-  // Pump devices
+  action_clearreal();
   device_pumpall();
-
-  // Handle keyboard repeats
   keyboard_dorepeat();  
-
-  // Inject pending joystick events
   joystick_pump();
 
   queue_unlock();  

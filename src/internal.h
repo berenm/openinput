@@ -185,6 +185,7 @@ typedef struct oi_joyconfig {
 
 // Action state
 sint action_init();
+void action_clearreal();
 void action_process(oi_event *evt);
 void action_cleartable(struct oi_aclink *tab[], uint num);
 struct oi_aclink *action_tail(struct oi_aclink **head, uint alloc);
@@ -235,6 +236,9 @@ void debug(char *format, ...);
 #define OI_SLEEP 10                                                 /**< Ms to sleep in busy wait-loop */
 #define OI_MIN_KEYLENGTH 5                                          /**< Min symbolic event name */
 #define OI_MAX_KEYLENGTH 20                                         /**< Max symbolic event name */
+
+#define OI_JOY_TAB_AXES 0                                           /**< Lookup table offset for joystick axes */
+#define OI_JOY_TAB_BTNS 1                                           /**< Lookup table offset for joystick buttons */
 /**
  * @}
  */
