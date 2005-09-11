@@ -116,6 +116,9 @@ sint oi_close() {
     i++;
   }
 
+  // Some managers have shutdown functions
+  joystick_close();
+
   // Done
   return e;
 }

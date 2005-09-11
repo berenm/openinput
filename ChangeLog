@@ -1,15 +1,16 @@
 SVN head
 
+	* Fixed: Pointer safety check in oi_mouse_absolute/relative
 	* Fixed: Doxygen group/brief/description belong-here issues
 	* Changed: Reordered function paramaters: index is always first
 	* Added/Change: state manager data is now per-device using the new
 	  oi_private[] data structures. This change has been
 	  implemented for both keyboard, mouse and joystick managers	  
-	* Started: Joystick state manager
+	* Added: Joystick state manager
 	* Fix: renamed Doxyfile to Doxyfile.in and reenable
 	  autoconf processing for correct setting of version
 	* Fix: key/modifier name typo in foo/foo.c
-	* Started: Win32 input driver
+	* Added: Win32 input driver
 	* Change: openinput.h is now autoconf-processed to fill
 	  in version. Input file is 'openinput_h_version.in' which
 	  is renamed by configure
@@ -18,7 +19,7 @@ SVN head
 	  driver/device-state resync, used for enable/disable device.
 	* Added: oi_device_enable() to enable/disable pumping
 	* Added: oi_device_info() to get name/desc/provide
-	* Started: GNU/Linux joystick driver
+	* Added: GNU/Linux joystick driver
 	* Cleanup: Device bootstrap/init procedure overhaul
 	* Fix: Discovery-event structure device index number
 

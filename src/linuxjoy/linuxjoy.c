@@ -250,13 +250,6 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
     }
   }
 
-  /* //TODO //FIXME
-   * SDL supports user-configuration of joysticks using
-   * environment variables - there must be a nicer way!?!
-   * Also, should we prepare more stuff? Hats? Balls? Buttons?
-   * Throttles? Sticks? Axes mapping tables?
-   */
-
   // Store device name and description
   priv->name = (char*)malloc(DLJS_NAME_SIZE);
   sprintf(priv->name, "linuxjoy%u%u",  priv->id/10, priv->id%10);

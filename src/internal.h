@@ -148,8 +148,9 @@ inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
 
 // Joystick state
 sint joystick_init();
+sint joystick_close();
 void joystick_manage(struct oi_privjoy **joy, uint provide);
-void joystick_axis(uchar index, uchar axis, sint value, uchar post);
+void joystick_axis(uchar index, uchar axis, sint value, uchar relative, uchar post);
 void joystick_button(uchar index, uchar btn, uchar state, uchar post);
 sint joystick_hatpos(sint x, sint y);
 void joystick_pump();
@@ -176,7 +177,7 @@ void joystick_pump();
 typedef struct oi_joyconfig {
   char *name;                              /**< Name of joystick */
   uchar buttons;                           /**< Number of buttons */
-  uchar kind[OI_JOY_NUM_AXES];             /**< Axis "kind" mapping */
+  oi_joytype kind[OI_JOY_NUM_AXES];        /**< Axis "type" mapping */
   uchar pair[OI_JOY_NUM_AXES];             /**< Ball/stick/hat pairing */
 } oi_joyconfig;
 

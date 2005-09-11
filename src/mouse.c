@@ -256,8 +256,12 @@ sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
   uchar i;
 
   // Default coordinates
-  *x = 0;
-  *y = 0;
+  if(x) {
+    *x = 0;
+  }
+  if(y) {
+    *y = 0;
+  }
 
   // Get device index
   i = index;
@@ -319,8 +323,12 @@ sint oi_mouse_relative(uchar index, sint *x, sint *y) {
   uchar i;
 
   // Default coordinates
-  *x = 0;
-  *y = 0;
+  if(x) {
+    *x = 0;
+  }
+  if(y) {
+    *y = 0;
+  }
 
   // Get device index
   i = index;

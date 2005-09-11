@@ -36,8 +36,9 @@
  */
 typedef struct oi_privjoy {
   uint button;                                        /**< Button state mask */
-  sint relaxes[OI_JOY_NUM_AXES];                      /**< Relative axes values */
+  sint relaxes[OI_JOY_NUM_AXES];                      /**< Cummulative relative axes values */
   sint absaxes[OI_JOY_NUM_AXES];                      /**< Absolute axes values */ 
+  sint insaxes[OI_JOY_NUM_AXES];                      /**< Instantaneous relative values */
   uchar update[OI_JOY_NUM_AXES];                      /**< Post event update */
 } oi_privjoy;
 

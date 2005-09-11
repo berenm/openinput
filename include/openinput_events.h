@@ -219,14 +219,14 @@ typedef struct oi_action_event {
  * @brief Joystick axis event
  *
  * Sent when an axis (stick/throttle/whatever)
- * changes position
+ * changes position. Use the "code" to get the axis index and type.
  */
 typedef struct oi_joyaxis_event {
   uchar type;                       /**< OI_JOYAXIS */
   uchar device;                     /**< Device index */
-  uchar axis;                       /**< Axis index */
-  uchar kind;                       /**< Axis type, see @ref PJoyTypes */
-  sint value;                       /**< Axis position or relative movement */
+  uint code;                        /**< Joystick code see @ref PJoyTypes */
+  sint abs;                         /**< Absolute axis position */
+  sint rel;                         /**< Relative axis motion */
 } oi_joyaxis_event;
 
 
@@ -235,12 +235,12 @@ typedef struct oi_joyaxis_event {
  * @brief Joystick button event
  *
  * Sent when a button on a joystick
- * is pressed or released
+ * is pressed or released. Use the "code" to get the button index.
  */
 typedef struct oi_joybutton_event {
   uchar type;                       /**< OI_JOYBUTTONUP or OI_JOYBUTTONDOWN */
   uchar device;                     /**< Device index */
-  uchar button;                     /**< Button index */
+  uint code;                        /**< Joystick code see @ref PJoyTypes */
   uint state;                       /**< Buttons state bitmask */
 } oi_joybutton_event;
 
@@ -254,7 +254,7 @@ typedef struct oi_joybutton_event {
 typedef struct oi_joyball_event {
   uchar type;                       /**< OI_JOYBALL */
   uchar device;                     /**< Device index */
-  uchar ball;                       /**< Trackball index */
+  uint code;                        /**< Joystick code see @ref PJoyTypes */
   sshort relx;                      /**< Relative x movement */
   sshort rely;                      /**< Relative y movement */
 } oi_joyball_event;

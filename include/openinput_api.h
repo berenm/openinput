@@ -89,7 +89,7 @@ oi_key oi_key_getcode(char *name);
 // Get absolute position of mouse (button_mask)
 sint oi_mouse_absolute(uchar index, sint *x, sint *y);
 
-// Get relative position of mouse (button_mask)
+// Get relative motion of mouse (button_mask)
 sint oi_mouse_relative(uchar index, sint *x, sint *y);
 
 // Warp mouse cursor position (errorcode)
@@ -100,6 +100,26 @@ char *oi_mouse_getname(oi_mouse button);
 
 // Get mouse-id given name (oi_mouse)
 oi_mouse oi_mouse_getcode(char *name);
+
+/* ******************************************************************** */
+
+// Get absolute position of joystick axis (button_mask)
+uint oi_joy_absolute(uchar index, uchar axis, sint *value, sint *second);
+
+// Get relative motion of joystick axis (button_mask)
+uint oi_joy_absolute(uchar index, uchar axis, sint *value, sint *second);
+
+// Get name of joystick button/axis (string)
+char *oi_joy_getname(uint code);
+
+// Get mouse-id given name (oi_mouse)
+uint oi_joy_getcode(char *name);
+
+// Get basic information about a joystick device (errorcode)
+sint oi_joy_info(uchar index, char **name, uchar *buttons, uchar *axes);
+
+// Get advanced axes information for a joystick device (errorcode)
+sint op_joy_axessetup(uchar index, oi_joytype *type[], uchar *pair[], uchar *num);
 
 /* ******************************************************************** */
 

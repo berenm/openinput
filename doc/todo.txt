@@ -1,6 +1,10 @@
 Loose ends and suggestions for improvements
 -------------------------------------------
 
+before-release-things
+- finish linuxjoy driver
+- finish win32 driver
+
 library close->reopen
 - does it work?
 - memory leaks
@@ -17,15 +21,6 @@ documentation
 
 threading
 - is it really needed?
-
-joystick support
-- events
-- general state manager
-- per-device state managment in manager, not driver
-- full axes/button/hat/ball/throttle/rudder mapping support (?)
-- come up with a good code/string naming scheme (joy_buttonXXX?)
-- extended joystick information and user-joystick-map setup
-- absolute/relative axes handling (FIX NEEDED)
 
 other-wierd-kind-of-input-device-support ("HID")
 - tablets
