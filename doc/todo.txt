@@ -2,8 +2,8 @@ Loose ends and suggestions for improvements
 -------------------------------------------
 
 before-release-things
-- finish linuxjoy driver
 - finish win32 driver
+- fix test/keynametest
 
 library close->reopen
 - does it work?

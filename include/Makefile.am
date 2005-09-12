@@ -10,5 +10,6 @@ openinputinclude_HEADERS = \
 	openinput_events.h \
 	openinput_types.h \
 	openinput_keyboard.h \
+	openinput_joystick.h \
 	openinput_mouse.h \
 	openinput_action.h

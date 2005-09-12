@@ -6,9 +6,8 @@ pkgconfigdir = $(libdir)/pkgconfig
 dist_pkgconfig_DATA = openinput.pc
 
 dist-hook:
-	mkdir ${distdir}/doc
+	mkdir -p ${distdir}/doc/doxygen
 	cp ${srcdir}/doc/*txt ${distdir}/doc
-	mkdir ${distdir}/doc/doxygen
 	cp ${srcdir}/doc/doxygen/*dox ${distdir}/doc/doxygen/
 	cp ${srcdir}/doc/doxygen/*html ${distdir}/doc/doxygen/
 	cp ${srcdir}/doc/doxygen/*css ${distdir}/doc/doxygen/

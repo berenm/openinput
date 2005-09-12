@@ -2,7 +2,8 @@ DIST_SUBDIRS = \
 	foo \
 	x11 \
 	unixsignal \
-	linuxjoy
+	linuxjoy \
+	win32
 
 SUBDIRS = \
 	@PLATDIRS@
