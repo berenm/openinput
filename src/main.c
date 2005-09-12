@@ -26,6 +26,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "openinput.h"
 #include "internal.h"
 
@@ -157,12 +162,17 @@ inline sint oi_runstate() {
  * be used for timestamps and alike.
  */
 inline uint oi_getticks() {
-  struct timeval now;
   uint ticks;
 
   // We do this the POSIX way
+#ifdef HAVE_GETTIMEOFDAY
+  struct timeval now;
   gettimeofday(&now, NULL);
   ticks = now.tv_sec*1000 + now.tv_usec/1000;
+#elif WIN32
+  ticks = GetTickCount();
+#endif
+
   return ticks;
 }
 

@@ -380,13 +380,17 @@ uint device_windowid(char *str, char tok) {
   // Set token to find, and scan
   match[0] = tok;
   strcat(match, ":%u");
-  if((sub = index(str, tok))) {
-    e = sscanf(sub, match, &val);
+
+  // Find sub-string index (index of tok in str)
+  sub = str;
+  while(sub < str+strlen(str)) {
+    if(*sub == tok) {
+      break;
+    }
+    sub++;
   }
-  else {
-    e = 0;
-  }
-  
+
+  e = sscanf(sub, match, &val);
   if(e != 1) {
     debug("device_windowid: parameter not found");
     return 0;

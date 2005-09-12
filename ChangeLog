@@ -1,5 +1,12 @@
 SVN head
 
+	* Fix: Added Win32 calling convention and export keyword to
+	  all API functions in openinput.h / openinput_api.h
+	* Fix: oi_events_wait() uses nanosleep() instead of usleep under
+	  POSIX and Sleep() under win32.
+	* Fix: device_windowid() does not depend on "index()"
+	* Added: ARCHDET macro for configure to get nice arch name
+	  for future use (configure-time autoconfiguration)
 	* Added: action_clearreal() function to reset state of analogue
 	  actions. This is called during the beginning of oi_events_pump
 	* Added: Action manager support for joysticks

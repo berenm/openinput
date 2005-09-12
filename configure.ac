@@ -45,6 +45,7 @@ AC_SUBST(OI_VERSION)
 dnl Initialize automake
 AM_INIT_AUTOMAKE([OpenInput], $OI_VERSION)
 AC_CONFIG_HEADERS([config.h])
+ARCHDET
 
 dnl Doxygen
 DX_HTML_FEATURE(ON)
@@ -62,72 +63,77 @@ TESTPRGS="keynametest"
 
 dnl Debugging mode
 AC_ARG_ENABLE(debug,
-   AS_HELP_STRING([--enable-debug], [enable extra debugging in the binary (default=no)]),
-   [], enable_debug=no)
+    AS_HELP_STRING([--enable-debug], [enable extra debugging in the binary (default=no)]),
+    [], enable_debug=no)
 if test x$enable_debug = xyes; then
-   AC_DEFINE([DEBUG], [1], [Internal debugging]) 
+    AC_DEFINE([DEBUG], [1], [Internal debugging]) 
 fi
 
 dnl Driver "foo"
 AC_ARG_ENABLE(foo,
-   AS_HELP_STRING([--enable-foo], [enable the foo debug input system (default=no)]),
-   [], enble_foo=no)
+    AS_HELP_STRING([--enable-foo], [enable the foo debug input system (default=no)]),
+    [], enble_foo=no)
 if test x$enable_foo = xyes; then
-   AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
-   PLATDIRS="$PLATDIRS foo"
-   PLATLIBS="$PLATLIBS foo/libfoo.la"
-   TESTPRGS="$TESTPRGS footest"
+    AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
+    PLATDIRS="$PLATDIRS foo"
+    PLATLIBS="$PLATLIBS foo/libfoo.la"
+    TESTPRGS="$TESTPRGS footest"
 fi
 
 dnl Driver "x11"
 AC_ARG_ENABLE(x11,
-   AS_HELP_STRING([--enable-x11], [enable X11 window system input (default=yes)]),
-   [], enable_x11=yes)
+    AS_HELP_STRING([--enable-x11], [enable X11 window system input (default=yes)]),
+    [], enable_x11=yes)
 if test x$enable_x11 = xyes; then
-   AC_PATH_X
-   AC_PATH_XTRA
-   if test x$have_x = xyes; then
-      AC_DEFINE([ENABLE_X11], [1], [X11 window system])
-      PLATDIRS="$PLATDIRS x11"
-      PLATLIBS="$PLATLIBS x11/libx11.la"
-      TESTPRGS="$TESTPRGS x11test x11actiontest"
-   fi
+    AC_PATH_X
+    AC_PATH_XTRA
+    if test x$have_x = xyes; then
+        AC_DEFINE([ENABLE_X11], [1], [X11 window system])
+        PLATDIRS="$PLATDIRS x11"
+        PLATLIBS="$PLATLIBS x11/libx11.la"
+        TESTPRGS="$TESTPRGS x11test x11actiontest"
+    fi
 fi
 
 dnl Driver "unixsignal"
 AC_ARG_ENABLE(unixsignal,
-   AS_HELP_STRING([--enable-unixsignal], [enable UNIX signal handler (default=yes)]),
-   [], enable_unixsignal=yes)
-   dnl TODO: Check that we're on a POSIX system!
+    AS_HELP_STRING([--enable-unixsignal], [enable UNIX signal handler (default=yes)]),
+    [], enable_unixsignal=yes)
 if test x$enable_unixsignal = xyes; then
-   have_unixsignal=no
-   AC_CHECK_HEADER(signal.h, have_unixsignal=yes)
-   if test x$have_unixsignal = xyes; then
-      AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
-      PLATDIRS="$PLATDIRS unixsignal"
-      PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
-   fi
+    have_unixsignal=no
+    AC_CHECK_HEADER(signal.h, have_unixsignal=yes)
+    if test x$have_unixsignal = xyes; then
+       AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
+       PLATDIRS="$PLATDIRS unixsignal"
+       PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
+    fi
 fi
 
 dnl Driver "linuxjoy"
 AC_ARG_ENABLE(linuxjoy,
-   AS_HELP_STRING([--enable-linuxjoy], [enable GNU/Linux joystick driver (default=yes)]),
-   [], enable_linuxjoy=yes)
-   dnl TODO: Check that we're on a GNU/Linux kernel system!
+    AS_HELP_STRING([--enable-linuxjoy], [enable GNU/Linux joystick driver (default=yes)]),
+    [], enable_linuxjoy=yes)
 if test x$enable_linuxjoy = xyes; then
-   AC_DEFINE([ENABLE_LINUXJOY], [1], [GNU/Linux joystick driver])
-   PLATDIRS="$PLATDIRS linuxjoy"
-   PLATLIBS="$PLATLIBS linuxjoy/liblinuxjoy.la"
+    have_linuxjoy=no
+    AC_CHECK_HEADER([linux/joystick.h],[have_linuxjoy=yes])
+    if test x$have_linuxjoy = xyes; then
+        AC_DEFINE([ENABLE_LINUXJOY], [1], [GNU/Linux joystick driver])
+        PLATDIRS="$PLATDIRS linuxjoy"
+        PLATLIBS="$PLATLIBS linuxjoy/liblinuxjoy.la"
+    fi
 fi
 
 dnl Driver "win32"
 AC_ARG_ENABLE(win32,
-   AS_HELP_STRING([--enable-win32], [enable native Microsoft Windows input driver (default=yes)]),
-   [], enable_win32=yes)
+     AS_HELP_STRING([--enable-win32], [enable native Microsoft Windows input driver (default=yes)]),
+     [], enable_win32=yes)
 if test x$enable_win32 = xyes; then
-   AC_DEFINE([ENABLE_WIN32], [1], [Microsoft Windows input driver])
-   PLATDIRS="$PLATDIRS win32"
-   PLATLIBS="$PLATLIBS win32/libwin32.la"
+     AC_CHECK_HEADER([windows.h], [have_win32=yes])
+     if test x$have_win32 = xyes; then
+         AC_DEFINE([ENABLE_WIN32], [1], [Microsoft Windows input driver])
+         PLATDIRS="$PLATDIRS win32"
+         PLATLIBS="$PLATLIBS win32/libwin32.la"
+     fi
 fi
 
 dnl Check for libraries and header files
@@ -156,7 +162,7 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([getcwd gettimeofday isascii memchr memmove memset rmdir select strchr strcspn strdup strerror strpbrk strrchr strspn strstr])
+AC_CHECK_FUNCS([gettimeofday isascii memchr memset select strchr strcspn strdup strrchr strspn strstr nanosleep])
 
 dnl Make variables available
 AC_SUBST(TESTPRGS)

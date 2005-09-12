@@ -233,7 +233,7 @@ void debug(char *format, ...);
  */
 #define OI_MAX_DEVICES 64                                           /**< Max number of attached devices */
 #define OI_MAX_EVENTS 128                                           /**< Size of event queue */
-#define OI_SLEEP 10                                                 /**< Ms to sleep in busy wait-loop */
+#define OI_SLEEP 1                                                  /**< Ms to sleep in busy wait-loop */
 #define OI_MIN_KEYLENGTH 5                                          /**< Min symbolic event name */
 #define OI_MAX_KEYLENGTH 20                                         /**< Max symbolic event name */
 

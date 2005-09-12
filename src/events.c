@@ -25,6 +25,12 @@
 #include "config.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <time.h>
+
+#ifdef WIN32
+#include <windows.h>
+#endif
+
 #include "openinput.h"
 #include "internal.h"
 
@@ -187,7 +193,18 @@ void oi_events_wait(oi_event *evt) {
     oi_events_pump();
 
     found = queue_peep(evt, 1, ~event_mask, TRUE);
-    usleep(OI_SLEEP);
+    
+#ifdef HAVE_NANOSLEEP
+    {
+      // Use nanosleep under POSIX
+      struct timespec ts;
+      ts.tv_sec = 0;
+      ts.tv_nsec = OI_SLEEP * 1000000;
+      nanosleep(&ts, NULL);
+    }
+#elif WIN32
+    Sleep(OI_SLEEP);
+#endif
   }
 }
 
