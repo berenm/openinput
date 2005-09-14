@@ -157,7 +157,6 @@ oi_device *win32_device() {
  * an existing/pre-created window.
  */
 sint win32_init(oi_device *dev, char *window_id, uint flags) {
-  uint val;
   win32_private *priv;
 
   // Set some stupid private values
@@ -165,14 +164,14 @@ sint win32_init(oi_device *dev, char *window_id, uint flags) {
   debug("win32_init");
   
   // Get the window handle or bail
-  priv->hwnd = device_windowid(window_id, OI_I_WINID);
+  priv->hwnd = (HWND)device_windowid(window_id, OI_I_WINID);
   if(!priv->hwnd) {
     debug("win32_init: winid (w) parameter required");
     return OI_ERR_NO_DEVICE;
   }
 
   // Get current window-procedure
-  priv->old_wndproc = GetWindowLongPtr(priv->hwnd, GWLP_WNDPROC);
+  priv->old_wndproc = (WNDPROC)GetWindowLongPtr(priv->hwnd, GWLP_WNDPROC);
   if(!priv->old_wndproc) {
     debug("win32_init: invalid window handle");
     return OI_ERR_NO_DEVICE;
@@ -188,7 +187,7 @@ sint win32_init(oi_device *dev, char *window_id, uint flags) {
   win32_trackmouse();
 
   // Lastly, install our own window handle
-  SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, win32_wndproc);
+  SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, (LONG)win32_wndproc);
   debug("win32_init: initialized");
 
   return OI_ERR_OK;
@@ -219,7 +218,7 @@ sint win32_destroy(oi_device *dev) {
     if(priv) {
       // Set old window-procedure
       if(priv->old_wndproc) {
-	SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, priv->old_wndproc);
+	SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, (LONG)priv->old_wndproc);
       }
       free(dev->private);
     }
@@ -252,7 +251,7 @@ void win32_process(oi_device *dev) {
   MSG msg;
   win32_private *priv;
   
-  priv = (win32_private*)dev->priv;
+  priv = (win32_private*)dev->private;
 
   // Process
   if(!oi_runstate()) {
@@ -293,7 +292,7 @@ sint win32_grab(oi_device *dev, sint on) {
     SetCursorPos(pt.x, pt.y);
 
     // Grab mouse and focus keyboard
-    ClipCursor(priv->rect);
+    ClipCursor(&priv->rect);
     SetFocus(priv->hwnd);
 
     priv->relative |= DW32_GRAB;
@@ -368,7 +367,7 @@ sint win32_warp(oi_device *dev, sint x, sint y) {
     POINT pt;
     pt.x = x;
     pt.y = y;
-    ClientToScreen(private->hwnd, &pt);
+    ClientToScreen(priv->hwnd, &pt);
     SetCursorPos(pt.x, pt.y);
   }
 
@@ -400,10 +399,10 @@ sint win32_winsize(oi_device *dev, sint *w, sint *h) {
   
   // Safely store values
   if(w) {
-    *w = private->width;
+    *w = priv->width;
   }
   if(h) {
-    *h = private->height;
+    *h = priv->height;
   }
 
   return OI_ERR_OK;

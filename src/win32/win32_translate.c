@@ -47,7 +47,7 @@ void win32_initkeymap() {
 
   // Default to unknown key
   for(i=0; i<DW32_KEYTABLE; i++) {
-    win32_keymap[i] = OIK_UNKNONW;
+    win32_keymap[i] = OIK_UNKNOWN;
   }
 
   // Ok, here we go
@@ -182,7 +182,7 @@ void win32_keystate(oi_device *dev) {
   for(i=0; i<DW32_KEYTABLE; i++) {
 
     // Only check known keys
-    key = win32_keytable[i];
+    key = win32_keymap[i];
     if(key == OIK_UNKNOWN) {
       continue;
     }

@@ -85,13 +85,13 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
       uint mask;
 
       minimize = HIWORD(wparam);
-      gain = !i && (LOWORD(wparam) != WA_INACTIVE);
+      gain = !minimize && (LOWORD(wparam) != WA_INACTIVE);
       mask = OI_FOCUS_INPUT;
       debug("win32_wndproc: activate - minimize:%u gain:%u", minimize, gain);
 
       // Visibility changes on gain and loose+minimize
       if(gain || (!gain && minimize)) {
-	mask |= OI_FOCUS_VISIBILITY;
+	mask |= OI_FOCUS_VISIBLE;
       }
       
       // Update keyboard state on focus gain
@@ -165,7 +165,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
       x = LOWORD(lparam);
       y = HIWORD(lparam);
       if(private->relative == (DW32_GRAB|DW32_HIDE)) {
-	win32_relative_movement(x, y);
+	win32_relative_mouse(x, y);
       }
       else {
 	mouse_move(device->index, x, y, FALSE, TRUE);
@@ -210,7 +210,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     // Mouse wheel
   case WM_MOUSEWHEEL:
     {
-      oi_mouse button;
+      oi_mouse btn;
 
       debug("win32_wndproc: mouse wheel");
       if((sshort)HIWORD(wparam) > 0) {
@@ -238,7 +238,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 
     // Erase background
-  case WN_ERASEBKGND:
+  case WM_ERASEBKGND:
     {
       debug("win32_wndproc: erase background");
       oi_event ev;
