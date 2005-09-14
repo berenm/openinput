@@ -1,3 +1,5 @@
+TESTS = @TESTPRGS@
+
 EXTRA_PROGRAMS = \
 keynametest \
 footest \

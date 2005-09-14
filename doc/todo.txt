@@ -2,8 +2,8 @@ Loose ends and suggestions for improvements
 -------------------------------------------
 
 before-release-things
-- finish win32 driver
 - fix test/keynametest
+- win32 test program
 
 library close->reopen
 - does it work?
@@ -15,6 +15,7 @@ could-be bugs
 
 ogre integration
 - write small howto (the glxwindowinterface)
+- hooking into applications on x11/win32
 
 documentation
 - manpages (doxygen'ed?)

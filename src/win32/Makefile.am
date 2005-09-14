@@ -4,7 +4,9 @@ libwin32.la
 
 libwin32_la_SOURCES = \
 win32.c \
-win32.h
+win32.h \
+win32_events.c \
+win32_translate.c
 
 libwin32_la_LIBADD =
 
