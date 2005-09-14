@@ -81,18 +81,18 @@ typedef struct win32_private {
  * @ingroup DWin32
  * @{
  */
-#define VK_SEMICOLON	 0xBA    /**< Key ; */
-#define VK_EQUALS	 0xBB    /**< Key = */
-#define VK_COMMA	 0xBC    /**< Key , */
-#define VK_MINUS	 0xBD    /**< Key - */
-#define VK_PERIOD	 0xBE    /**< Key . */
-#define VK_SLASH	 0xBF    /**< Key /*/
-#define VK_GRAVE	 0xC0    /**< Key ` */
-#define VK_LBRACKET	 0xDB    /**< Key [*/
-#define VK_BACKSLASH	 0xDC    /**< Key \ */
-#define VK_RBRACKET	 0xDD    /**< Key ] */
-#define VK_APOSTROPHE	 0xDE    /**< Key '*/
-#define VK_BACKTICK	 0xDF    /**< Key ` */
+#define VK_SEMICOLON	 0xBA    /**< key_semicolon */
+#define VK_EQUALS	 0xBB    /**< key_equals */
+#define VK_COMMA	 0xBC    /**< key_comma */
+#define VK_MINUS	 0xBD    /**< key_minus */
+#define VK_PERIOD	 0xBE    /**< key_period */
+#define VK_SLASH	 0xBF    /**< key_slash */
+#define VK_GRAVE	 0xC0    /**< key_backquote */
+#define VK_LBRACKET	 0xDB    /**< key_leftbracket */
+#define VK_BACKSLASH	 0xDC    /**< key_backslash */
+#define VK_RBRACKET	 0xDD    /**< key_rightbracket */
+#define VK_APOSTROPHE	 0xDE    /**< key_quote */
+#define VK_BACKTICK	 0xDF    /**< key_backquote */
 
 #define DW32_KEYTABLE    256     /**< Keytable size */
 #define DW32_REPKEYMASK  (1<<30) /**< Repeated key bit */

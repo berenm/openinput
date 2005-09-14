@@ -59,10 +59,11 @@ void win32_setdevhook(oi_device *dev) {
  * @ingroup DWin32
  * @brief The window procedure
  *
- * @param flags initialization flags, see @ref PFlags
- * @returns true (1) if device is present, false (0) otherwise
- *
- * This is a bootstrap function.
+ * @param hwnd window handle
+ * @param msg message id
+ * @param wparam word-length paramter for message
+ * @param lparam long-length paramter for message
+ * @returns 0 if message was handled, otherwise undefined
  *
  * This is the main Windows callback procedure, which is called
  * whenever the application dispatches messages. This is where

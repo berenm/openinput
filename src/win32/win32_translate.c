@@ -257,10 +257,10 @@ void win32_keystate(oi_device *dev) {
  * @ingroup DWin32
  * @brief Translate Win32 VK keysym to OpenInput keysym
  *
- * @param dev pointer to device structure
- * @param wparam raw message wparam
- * @param lparam raw message lparam
- * @param state true (1) if pressed, false (0) otherwise
+ * @param priv pointer to private structure
+ * @param wparam raw message word param
+ * @param lparam raw message long param
+ * @param state true (1) if key pressed, false (0) otherwise
  * @param keysym OpenInput keysym to be filled
  * @returns pointer to the keysym parameter
  *
