@@ -49,7 +49,7 @@ void win32_keystate(oi_device *dev);
 inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
 				  uchar state, oi_keysym *keysym);
 LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-void win32_trackmouse(HWND hwnd);
+void win32_trackmouse();
 inline void win32_relative_mouse(uint x, uint y);
 void win32_movesize();
 
