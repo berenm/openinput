@@ -419,14 +419,17 @@ sint x11_winsize(oi_device *dev, sint *w, sint *h) {
   
   XGetWindowAttributes(priv->disp, priv->win, &attr);
 
+  // Update state
+  priv->width = attr.width;
+  priv->height = attr.height;
+
+  // Safely store data
   if(w) {
     *w = attr.width;
   }
   if(h) {
     *h = attr.height;
   }
-  priv->width = *w;
-  priv->height = *h;
 
   debug("x11_winsize: width:%i height:%i", *w, *h);
   

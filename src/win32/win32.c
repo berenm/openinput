@@ -1,5 +1,5 @@
 /*
- * win32.h : Microsoft Windows input device driver
+ * win32.c: Microsoft Windows input device driver
  *
  * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -25,6 +25,7 @@
 #include "config.h"
 #include <string.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "openinput.h"
 #include "internal.h"
 #include "bootstrap.h"
@@ -34,7 +35,10 @@
  * @ingroup Drivers
  * @defgroup DWin32 Microsoft Windows input driver
  *
- * @todo Document this!
+ * The Windows input driver handles mouse and keyboard
+ * under Microsoft Windows using the standard Windows
+ * message API, which is supported on all Win32 platforms
+ * (starting with Windows95).
  */
 
 // Bootstrap global
@@ -45,7 +49,6 @@ oi_bootstrap win32_bootstrap = {
   win32_avail,
   win32_device
 };
-
 
 /* ******************************************************************** */
  
@@ -58,12 +61,30 @@ oi_bootstrap win32_bootstrap = {
  *
  * This is a bootstrap function.
  *
- * @todo Document this!
+ * We're available if we're allowed to hook into an exisiting
+ * window and that the Windows version is running on an NT
+ * kernel. The latter is a requirement due to the mouse
+ * tracking handling which is not available on all version
+ * of Win95.
  */
 sint win32_avail(uint flags) {
+  DWORD ver;
+
   debug("win32_avail");
 
-  return FALSE;
+  // Check flags
+  if(flags & OI_FLAG_NOWINDOW) {
+    return FALSE;
+  }
+
+  // Require WinNT kernel
+  ver = GetVersion();
+  if(ver >= 0x80000000) {
+    return FALSE;
+  }
+
+  // Version is ok
+  return TRUE;
 }
 
 /* ******************************************************************** */
@@ -76,7 +97,7 @@ sint win32_avail(uint flags) {
  *
  * This is a bootstrap function.
  * 
- * @todo Document this!
+ * Create the private data structure and device interface.
  */
 oi_device *win32_device() {
   oi_device *dev;
@@ -121,7 +142,7 @@ oi_device *win32_device() {
 
 /**
  * @ingroup DWin32
- * @brief Initialize the win32 test driver
+ * @brief Initialize the win32 device driver
  *
  * @param dev pointer to device interface
  * @param window_id window hook paramaters, see @ref PWindow
@@ -130,27 +151,45 @@ oi_device *win32_device() {
  *
  * This is a device interface function.
  *
- * @todo Document this!
+ * Initialize the Windows driver. This includes setting
+ * up most of the private data block members and installing
+ * a new windows procedure, which is how we 'hook' into
+ * an existing/pre-created window.
  */
 sint win32_init(oi_device *dev, char *window_id, uint flags) {
   uint val;
   win32_private *priv;
 
-  debug("win32_init: window '%s', flags %i", window_id, flags);
-  
-  // Sniff the handles
-  val = device_windowid(window_id, OI_I_CONN);
-  debug("win32_init: conn (c) parameter %i", val);
-
-  val = device_windowid(window_id, OI_I_SCRN);
-  debug("win32_init: scrn (s) parameter %i", val);
-
-  val = device_windowid(window_id, OI_I_WINID);
-  debug("win32_init: winid (w) parameter %i", val);
-
   // Set some stupid private values
   priv = (win32_private*)dev->private;
-  priv->x = 0;
+  debug("win32_init");
+  
+  // Get the window handle or bail
+  priv->hwnd = device_windowid(window_id, OI_I_WINID);
+  if(!priv->hwnd) {
+    debug("win32_init: winid (w) parameter required");
+    return OI_ERR_NO_DEVICE;
+  }
+
+  // Get current window-procedure
+  priv->old_wndproc = GetWindowLongPtr(priv->hwnd, GWLP_WNDPROC);
+  if(!priv->old_wndproc) {
+    debug("win32_init: invalid window handle");
+    return OI_ERR_NO_DEVICE;
+  }
+
+  // Set device pointer for callback functions
+  win32_setdevhook(dev);
+
+  // Initialize keymap table, size/position state and track mouse
+  win32_initkeymap();
+  win32_keystate(dev);
+  win32_movesize();
+  win32_trackmouse();
+
+  // Lastly, install our own window handle
+  SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, win32_wndproc);
+  debug("win32_init: initialized");
 
   return OI_ERR_OK;
 }
@@ -169,14 +208,23 @@ sint win32_init(oi_device *dev, char *window_id, uint flags) {
  * @todo Document this!
  */
 sint win32_destroy(oi_device *dev) {
+  win32_private *priv;
+
   debug("win32_destroy");
   
-  // Free device
   if(dev) {
+    priv = (win32_private*)dev->private;    
+
     // Private data
-    if(dev->private) {
+    if(priv) {
+      // Set old window-procedure
+      if(priv->old_wndproc) {
+	SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, priv->old_wndproc);
+      }
       free(dev->private);
     }
+
+    // Device struct
     free(dev);
     dev = NULL;
   }
@@ -194,28 +242,26 @@ sint win32_destroy(oi_device *dev) {
  *
  * This is a device interface function.
  *
- * @todo Document this!
+ * Process any pending events in the queue. This is simply
+ * done by fetching the events, translating any keypresses
+ * etc. to something readible and finally dispatching the message
+ * the the window procedures. Windows uses the wndproc-callback
+ * interface - see the win32_wndproc function in win32_events.c
  */
 void win32_process(oi_device *dev) {
-  static oi_event ev;
-
-  debug("win32_process");
-
-  if(!oi_runstate()) {
-    debug("win32_process: oi_running false");
-    return;
-  }
-
-  // Since this is a test device, generate an event
-  ev.type = OI_KEYDOWN;
-  ev.key.device = dev->index;
-  ev.key.state = 1;
-  ev.key.keysym.scancode = 65;
-  ev.key.keysym.sym = OIK_A;
-  ev.key.keysym.mod = OIM_NONE;
+  MSG msg;
+  win32_private *priv;
   
-  // Post event
-  queue_add(&ev);
+  priv = (win32_private*)dev->priv;
+
+  // Process
+  if(!oi_runstate()) {
+
+    // Peekaboo and dispatch messages to the window-procedure
+    while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+      DispatchMessage(&msg);
+    }
+  }  
 }
 
 /* ******************************************************************** */
@@ -234,14 +280,34 @@ void win32_process(oi_device *dev) {
  */
 sint win32_grab(oi_device *dev, sint on) {
   win32_private *priv;
+  POINT pt;
+
   priv = (win32_private*)dev->private;
   debug("win32_grab");
+
+  if(on) {
+    // Center mouse
+    pt.x = priv->width/2;
+    pt.y = priv->height/2;
+    ClientToScreen(priv->hwnd, &pt);
+    SetCursorPos(pt.x, pt.y);
+
+    // Grab mouse and focus keyboard
+    ClipCursor(priv->rect);
+    SetFocus(priv->hwnd);
+
+    priv->relative |= DW32_GRAB;
+  }
+  else {
+    // Ungrab mouse
+    ClipCursor(NULL);
+    priv->relative &= ~DW32_GRAB;
+  }
 
   return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
-
 
 /**
  * @ingroup DWin32
@@ -259,6 +325,16 @@ sint win32_hidecursor(oi_device *dev, sint on) {
   win32_private *priv;
   priv = (win32_private*)dev->private;
   debug("win32_hidecursor");
+  
+  // Hide
+  if(on) {
+    ShowCursor(FALSE);
+    priv->relative |= DW32_HIDE;
+  }
+  else {
+    ShowCursor(TRUE);
+    priv->relative &= ~DW32_HIDE;
+  }
   
   return OI_ERR_OK;
 }
@@ -283,6 +359,19 @@ sint win32_warp(oi_device *dev, sint x, sint y) {
   priv = (win32_private*)dev->private;
   debug("win32_warp");
 
+  // Post event if we're in relative mode
+  if(priv->relative == (DW32_GRAB | DW32_HIDE)) {
+    mouse_move(dev->index, x, y, FALSE, FALSE);
+  }
+  else {
+    // Absolute mode, update position
+    POINT pt;
+    pt.x = x;
+    pt.y = y;
+    ClientToScreen(private->hwnd, &pt);
+    SetCursorPos(pt.x, pt.y);
+  }
+
   return OI_ERR_OK;
 }
 
@@ -305,6 +394,17 @@ sint win32_winsize(oi_device *dev, sint *w, sint *h) {
   win32_private *priv;
   priv = (win32_private*)dev->private;
   debug("win32_winsize");
+
+  // Update driver width/height/position
+  win32_movesize();
+  
+  // Safely store values
+  if(w) {
+    *w = private->width;
+  }
+  if(h) {
+    *h = private->height;
+  }
 
   return OI_ERR_OK;
 }

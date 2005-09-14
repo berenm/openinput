@@ -42,6 +42,19 @@ sint win32_reset(oi_device *dev);
 
 /* ******************************************************************** */
 
+// Misc local functions
+void win32_setdevhook(oi_device *dev);
+void win32_initkeymap();
+void win32_keystate(oi_device *dev);
+inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
+				  uchar state, oi_keysym *keysym);
+LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+void win32_trackmouse(HWND hwnd);
+inline void win32_relative_mouse(uint x, uint y);
+void win32_movesize();
+
+/* ******************************************************************** */
+
 /**
  * @ingroup DWin32
  * @brief Foo driver private instance data
@@ -50,8 +63,43 @@ sint win32_reset(oi_device *dev);
  * instance of the device driver.
  */
 typedef struct win32_private {
-  sint x;            /**< Cursor horizontal position */
+  HWND hwnd;                     /**< Window handle */
+  WNDPROC old_wndproc;           /**< Old window procedure handle */
+  RECT rect;                     /**< Window bounds for mouse clipping */
+  uchar relative;                /**< Relative mouse movement */
+  sint winx;                     /**< Window x coordinate */
+  sint winy;                     /**< Window y coordinate */
+  sint width;                    /**< Window width */
+  sint height;                   /**< Window height */
+  uchar shiftleft;               /**< Previous left shift button state */
+  uchar shiftright;              /**< Previous right shift button state */
 } win32_private;
+
+/* ******************************************************************** */
+
+/**
+ * @ingroup DWin32
+ * @{
+ */
+#define VK_SEMICOLON	 0xBA    /**< Key ; */
+#define VK_EQUALS	 0xBB    /**< Key = */
+#define VK_COMMA	 0xBC    /**< Key , */
+#define VK_MINUS	 0xBD    /**< Key - */
+#define VK_PERIOD	 0xBE    /**< Key . */
+#define VK_SLASH	 0xBF    /**< Key /*/
+#define VK_GRAVE	 0xC0    /**< Key ` */
+#define VK_LBRACKET	 0xDB    /**< Key [*/
+#define VK_BACKSLASH	 0xDC    /**< Key \ */
+#define VK_RBRACKET	 0xDD    /**< Key ] */
+#define VK_APOSTROPHE	 0xDE    /**< Key '*/
+#define VK_BACKTICK	 0xDF    /**< Key ` */
+
+#define DW32_KEYTABLE    256     /**< Keytable size */
+#define DW32_REPKEYMASK  (1<<30) /**< Repeated key bit */
+#define DW32_EXTENDMASK  (1<<24) /**< Extended key bit */
+#define DW32_GRAB        1       /**< Mouse grabbed */
+#define DW32_HIDE        2       /**< Mouse hidden */
+/** @} */
 
 /* ******************************************************************** */
 

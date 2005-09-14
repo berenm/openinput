@@ -1,5 +1,5 @@
 /*
- * x11_translate.c : Feed X11 events into the OI subsystems
+ * x11_translate.c : X11 keyboard translators
  *
  * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -50,7 +50,7 @@ void x11_initkeymap() {
   int i;
 
   // Clear odd and misc keymaps
-  for(i=0; i<(sizeof(x11_oddmap)/sizeof(x11_oddmap[0])); i++) {
+  for(i=0; i<TABLESIZE(x11_oddmap); i++) {
     x11_oddmap[i] = OIK_UNKNOWN;
     x11_miscmap[i] = OIK_UNKNOWN;
   }

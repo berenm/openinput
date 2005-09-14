@@ -321,10 +321,15 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
 
     // Window was resized or moved
   case ConfigureNotify:
-    debug("x11_dispatch: configure_notify");
-    appstate_resize(dev->index, xev.xconfigure.width, xev.xconfigure.height, TRUE);
-    ((x11_private*)dev->private)->width = xev.xconfigure.width;
-    ((x11_private*)dev->private)->height = xev.xconfigure.height;
+    debug("x11_dispatch: configure_notify"); 
+    // Only post update if anything changed
+    if((((x11_private*)dev->private)->width != xev.xconfigure.width) &&
+       (((x11_private*)dev->private)->height != xev.xconfigure.height)) {
+
+      appstate_resize(dev->index, xev.xconfigure.width, xev.xconfigure.height, TRUE);
+      ((x11_private*)dev->private)->width = xev.xconfigure.width;
+      ((x11_private*)dev->private)->height = xev.xconfigure.height;
+    }
     break;
     
 

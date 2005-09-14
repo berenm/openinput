@@ -1,5 +1,7 @@
 SVN head
 
+	* Fix: x11-winsize pointer safety by using xattr directly
+	* Fix: x11-resize only post event on real resize
 	* Fix: Added Win32 calling convention and export keyword to
 	  all API functions in openinput.h / openinput_api.h
 	* Fix: oi_events_wait() uses nanosleep() instead of usleep under
