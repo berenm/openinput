@@ -43,10 +43,11 @@ sint win32_reset(oi_device *dev);
 /* ******************************************************************** */
 
 // Misc local functions
+struct win32_private;
 void win32_setdevhook(oi_device *dev);
 void win32_initkeymap();
 void win32_keystate(oi_device *dev);
-inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
+inline oi_keysym *win32_translate(struct win32_private *priv, WPARAM wparam, LPARAM lparam,
 				  uchar state, oi_keysym *keysym);
 LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 void win32_trackmouse();

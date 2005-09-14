@@ -8,10 +8,10 @@ x11.h \
 x11_events.c \
 x11_translate.c
 
-libx11_la_LIBADD = \
-$(X_LIBS) \
--lX11 \
-$(X_LIBS_EXTRA)
+#libx11_la_LIBADD = \
+#$(X_LIBS) \
+#-lX11 \
+#$(X_LIBS_EXTRA)
 
 INCLUDES = \
 $(X_CFLAGS) \

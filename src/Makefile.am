@@ -6,19 +6,20 @@ DIST_SUBDIRS = \
 	win32
 
 SUBDIRS = \
-	@PLATDIRS@
+	@BUILD_DIRS@
 
 lib_LTLIBRARIES = \
 	libopeninput.la
 
 libopeninput_la_DEPENDENCIES = \
-	@PLATLIBS@
+	@BUILD_LIBS@
 
 libopeninput_la_LIBADD = \
-	 @PLATLIBS@
+	@BUILD_LIBS@ \
+	@SYSTEM_LIBS@
 
 libopeninput_la_LDFLAGS = \
-	-noundefined \
+	-no-undefined \
 	-release @LT_RELEASE@ \
 	-version-info @LT_CURRENT@:@LT_REVISION@:@LT_AGE@
 

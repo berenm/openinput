@@ -1,5 +1,7 @@
 SVN head
 
+	* Fix: configure/automake dir/lib/test generation cleanup and
+	  win32 link library fix
 	* Fix: x11-winsize pointer safety by using xattr directly
 	* Fix: x11-resize only post event on real resize
 	* Fix: Added Win32 calling convention and export keyword to

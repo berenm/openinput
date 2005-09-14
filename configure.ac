@@ -1,3 +1,4 @@
+
 dnl Prerequisites
 AC_PREREQ(2.59)
 
@@ -59,7 +60,10 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(OpenInput, [doc/doxygen/Doxyfile], [doc/api/])
 
 dnl Default test programs
-TESTPRGS="keynametest"
+TEST_PROGS="keynametest"
+BUILD_DIRS=""
+BUILD_LIBS=""
+SYSTEM_LIBS=""
 
 dnl Debugging mode
 AC_ARG_ENABLE(debug,
@@ -75,9 +79,9 @@ AC_ARG_ENABLE(foo,
     [], enble_foo=no)
 if test x$enable_foo = xyes; then
     AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
-    PLATDIRS="$PLATDIRS foo"
-    PLATLIBS="$PLATLIBS foo/libfoo.la"
-    TESTPRGS="$TESTPRGS footest"
+    BUILD_DIRS="$BUILD_DIRS foo"
+    BUILD_LIBS="$BUILD_LIBS foo/libfoo.la"
+    TEST_PROGS="$TEST_PROGS footest"
 fi
 
 dnl Driver "x11"
@@ -89,9 +93,10 @@ if test x$enable_x11 = xyes; then
     AC_PATH_XTRA
     if test x$have_x = xyes; then
         AC_DEFINE([ENABLE_X11], [1], [X11 window system])
-        PLATDIRS="$PLATDIRS x11"
-        PLATLIBS="$PLATLIBS x11/libx11.la"
-        TESTPRGS="$TESTPRGS x11test x11actiontest"
+        BUILD_DIRS="$BUILD_DIRS x11"
+        BUILD_LIBS="$BUILD_LIBS x11/libx11.la"
+        TEST_PROGS="$TEST_PROGS x11test x11actiontest"
+	SYSTEM_LIBS="$SYSTEM_LIBS $X_LIBS -lX11 $X_LIBS_EXTRA"
     fi
 fi
 
@@ -104,8 +109,8 @@ if test x$enable_unixsignal = xyes; then
     AC_CHECK_HEADER(signal.h, have_unixsignal=yes)
     if test x$have_unixsignal = xyes; then
        AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
-       PLATDIRS="$PLATDIRS unixsignal"
-       PLATLIBS="$PLATLIBS unixsignal/libunixsignal.la"
+       BUILD_DIRS="$BUILD_DIRS unixsignal"
+       BUILD_LIBS="$BUILD_LIBS unixsignal/libunixsignal.la"
     fi
 fi
 
@@ -118,8 +123,8 @@ if test x$enable_linuxjoy = xyes; then
     AC_CHECK_HEADER([linux/joystick.h],[have_linuxjoy=yes])
     if test x$have_linuxjoy = xyes; then
         AC_DEFINE([ENABLE_LINUXJOY], [1], [GNU/Linux joystick driver])
-        PLATDIRS="$PLATDIRS linuxjoy"
-        PLATLIBS="$PLATLIBS linuxjoy/liblinuxjoy.la"
+        BUILD_DIRS="$BUILD_DIRS linuxjoy"
+        BUILD_LIBS="$BUILD_LIBS linuxjoy/liblinuxjoy.la"
     fi
 fi
 
@@ -131,8 +136,9 @@ if test x$enable_win32 = xyes; then
      AC_CHECK_HEADER([windows.h], [have_win32=yes])
      if test x$have_win32 = xyes; then
          AC_DEFINE([ENABLE_WIN32], [1], [Microsoft Windows input driver])
-         PLATDIRS="$PLATDIRS win32"
-         PLATLIBS="$PLATLIBS win32/libwin32.la"
+         BUILD_DIRS="$BUILD_DIRS win32"
+         BUILD_LIBS="$BUILD_LIBS win32/libwin32.la"
+	 SYSTEM_LIBS="$SYSTEM_LIBS -luser32"
      fi
 fi
 
@@ -163,11 +169,11 @@ AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
 AC_CHECK_FUNCS([gettimeofday isascii memchr memset select strchr strcspn strdup strrchr strspn strstr nanosleep])
-
 dnl Make variables available
-AC_SUBST(TESTPRGS)
-AC_SUBST(PLATDIRS)
-AC_SUBST(PLATLIBS)
+AC_SUBST(TEST_PROGS)
+AC_SUBST(BUILD_DIRS)
+AC_SUBST(BUILD_LIBS)
+AC_SUBST(SYSTEM_LIBS)
 
 dnl Files to be processed
 AC_CONFIG_FILES([
@@ -189,3 +195,5 @@ AC_CONFIG_FILES([include/openinput_h_version], \
 
 dnl Finish
 AC_OUTPUT
+AC_MSG_NOTICE([the following drivers will be compiled:])
+AC_MSG_NOTICE([=>$BUILD_DIRS])

@@ -1,4 +1,4 @@
-TESTS = @TESTPRGS@
+TESTS = @TEST_PROGS@
 
 EXTRA_PROGRAMS = \
 keynametest \
@@ -6,7 +6,7 @@ footest \
 x11test \
 x11actiontest
 
-noinst_PROGRAMS = @TESTPRGS@
+noinst_PROGRAMS = @TEST_PROGS@
 
 footest_SOURCES = \
 footest.c
