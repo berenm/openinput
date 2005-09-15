@@ -78,7 +78,7 @@ install: build
 	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	
 	#Ensure buggy permission 755 is corrected
-	chmod 644 $(CURDIR)/debian/tmp/usr/lib/libopeninput.so.0.0.0
+	chmod 644 $(CURDIR)/debian/tmp/usr/lib/libopeninput-*
 
 # Build architecture-independent files here.
 binary-indep: build install
