@@ -44,15 +44,15 @@
  * used on debug-enabled builds.
  */
 void debug(char* format, ...) {
-  va_list args;
+    va_list args;
 
-  fprintf(stderr, "openinput: ");
+    fprintf(stderr, "openinput: ");
 
-  va_start(args, format);
-  vfprintf(stderr, format, args);
-  va_end(args);
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
 
-  fprintf(stderr, "\n");
+    fprintf(stderr, "\n");
 }
 #endif
 

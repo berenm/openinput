@@ -1,5 +1,7 @@
-SVN head
+Version 0.2.0 - 2005-09-15
 
+	* Fix: oi_init() should (normally) not bail if managers fail init
+	* Changed: Fully tab-is-four-spaces indented everything!
 	* Fix: configure/automake dir/lib/test generation cleanup and
 	  win32 link library fix
 	* Fix: x11-winsize pointer safety by using xattr directly

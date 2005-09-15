@@ -62,31 +62,35 @@ static sint oi_running;
  * -# you're good to go! ;-)
  */
 sint oi_init(char *window_id, uint flags) {
-  debug("oi_init");
+    sint err;
+    debug("oi_init");
 
-  // Initialize queue and device manager
-  oi_running = FALSE;
-  if((queue_init() != OI_ERR_OK) ||
-     (device_init() != OI_ERR_OK)) {
-    return OI_ERR_INTERNAL;
-  }
+    // Initialize queue and device manager
+    oi_running = FALSE;
+    if((queue_init() != OI_ERR_OK) ||
+       (device_init() != OI_ERR_OK)) {
+        return OI_ERR_INTERNAL;
+    }
 
-  // Bootstrap all devices
-  device_bootstrap(window_id, flags);
+    // Bootstrap all devices
+    device_bootstrap(window_id, flags);
+    debug("oi_init: device init finished");
 
-  // Initialize state managers
-  if((appstate_init() != OI_ERR_OK) ||
-     (mouse_init() != OI_ERR_OK) ||
-     (keyboard_init() != OI_ERR_OK) ||
-     (action_init() != OI_ERR_OK)) {
-    return OI_ERR_INTERNAL;
-  }
+    // Initialize non-critical manager
+    err = appstate_init();
 
-  // Set running flag
-  oi_running = TRUE;
-  debug("oi_init: entered run mode");
-    
-  return OI_ERR_OK;
+    // The rest _must_ succeed
+    if((mouse_init() != OI_ERR_OK) ||
+       (keyboard_init() != OI_ERR_OK) ||
+       (action_init() != OI_ERR_OK)) {
+        return OI_ERR_INTERNAL;
+    }
+
+    // Set running flag
+    oi_running = TRUE;
+    debug("oi_init: entered run mode");
+
+    return err;
 }
 
 /* ******************************************************************** */
@@ -102,30 +106,30 @@ sint oi_init(char *window_id, uint flags) {
  * closes - it not, you may experience memory leaks and the like.
  */
 sint oi_close() {
-  int i;
-  int e;
+    int i;
+    int e;
 
-  debug("oi_close");
-  oi_running = FALSE;
+    debug("oi_close");
+    oi_running = FALSE;
 
-  // Parse all devices
-  e = 0;
-  i = 1;
-  while(device_get(i) != NULL) {
+    // Parse all devices
+    e = 0;
+    i = 1;
+    while(device_get(i) != NULL) {
 
-    // Destroy it
-    if(device_destroy(i) != OI_ERR_OK) {
-      e++;
+        // Destroy it
+        if(device_destroy(i) != OI_ERR_OK) {
+            e++;
+        }
+
+        i++;
     }
 
-    i++;
-  }
+    // Some managers have shutdown functions
+    joystick_close();
 
-  // Some managers have shutdown functions
-  joystick_close();
-
-  // Done
-  return e;
+    // Done
+    return e;
 }
 
 /* ******************************************************************** */
@@ -146,7 +150,7 @@ sint oi_close() {
  * See oi_init for more information.
  */
 inline sint oi_runstate() {
-  return oi_running;
+    return oi_running;
 }
 
 /* ******************************************************************** */
@@ -162,18 +166,18 @@ inline sint oi_runstate() {
  * be used for timestamps and alike.
  */
 inline uint oi_getticks() {
-  uint ticks;
+    uint ticks;
 
-  // We do this the POSIX way
+    // We do this the POSIX way
 #ifdef HAVE_GETTIMEOFDAY
-  struct timeval now;
-  gettimeofday(&now, NULL);
-  ticks = now.tv_sec*1000 + now.tv_usec/1000;
+    struct timeval now;
+    gettimeofday(&now, NULL);
+    ticks = now.tv_sec*1000 + now.tv_usec/1000;
 #elif WIN32
-  ticks = GetTickCount();
+    ticks = GetTickCount();
 #endif
 
-  return ticks;
+    return ticks;
 }
 
 /* ******************************************************************** */

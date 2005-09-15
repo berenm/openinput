@@ -11,7 +11,7 @@
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the GNU
  * Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
@@ -46,14 +46,13 @@ static sint rep_delay;
  * Must be called on library initialization.
  */
 sint keyboard_init() {
-  // Disable key-repeat
-  oi_key_repeat(0, 0);
-
-  // Fill keyboard names
-  memset(keynames, 0, TABLESIZE(keynames));
-  keyboard_fillnames(keynames);
-
-  return OI_ERR_OK;
+    // Disable key-repeat
+    oi_key_repeat(0, 0);
+    
+    // Fill keyboard names
+    keyboard_fillnames(keynames);
+    
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -77,21 +76,21 @@ sint keyboard_init() {
  * the device provides keyboard as determined by the provide-mask
  */
 void keyboard_manage(oi_privkey **key, uint provide) {
-  // Only care about keyboard
-  if(!(provide & OI_PRO_KEYBOARD)) {
-    return;
-  }
-  
-  // Allocate
-  *key = (oi_privkey*)malloc(sizeof(oi_privkey));
-
-  // Clear state
-  memset((*key)->keystate, FALSE, TABLESIZE((*key)->keystate));
-  (*key)->modstate = OIM_NONE;
-  (*key)->rep_first = FALSE;
-  (*key)->rep_time = 0;
-
-  debug("keyboard_manage: manager data installed");
+    // Only care about keyboard
+    if(!(provide & OI_PRO_KEYBOARD)) {
+	return;
+    }
+    
+    // Allocate
+    *key = (oi_privkey*)malloc(sizeof(oi_privkey));
+    
+    // Clear state
+    memset((*key)->keystate, FALSE, TABLESIZE((*key)->keystate));
+    (*key)->modstate = OIM_NONE;
+    (*key)->rep_first = FALSE;
+    (*key)->rep_time = 0;
+    
+    debug("keyboard_manage: manager data installed");
 }
 
 /* ******************************************************************** */
@@ -112,193 +111,193 @@ void keyboard_manage(oi_privkey **key, uint provide) {
  * and ScrollLock.
  */
 void keyboard_update(uchar index, oi_keysym *keysym, sint state, uchar post) {
-  oi_privkey *priv;
-  oi_type type;
-  oi_event ev;
-  uint newmod;
-  uchar repeat;
-  
-  // Get private per-device data
-  priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
-  if(!priv) {
-    return;
-  }
-
-  // Temporary new modifier state
-  newmod = priv->modstate;
-  repeat = FALSE;
-  
-  // Check for modifier updates
-  if(state) {
-    // Add modifiers to the event
-    keysym->mod = newmod;
-
-    // Handle each modifier-key
-    switch(keysym->sym) {
-      
-    case OIK_NUMLOCK:
-      // Locks are special
-      newmod ^= OIM_NUMLOCK;
-      if(!(newmod & OIM_NUMLOCK)) {
-	state = FALSE;
-      }
-      keysym->mod = newmod;
-      break;
-      
-    case OIK_CAPSLOCK:
-      // Locks are special
-      newmod ^= OIM_CAPSLOCK;
-      if(!(newmod & OIM_CAPSLOCK)) {
-	state = FALSE;
-      }
-      keysym->mod = newmod;
-      break;
-
-    case OIK_SCROLLOCK:
-      // Locks are special
-      newmod ^= OIM_SCROLLOCK;
-      if(!(newmod & OIM_SCROLLOCK)) {
-	state = FALSE;
-      }
-      keysym->mod = newmod;
-      break;
-
-    case OIK_RSHIFT:
-      newmod |= OIM_RSHIFT;
-      break;
-
-    case OIK_LSHIFT:
-      newmod |= OIM_LSHIFT;
-      break;
-
-    case OIK_RCTRL:
-      newmod |= OIM_RCTRL;
-      break;
-
-    case OIK_LCTRL:
-      newmod |= OIM_LCTRL;
-      break;
-
-    case OIK_RALT:
-      newmod |= OIM_RALT;
-      break;
-
-    case OIK_LALT:
-      newmod |= OIM_LALT;
-      break;
-
-    case OIK_RMETA:
-      newmod |= OIM_RMETA;
-      break;
-
-    case OIK_LMETA:
-      newmod |= OIM_LMETA;
-      break;
-
-    case OIK_ALTGR:
-      newmod |= OIM_ALTGR;
-      break;
-
-    default:
-      // Not a modifier and key down - we can do repeats ;)
-      repeat = TRUE;
-      break;
+    oi_privkey *priv;
+    oi_type type;
+    oi_event ev;
+    uint newmod;
+    uchar repeat;
+    
+    // Get private per-device data
+    priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
+    if(!priv) {
+	return;
     }
-  }
-  else {
-    // Handle each modifier-key
-    switch(keysym->sym) {
-      
-    case OIK_NUMLOCK:
-    case OIK_CAPSLOCK:
-    case OIK_SCROLLOCK:
-      // Only send down-events on num and capslock
-      return;
-
-    case OIK_RSHIFT:
-      newmod &= ~OIM_RSHIFT;
-      break;
-
-    case OIK_LSHIFT:
-      newmod &= ~OIM_LSHIFT;
-      break;
-
-    case OIK_RCTRL:
-      newmod &= ~OIM_RCTRL;
-      break;
-
-    case OIK_LCTRL:
-      newmod &= ~OIM_LCTRL;
-      break;
-
-    case OIK_RALT:
-      newmod &= ~OIM_RALT;
-      break;
-
-    case OIK_LALT:
-      newmod &= ~OIM_LALT;
-      break;
-
-    case OIK_RMETA:
-      newmod &= ~OIM_RMETA;
-      break;
-
-    case OIK_LMETA:
-      newmod &= ~OIM_LMETA;
-      break;
-
-    case OIK_ALTGR:
-      newmod &= ~OIM_ALTGR;
-      break;
-
-    default:
-      break;
-    }     
-
-    // We're removing modifiers, store event mod
-    keysym->mod = newmod;
-  }
-
-  // Handle down and up type event
-  if(state) {
-    type = OI_KEYDOWN;
-  }
-  else {
-    type = OI_KEYUP;
-
-    // Disable repeat if key matches
-    if(priv->rep_time &&
-       (priv->rep_ev.key.keysym.sym == keysym->sym)) {
-      priv->rep_time = 0;
+    
+    // Temporary new modifier state
+    newmod = priv->modstate;
+    repeat = FALSE;
+    
+    // Check for modifier updates
+    if(state) {
+	// Add modifiers to the event
+	keysym->mod = newmod;
+	
+	// Handle each modifier-key
+	switch(keysym->sym) {
+	    
+	case OIK_NUMLOCK:
+	    // Locks are special
+	    newmod ^= OIM_NUMLOCK;
+	    if(!(newmod & OIM_NUMLOCK)) {
+		state = FALSE;
+	    }
+	    keysym->mod = newmod;
+	    break;
+	    
+	case OIK_CAPSLOCK:
+	    // Locks are special
+	    newmod ^= OIM_CAPSLOCK;
+	    if(!(newmod & OIM_CAPSLOCK)) {
+		state = FALSE;
+	    }
+	    keysym->mod = newmod;
+	    break;
+	    
+	case OIK_SCROLLOCK:
+	    // Locks are special
+	    newmod ^= OIM_SCROLLOCK;
+	    if(!(newmod & OIM_SCROLLOCK)) {
+		state = FALSE;
+	    }
+	    keysym->mod = newmod;
+	    break;
+	    
+	case OIK_RSHIFT:
+	    newmod |= OIM_RSHIFT;
+	    break;
+	    
+	case OIK_LSHIFT:
+	    newmod |= OIM_LSHIFT;
+	    break;
+	    
+	case OIK_RCTRL:
+	    newmod |= OIM_RCTRL;
+	    break;
+	    
+	case OIK_LCTRL:
+	    newmod |= OIM_LCTRL;
+	    break;
+	    
+	case OIK_RALT:
+	    newmod |= OIM_RALT;
+	    break;
+	    
+	case OIK_LALT:
+	    newmod |= OIM_LALT;
+	    break;
+	    
+	case OIK_RMETA:
+	    newmod |= OIM_RMETA;
+	    break;
+	    
+	case OIK_LMETA:
+	    newmod |= OIM_LMETA;
+	    break;
+	    
+	case OIK_ALTGR:
+	    newmod |= OIM_ALTGR;
+	    break;
+	    
+	default:
+	    // Not a modifier and key down - we can do repeats ;)
+	    repeat = TRUE;
+	    break;
+	}
     }
-  }
-
-  // If key state didn't change, bail out
-  if(priv->keystate[keysym->sym] == state) {
-    return;
-  }
-  
-  // Store new states
-  priv->keystate[keysym->sym] = state;
-  priv->modstate = newmod;
-
-  // Setup event
-  ev.type = type;
-  ev.key.device = index;
-  ev.key.state = state;
-  ev.key.keysym = *keysym;
-
-  // Update key-repeat if enabled and repeatable key
-  if(repeat && (rep_delay > 0)) {
-    priv->rep_ev = ev;
-    priv->rep_first = TRUE;
-    priv->rep_time = oi_getticks();
-  }
-
-  // Postal services
-  if(post) {
-    queue_add(&ev);
-  }
+    else {
+	// Handle each modifier-key
+	switch(keysym->sym) {
+	    
+	case OIK_NUMLOCK:
+	case OIK_CAPSLOCK:
+	case OIK_SCROLLOCK:
+	    // Only send down-events on num and capslock
+	    return;
+	    
+	case OIK_RSHIFT:
+	    newmod &= ~OIM_RSHIFT;
+	    break;
+	    
+	case OIK_LSHIFT:
+	    newmod &= ~OIM_LSHIFT;
+	    break;
+	    
+	case OIK_RCTRL:
+	    newmod &= ~OIM_RCTRL;
+	    break;
+	    
+	case OIK_LCTRL:
+	    newmod &= ~OIM_LCTRL;
+	    break;
+	    
+	case OIK_RALT:
+	    newmod &= ~OIM_RALT;
+	    break;
+	    
+	case OIK_LALT:
+	    newmod &= ~OIM_LALT;
+	    break;
+	    
+	case OIK_RMETA:
+	    newmod &= ~OIM_RMETA;
+	    break;
+	    
+	case OIK_LMETA:
+	    newmod &= ~OIM_LMETA;
+	    break;
+	    
+	case OIK_ALTGR:
+	    newmod &= ~OIM_ALTGR;
+	    break;
+	    
+	default:
+	    break;
+	}	  
+	
+	// We're removing modifiers, store event mod
+	keysym->mod = newmod;
+    }
+    
+    // Handle down and up type event
+    if(state) {
+	type = OI_KEYDOWN;
+    }
+    else {
+	type = OI_KEYUP;
+	
+	// Disable repeat if key matches
+	if(priv->rep_time &&
+	   (priv->rep_ev.key.keysym.sym == keysym->sym)) {
+	    priv->rep_time = 0;
+	}
+    }
+    
+    // If key state didn't change, bail out
+    if(priv->keystate[keysym->sym] == state) {
+	return;
+    }
+    
+    // Store new states
+    priv->keystate[keysym->sym] = state;
+    priv->modstate = newmod;
+    
+    // Setup event
+    ev.type = type;
+    ev.key.device = index;
+    ev.key.state = state;
+    ev.key.keysym = *keysym;
+    
+    // Update key-repeat if enabled and repeatable key
+    if(repeat && (rep_delay > 0)) {
+	priv->rep_ev = ev;
+	priv->rep_first = TRUE;
+	priv->rep_time = oi_getticks();
+    }
+    
+    // Postal services
+    if(post) {
+	queue_add(&ev);
+    }
 }
 
 /* ******************************************************************** */
@@ -316,48 +315,48 @@ void keyboard_update(uchar index, oi_keysym *keysym, sint state, uchar post) {
  * should not be invoked from elsewhere
  */
 void keyboard_dorepeat() {
-  uchar i;
-  oi_privkey *priv;
-  uint now;
-  sint interval;
-
-  return;
-
-  // Perform repeating for all keyboards
-  for(i=0; i<OI_MAX_DEVICES; i++) {
-
-    // Speed-checking of keyboard
-    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
-    if(priv) {
-
-      // Available?
-      if(priv->rep_time) {
-	now = oi_getticks();
-	interval = now - priv->rep_time;
+    uchar i;
+    oi_privkey *priv;
+    uint now;
+    sint interval;
+    
+    return;
+    
+    // Perform repeating for all keyboards
+    for(i=0; i<OI_MAX_DEVICES; i++) {
 	
-	// New keypress?
-	if(priv->rep_first) {
-	  
-	  // Wait for delay to expire
-	  if(interval > rep_delay) {
-	    priv->rep_first = FALSE;
-	    priv->rep_time = now;
-	  }
+	// Speed-checking of keyboard
+	priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+	if(priv) {
+	    
+	    // Available?
+	    if(priv->rep_time) {
+		now = oi_getticks();
+		interval = now - priv->rep_time;
+		
+		// New keypress?
+		if(priv->rep_first) {
+		    
+		    // Wait for delay to expire
+		    if(interval > rep_delay) {
+			priv->rep_first = FALSE;
+			priv->rep_time = now;
+		    }
+		}
+		
+		// Really, do a repeat by sending an event
+		else if(interval > rep_interval) {
+		    priv->rep_time = now;
+		    queue_add(&priv->rep_ev);
+		}
+	    }
+	    // End timestamp
+	    
 	}
+	// End valid priv
 	
-	// Really, do a repeat by sending an event
-	else if(interval > rep_interval) {
-	  priv->rep_time = now;
-	  queue_add(&priv->rep_ev);
-	}
-      }
-      // End timestamp
-     
     }
-    // End valid priv
-
-  }
-  // End for-loop
+    // End for-loop
 }
 
 /* ******************************************************************** */
@@ -372,13 +371,13 @@ void keyboard_dorepeat() {
  * Set new keyboard modifier mask.
  */
 void keyboard_setmodifier(uchar index, uint newmod) {
-  oi_privkey *priv;
-
-  // Only set modifier for known keyboard
-  priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
-  if(priv) {
-    priv->modstate = newmod;
-  }
+    oi_privkey *priv;
+    
+    // Only set modifier for known keyboard
+    priv = (oi_privkey*)device_priv(index, OI_PRO_KEYBOARD);
+    if(priv) {
+	priv->modstate = newmod;
+    }
 }
 
 /* ******************************************************************** */
@@ -395,30 +394,30 @@ void keyboard_setmodifier(uchar index, uint newmod) {
  * See @ref PModname for modifier definitions.
  */
 uint oi_key_modstate(uchar index) {
-  oi_privkey *priv;
-  uchar i;
-
-  // Find first keyboard if index is zero
-  i = index;
-  if(i == 0) {
-    for(i=1; i<OI_MAX_DEVICES; i++) {
-      if(device_priv(index, OI_PRO_KEYBOARD)) {
-	break;
-      }
-    }
+    oi_privkey *priv;
+    uchar i;
     
-    // No keyboard found
-    return OIM_NONE;
-  }  
-
-  // Get private data, gracefull value return
-  priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
-  if(priv) {
-    return priv->modstate;
-  }
-  else {
-    return OIM_NONE;
-  }
+    // Find first keyboard if index is zero
+    i = index;
+    if(i == 0) {
+	for(i=1; i<OI_MAX_DEVICES; i++) {
+	    if(device_priv(index, OI_PRO_KEYBOARD)) {
+		break;
+	    }
+	}
+	
+	// No keyboard found
+	return OIM_NONE;
+    }  
+    
+    // Get private data, gracefull value return
+    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+    if(priv) {
+	return priv->modstate;
+    }
+    else {
+	return OIM_NONE;
+    }
 }
 
 /* ******************************************************************** */
@@ -441,35 +440,35 @@ uint oi_key_modstate(uchar index) {
  * in the state table.
  */
 uchar *oi_key_keystate(uchar index, sint *num) {
-  oi_privkey *priv;
-  uchar i;
-
-  // Find first keyboard if index is zero
-  i = index;
-  if(i == 0) {
-    for(i=1; i<OI_MAX_DEVICES; i++) {
-      if(device_priv(index, OI_PRO_KEYBOARD)) {
-	break;
-      }
+    oi_privkey *priv;
+    uchar i;
+    
+    // Find first keyboard if index is zero
+    i = index;
+    if(i == 0) {
+	for(i=1; i<OI_MAX_DEVICES; i++) {
+	    if(device_priv(index, OI_PRO_KEYBOARD)) {
+		break;
+	    }
+	}
+	
+	// No keyboard found
+	return NULL;
     }
     
-    // No keyboard found
-    return NULL;
-  }
-
-  // Set number of keys
-  if(num != NULL) {
-    *num = OIK_LAST;
-  }
-
-  // Get private data, gracefull value return
-  priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
-  if(priv) {
-    return priv->keystate;
-  }
-  else {
-    return NULL;
-  }
+    // Set number of keys
+    if(num != NULL) {
+	*num = OIK_LAST;
+    }
+    
+    // Get private data, gracefull value return
+    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+    if(priv) {
+	return priv->keystate;
+    }
+    else {
+	return NULL;
+    }
 }
 
 /* ******************************************************************** */
@@ -486,15 +485,13 @@ uchar *oi_key_keystate(uchar index, sint *num) {
  * user-semi-friendly environments.
  */
 char *oi_key_getname(oi_key key) {
-  char *name;
-
-  name = keynames[OIK_UNKNOWN];
-
-  if(key < OIK_LAST) {
-    name = keynames[key];
-  }
-
-  return name;
+    // Simply boundary check
+    if((key > OIK_FIRST) && (key < OIK_LAST)) {
+        return keynames[key];
+    }
+    
+    // Out of bounds
+    return keynames[OIK_UNKNOWN];
 }
 
 /* ******************************************************************** */
@@ -517,14 +514,14 @@ char *oi_key_getname(oi_key key) {
  * If no name matches, the keycode returned is OIK_UNKNOWN.
  */
 inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
-  oi_key k;
-
-  for(k=first; k<=last; k++) {
-    if(strcmp(name, oi_key_getname(k)) == 0) {
-      return k;
+    oi_key k;
+    
+    for(k=first; k<=last; k++) {
+	if(strcmp(name, oi_key_getname(k)) == 0) {
+	    return k;
+	}
     }
-  }
-  return OIK_UNKNOWN;
+    return OIK_UNKNOWN;
 }
 
 /* ******************************************************************** */
@@ -549,103 +546,103 @@ inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
  * OIK_UNKNOWN is returned.
  */
 oi_key oi_key_getcode(char *name) {
-  int i;
-  oi_key k;
-
-  // Dummies
-  if(!name) {
-    return OIK_UNKNOWN;
-  }
-  if((strlen(name) < OI_MIN_KEYLENGTH) ||
-     (strlen(name) > OI_MAX_KEYLENGTH)) {
-    return OIK_UNKNOWN;
-  }
-
-  // Check prefix
-  if(strncmp(name, "key_", 4) != 0) {
-    return OIK_UNKNOWN;
-  }
-
-  // Catch this one now
-  if(strcmp(name, "key_unknown") == 0) {
-    return OIK_UNKNOWN;
-  }
-
-  // Just to be sure...
-  k = OIK_UNKNOWN;
-
-  // Letter or digit
-  if(strlen(name) == 5) {
-    if((name[4] >= 'a') && (name[4] <= 'z')) {
-      return OIK_A + (name[4]-'a');
+    int i;
+    oi_key k;
+    
+    // Dummies
+    if(!name) {
+	return OIK_UNKNOWN;
     }
-    if((name[4] >= '0') && (name[4] <= '9')) {
-      return OIK_0 + (name[4]-'0');
-    }
-
-    return OIK_UNKNOWN;
-  }
-
-  // Function keys (only these and 'f' starts with 'f')
-  if(name[4] == 'f') {
-    i = atoi(name+5);
-    if((i>=1) && (i<=15)) {
-      return OIK_F1 + i - 1;
+    if((strlen(name) < OI_MIN_KEYLENGTH) ||
+       (strlen(name) > OI_MAX_KEYLENGTH)) {
+	return OIK_UNKNOWN;
     }
     
-    return OIK_UNKNOWN;
-  }
-
-  // International
-  if(strncmp(name, "key_int", 7) == 0) {
-    i = atoi(name+7);
-    if((i>=0) && (i<=95)) {
-      return OIK_INT_0 + i;
+    // Check prefix
+    if(strncmp(name, "key_", 4) != 0) {
+	return OIK_UNKNOWN;
     }
     
-    return OIK_UNKNOWN;
-  }
-
-  // Numeric keypad non-numbers (num_period -> num_equals)
-  if((k = keyboard_scangetkey(name, OIK_N_PERIOD, OIK_N_EQUALS)) != OIK_UNKNOWN) {
-    return k;
-  }
-
-  // Numeric keypad numbers
-  if(strncmp(name, "key_num_", 8) == 0) {
-    i = atoi(name+8);
-    if((i>=0) && (i<=9)) {
-      return OIK_N_0 + i;
+    // Catch this one now
+    if(strcmp(name, "key_unknown") == 0) {
+	return OIK_UNKNOWN;
     }
-  }
-
-  // Backspace -> Slash
-  if((k = keyboard_scangetkey(name, OIK_BACKSPACE, OIK_SLASH)) != OIK_UNKNOWN) {
-    return k;
-  }
-
-  // Colon -> Backquote
-  if((k = keyboard_scangetkey(name, OIK_COLON, OIK_BACKQUOTE)) != OIK_UNKNOWN) {
-    return k;
-  }
-
-  // Delete
-  if(strcmp(name, "key_delete") == 0) {
-    return OIK_DELETE;
-  }
-
-  // Up -> pagedown
-  if((k = keyboard_scangetkey(name, OIK_UP, OIK_PAGEDOWN)) != OIK_UNKNOWN) {
-    return k;
-  }
-
-  // Numlock -> undo
-  if((k = keyboard_scangetkey(name, OIK_NUMLOCK, OIK_UNDO)) != OIK_UNKNOWN) {
-    return k;
-  }
-
-  // No more keys left
-  return OIK_UNKNOWN;
+    
+    // Just to be sure...
+    k = OIK_UNKNOWN;
+    
+    // Letter or digit
+    if(strlen(name) == 5) {
+	if((name[4] >= 'a') && (name[4] <= 'z')) {
+	    return OIK_A + (name[4]-'a');
+	}
+	if((name[4] >= '0') && (name[4] <= '9')) {
+	    return OIK_0 + (name[4]-'0');
+	}
+	
+	return OIK_UNKNOWN;
+    }
+    
+    // Function keys (only these and 'f' starts with 'f')
+    if(name[4] == 'f') {
+	i = atoi(name+5);
+	if((i>=1) && (i<=15)) {
+	    return OIK_F1 + i - 1;
+	}
+	
+	return OIK_UNKNOWN;
+    }
+    
+    // International
+    if(strncmp(name, "key_int", 7) == 0) {
+	i = atoi(name+7);
+	if((i>=0) && (i<=95)) {
+	    return OIK_INT_0 + i;
+	}
+	
+	return OIK_UNKNOWN;
+    }
+    
+    // Numeric keypad non-numbers (num_period -> num_equals)
+    if((k = keyboard_scangetkey(name, OIK_N_PERIOD, OIK_N_EQUALS)) != OIK_UNKNOWN) {
+	return k;
+    }
+    
+    // Numeric keypad numbers
+    if(strncmp(name, "key_num_", 8) == 0) {
+	i = atoi(name+8);
+	if((i>=0) && (i<=9)) {
+	    return OIK_N_0 + i;
+	}
+    }
+    
+    // Backspace -> Slash
+    if((k = keyboard_scangetkey(name, OIK_BACKSPACE, OIK_SLASH)) != OIK_UNKNOWN) {
+	return k;
+    }
+    
+    // Colon -> Backquote
+    if((k = keyboard_scangetkey(name, OIK_COLON, OIK_BACKQUOTE)) != OIK_UNKNOWN) {
+	return k;
+    }
+    
+    // Delete
+    if(strcmp(name, "key_delete") == 0) {
+	return OIK_DELETE;
+    }
+    
+    // Up -> pagedown
+    if((k = keyboard_scangetkey(name, OIK_UP, OIK_PAGEDOWN)) != OIK_UNKNOWN) {
+	return k;
+    }
+    
+    // Numlock -> undo
+    if((k = keyboard_scangetkey(name, OIK_NUMLOCK, OIK_UNDO)) != OIK_UNKNOWN) {
+	return k;
+    }
+    
+    // No more keys left
+    return OIK_UNKNOWN;
 }
 
 /* ******************************************************************** */
@@ -673,28 +670,28 @@ oi_key oi_key_getcode(char *name) {
  * Both delay and interval are "ms" (1/1000 second).
  */
 sint oi_key_repeat(sint delay, sint interval) {
-  oi_privkey *priv;
-  uchar i;
-
-  // Dummy check
-  if((delay < 0) || (interval < 0)) {
-    return OI_ERR_PARAM;
-  }
-
-  // Setup
-  rep_delay = delay;
-  rep_interval = interval;
-
-  // Reset all keyboard repeat states
-  for(i=1; i<OI_MAX_DEVICES; i++) {
-    priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
-    if(priv) {
-      priv->rep_first = FALSE;
-      priv->rep_time = 0;      
+    oi_privkey *priv;
+    uchar i;
+    
+    // Dummy check
+    if((delay < 0) || (interval < 0)) {
+	return OI_ERR_PARAM;
     }
-  }
-  
-  return OI_ERR_OK;
+    
+    // Setup
+    rep_delay = delay;
+    rep_interval = interval;
+    
+    // Reset all keyboard repeat states
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+	priv = (oi_privkey*)device_priv(i, OI_PRO_KEYBOARD);
+	if(priv) {
+	    priv->rep_first = FALSE;
+	    priv->rep_time = 0;      
+	}
+    }
+    
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

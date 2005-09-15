@@ -31,18 +31,16 @@
 /* ******************************************************************** */
 
 // Default initialization of all available devices (num_failed)
-extern DECLSPEC sint OICALL
-oi_init(char* window_id, uint flags);
+extern DECLSPEC sint OICALL oi_init(char* window_id, uint flags);
 
 // Shutdown all available devices (num_failed)
-extern DECLSPEC sint
-oi_close();
+extern DECLSPEC sint OICALL oi_close();
 
 /* ******************************************************************** */
 
 // Get device information (errorcode)
 extern DECLSPEC sint OICALL oi_device_info(uchar index, char **name,
-					   char **desc, uint *provides);
+                                           char **desc, uint *provides);
 
 // Enable/disable device event pumping (state)
 extern DECLSPEC oi_bool OICALL oi_device_enable(uchar index, oi_bool q);
@@ -108,11 +106,11 @@ extern DECLSPEC oi_mouse OICALL oi_mouse_getcode(char *name);
 
 // Get absolute position of joystick axis (button_mask)
 extern DECLSPEC uint OICALL oi_joy_absolute(uchar index, uchar axis,
-					    sint *value, sint *second);
+                                            sint *value, sint *second);
 
 // Get relative motion of joystick axis (button_mask)
 extern DECLSPEC uint OICALL oi_joy_absolute(uchar index, uchar axis,
-					    sint *value, sint *second);
+                                            sint *value, sint *second);
 
 // Get name of joystick button/axis (string)
 extern DECLSPEC char OICALL *oi_joy_getname(uint code);
@@ -122,12 +120,12 @@ extern DECLSPEC uint OICALL oi_joy_getcode(char *name);
 
 // Get basic information about a joystick device (errorcode)
 extern DECLSPEC sint OICALL oi_joy_info(uchar index, char **name,
-					uchar *buttons, uchar *axes);
+                                        uchar *buttons, uchar *axes);
 
 // Get advanced axes information for a joystick device (errorcode)
 extern DECLSPEC sint OICALL op_joy_axessetup(uchar index,
-					     oi_joytype *type[],
-					     uchar *pair[], uchar *num);
+                                             oi_joytype *type[],
+                                             uchar *pair[], uchar *num);
 
 /* ******************************************************************** */
 

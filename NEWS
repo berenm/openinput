@@ -12,5 +12,9 @@ day.month.year nick -- Version x.y.z
 
 ------------------------------------------------------------------------
 
+15.09.2005 makob -- Version 0.2.0
+    * Drivers: X11, posix signal, Linux joystick and Win32
+    * Keyboard, mouse and joystick managers
+
 17.06.2005 makob -- Version 0.0.1
     * Project startup

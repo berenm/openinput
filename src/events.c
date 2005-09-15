@@ -52,13 +52,13 @@ static uint event_mask = 0;
  * events from the queue
  */
 sint oi_events_peep(oi_event *evts, sint num) {
-  sint p;
+    sint p;
 
-  queue_lock();
-  p = queue_peep(evts, num, ~event_mask, FALSE);
-  queue_unlock();
+    queue_lock();
+    p = queue_peep(evts, num, ~event_mask, FALSE);
+    queue_unlock();
 
-  return p;
+    return p;
 }
 
 /* ******************************************************************** */
@@ -74,34 +74,34 @@ sint oi_events_peep(oi_event *evts, sint num) {
  * Inject events to the event queue
  */
 sint oi_events_add(oi_event *evts, sint num) {
-  int i;
-  int j;
-  int tot;
+    int i;
+    int j;
+    int tot;
 
-  queue_lock();
+    queue_lock();
 
-  // All add
-  tot = 0;
-  for(i=0; i<num; i++) {
+    // All add
+    tot = 0;
+    for(i=0; i<num; i++) {
 
-    // If filter mask does not match, look at next
-    if(!(OI_EVENT_MASK(evts[i].type) & ~event_mask)) {
-      continue;
+        // If filter mask does not match, look at next
+        if(!(OI_EVENT_MASK(evts[i].type) & ~event_mask)) {
+            continue;
+        }
+
+        // Add it
+        j = queue_add(&(evts[i]));
+        tot += j;
+
+        // As long as we don't overflow
+        if(j <= 0) {
+            break;
+        }
     }
 
-    // Add it
-    j = queue_add(&(evts[i]));
-    tot += j;
+    queue_unlock();
 
-    // As long as we don't overflow
-    if(j <= 0) {
-      break;
-    }
-  }
-
-  queue_unlock();
-
-  return tot;
+    return tot;
 }
 
 /* ******************************************************************** */
@@ -125,25 +125,25 @@ sint oi_events_add(oi_event *evts, sint num) {
  * -# Unlock queue
  */
 void oi_events_pump() {
-  static uint last = 0;
-  uint now;
+    static uint last = 0;
+    uint now;
 
-  // Bail out if 'no time' has passed
-  now = oi_getticks();
-  if(now == last) {
-    return;
-  }
-  last = now;
+    // Bail out if 'no time' has passed
+    now = oi_getticks();
+    if(now == last) {
+        return;
+    }
+    last = now;
 
-  // The very essence of OpenInput is the following lines
-  queue_lock();
+    // The very essence of OpenInput is the following lines
+    queue_lock();
 
-  action_clearreal();
-  device_pumpall();
-  keyboard_dorepeat();  
-  joystick_pump();
+    action_clearreal();
+    device_pumpall();
+    keyboard_dorepeat();
+    joystick_pump();
 
-  queue_unlock();  
+    queue_unlock();
 }
 
 /* ******************************************************************** */
@@ -161,14 +161,14 @@ void oi_events_pump() {
  * events
  */
 sint oi_events_poll(oi_event *evt) {
-  int found;
+    int found;
 
-  oi_events_pump();
+    oi_events_pump();
 
-  // Peep for 1 event with removal
-  found = queue_peep(evt, 1, ~event_mask, TRUE);
+    // Peep for 1 event with removal
+    found = queue_peep(evt, 1, ~event_mask, TRUE);
 
-  return found;
+    return found;
 }
 
 /* ******************************************************************** */
@@ -184,28 +184,28 @@ sint oi_events_poll(oi_event *evt) {
  * regular application (ie. not a game with high FPS requirements)
  */
 void oi_events_wait(oi_event *evt) {
-  int found;
+    int found;
 
-  // Wait until an event occurs
-  found = 0;
-  while(!found) {
-    // Pump and read
-    oi_events_pump();
+    // Wait until an event occurs
+    found = 0;
+    while(!found) {
+        // Pump and read
+        oi_events_pump();
 
-    found = queue_peep(evt, 1, ~event_mask, TRUE);
-    
+        found = queue_peep(evt, 1, ~event_mask, TRUE);
+
 #ifdef HAVE_NANOSLEEP
-    {
-      // Use nanosleep under POSIX
-      struct timespec ts;
-      ts.tv_sec = 0;
-      ts.tv_nsec = OI_SLEEP * 1000000;
-      nanosleep(&ts, NULL);
-    }
+        {
+            // Use nanosleep under POSIX
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = OI_SLEEP * 1000000;
+            nanosleep(&ts, NULL);
+        }
 #elif WIN32
-    Sleep(OI_SLEEP);
+        Sleep(OI_SLEEP);
 #endif
-  }
+    }
 }
 
 /* ******************************************************************** */
@@ -222,13 +222,13 @@ void oi_events_wait(oi_event *evt) {
  * is the default.
  */
 void oi_events_setmask(uint mask) {
-  oi_event ev;
+    oi_event ev;
 
-  // Set mask and discard all pending events
-  event_mask = mask;
-  while(oi_events_poll(&ev)) {
-    ;
-  }
+    // Set mask and discard all pending events
+    event_mask = mask;
+    while(oi_events_poll(&ev)) {
+        ;
+    }
 }
 
 /* ******************************************************************** */
@@ -243,7 +243,7 @@ void oi_events_setmask(uint mask) {
  * also @ref PEventmask
  */
 uint oi_events_getmask() {
-  return event_mask;
+    return event_mask;
 }
 
 /* ******************************************************************** */

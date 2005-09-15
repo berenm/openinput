@@ -66,17 +66,13 @@ if they are not implemented:
   hide()
   warp()
   winsize()
+  reset()
 
 --------------------------------------------------------------------
 
-* Keyboard and mouse state managers
+* Coding style
 
-In order to keep the number of arguments down in the internal
-state update functions, the "postdev" argument is encoded as:
-0  : no event gets posted.
-!0 : event gets posted with "postdev" as the sending device index.
-
-Some functions use the 'default device', eg. when warping the
-pointer and for window size/focus managment.
+Indentation is four (4) spaces. No tabs!
+Don't forget to write Doxygen function documentation!
 
 --------------------------------------------------------------------

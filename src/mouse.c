@@ -42,10 +42,10 @@
  * the mouse manager for use.
  */
 sint mouse_init() {
-  debug("mouse_init");
+    debug("mouse_init");
 
-  // Done
-  return OI_ERR_OK;
+    // Done
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -69,22 +69,22 @@ sint mouse_init() {
  * the device provides a mice as determined by the provide-mask
  */
 void mouse_manage(oi_privmouse **mouse, uint provide) {
-  // Only care about keyboard
-  if(!(provide & OI_PRO_MOUSE)) {
-    return;
-  }
-  
-  // Allocate
-  *mouse = (oi_privmouse*)malloc(sizeof(oi_privmouse));
-  
-  // Clear state
-  (*mouse)->button = OI_BUTTON_MASK(OIP_UNKNOWN);
-  (*mouse)->absx = 0;
-  (*mouse)->absy = 0;
-  (*mouse)->relx = 0;
-  (*mouse)->rely = 0;
+    // Only care about keyboard
+    if(!(provide & OI_PRO_MOUSE)) {
+        return;
+    }
 
-  debug("mouse_manage: manager data installed");
+    // Allocate
+    *mouse = (oi_privmouse*)malloc(sizeof(oi_privmouse));
+
+    // Clear state
+    (*mouse)->button = OI_BUTTON_MASK(OIP_UNKNOWN);
+    (*mouse)->absx = 0;
+    (*mouse)->absy = 0;
+    (*mouse)->relx = 0;
+    (*mouse)->rely = 0;
+
+    debug("mouse_manage: manager data installed");
 }
 
 /* ******************************************************************** */
@@ -107,75 +107,75 @@ void mouse_manage(oi_privmouse **mouse, uint provide) {
  * to use this function to inject events into the library.
  */
 void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
-  oi_privmouse *priv;
-  sint nx;
-  sint ny;
-  sint rx;
-  sint ry;
+    oi_privmouse *priv;
+    sint nx;
+    sint ny;
+    sint rx;
+    sint ry;
 
-  // Get private per-device data
-  priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
-  if(!priv) {
-    return;
-  }
+    // Get private per-device data
+    priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
+    if(!priv) {
+        return;
+    }
 
-  // Always make x,y absolute
-  rx = x;
-  ry = y;
-  if(relative) {
-    x = priv->absx + x;
-    y = priv->absy + y;
-  }
+    // Always make x,y absolute
+    rx = x;
+    ry = y;
+    if(relative) {
+        x = priv->absx + x;
+        y = priv->absy + y;
+    }
 
-  // Check absolute position of mouse wrt. window size
-  if(x < 0) {
-    nx = 0;
-  }
-  else if(x >= appstate_width()) {
-    nx = appstate_width()-1;
-  }
-  else {
-    nx = x;
-  }
-  
-  if(y < 0) {
-    ny = 0;
-  }
-  else if(y >= appstate_height()) {
-    ny = appstate_height()-1;
-  }
-  else {
-    ny = y;
-  }
+    // Check absolute position of mouse wrt. window size
+    if(x < 0) {
+        nx = 0;
+    }
+    else if(x >= appstate_width()) {
+        nx = appstate_width()-1;
+    }
+    else {
+        nx = x;
+    }
 
-  // Calculate relative motion, but only if inside window
-  if(!relative && (priv->absx >= 0) && (priv->absy >= 0)) {
-    rx = nx - priv->absx;
-    ry = ny - priv->absy;
-  }
-  
-  // Ok, everything calculated - set global state
-  priv->absx = nx;
-  priv->absy = ny;
-  priv->relx += rx;
-  priv->rely += ry;
+    if(y < 0) {
+        ny = 0;
+    }
+    else if(y >= appstate_height()) {
+        ny = appstate_height()-1;
+    }
+    else {
+        ny = y;
+    }
 
-  //FIXME some platforms may need manual pushing of cursor
-  
-  // Postal services
-  if(post) {
-    oi_event ev;
-    ev.type = OI_MOUSEMOVE;
-    ev.move.device = index;
-    ev.move.state = priv->button;
-    ev.move.x = priv->absx;
-    ev.move.y = priv->absy;
-    // Only send relative, not cummulative, ticks (thanks discipline!)
-    ev.move.relx = rx;
-    ev.move.rely = ry;
+    // Calculate relative motion, but only if inside window
+    if(!relative && (priv->absx >= 0) && (priv->absy >= 0)) {
+        rx = nx - priv->absx;
+        ry = ny - priv->absy;
+    }
 
-    queue_add(&ev);
-  }
+    // Ok, everything calculated - set global state
+    priv->absx = nx;
+    priv->absy = ny;
+    priv->relx += rx;
+    priv->rely += ry;
+
+    //FIXME some platforms may need manual pushing of cursor
+
+    // Postal services
+    if(post) {
+        oi_event ev;
+        ev.type = OI_MOUSEMOVE;
+        ev.move.device = index;
+        ev.move.state = priv->button;
+        ev.move.x = priv->absx;
+        ev.move.y = priv->absy;
+        // Only send relative, not cummulative, ticks (thanks discipline!)
+        ev.move.relx = rx;
+        ev.move.rely = ry;
+
+        queue_add(&ev);
+    }
 }
 
 /* ******************************************************************** */
@@ -192,48 +192,48 @@ void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
  * Feed mouse button press/release into mouse state manager.
  */
 void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
-  oi_privmouse *priv;
-  oi_mouse newbutton;
-  uchar type;
+    oi_privmouse *priv;
+    oi_mouse newbutton;
+    uchar type;
 
-  // Get per-device private data
-  priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
-  if(!priv) {
-    return;
-  }
+    // Get per-device private data
+    priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
+    if(!priv) {
+        return;
+    }
 
-  newbutton = priv->button;
+    newbutton = priv->button;
 
-  if(state) {
-    // Down
-    type = OI_MOUSEBUTTONDOWN;
-    newbutton |= OI_BUTTON_MASK(btn);
-  }
-  else {
-    // Up
-    type = OI_MOUSEBUTTONUP;
-    newbutton = newbutton - (newbutton & OI_BUTTON_MASK(btn));
-  }
+    if(state) {
+        // Down
+        type = OI_MOUSEBUTTONDOWN;
+        newbutton |= OI_BUTTON_MASK(btn);
+    }
+    else {
+        // Up
+        type = OI_MOUSEBUTTONUP;
+        newbutton = newbutton - (newbutton & OI_BUTTON_MASK(btn));
+    }
 
-  // If nothing changed, bail out
-  if(newbutton == priv->button) {
-    return;
-  }
+    // If nothing changed, bail out
+    if(newbutton == priv->button) {
+        return;
+    }
 
-  // Store state
-  priv->button = newbutton;
-  
-  // Postal services
-  if(post) {
-    oi_event ev;
-    ev.type = type;
-    ev.button.device = index;
-    ev.button.button = btn;
-    ev.button.state = priv->button;
-    ev.button.x = priv->absx;
-    ev.button.y = priv->absy;
-    queue_add(&ev);
-  }
+    // Store state
+    priv->button = newbutton;
+
+    // Postal services
+    if(post) {
+        oi_event ev;
+        ev.type = type;
+        ev.button.device = index;
+        ev.button.button = btn;
+        ev.button.state = priv->button;
+        ev.button.x = priv->absx;
+        ev.button.y = priv->absy;
+        queue_add(&ev);
+    }
 }
 
 /* ******************************************************************** */
@@ -252,56 +252,56 @@ void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
  * button state as a button mask.
  */
 sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
-  oi_privmouse *priv;
-  uchar i;
+    oi_privmouse *priv;
+    uchar i;
 
-  // Default coordinates
-  if(x) {
-    *x = 0;
-  }
-  if(y) {
-    *y = 0;
-  }
-
-  // Get device index
-  i = index;
-  if(i == 0) {
-    for(i=1; i<OI_MAX_DEVICES; i++) {
-      if(device_priv(i, OI_PRO_MOUSE)) {
-	break;
-      }
+    // Default coordinates
+    if(x) {
+        *x = 0;
+    }
+    if(y) {
+        *y = 0;
     }
 
-    // End reached
-    if(i==OI_MAX_DEVICES) {
-      return OIP_UNKNOWN;
+    // Get device index
+    i = index;
+    if(i == 0) {
+        for(i=1; i<OI_MAX_DEVICES; i++) {
+            if(device_priv(i, OI_PRO_MOUSE)) {
+                break;
+            }
+        }
+
+        // End reached
+        if(i==OI_MAX_DEVICES) {
+            return OIP_UNKNOWN;
+        }
     }
-  }
 
-  // Get device data
-  priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
-  if(!priv) {
-    return OIP_UNKNOWN;
-  }
-  
-  // Check current position
-  if(priv->absx < 0) {
-    priv->absx = 0;
-  }
-  if(priv->absy < 0) {
-    priv->absy = 0;
-  }  
+    // Get device data
+    priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
+    if(!priv) {
+        return OIP_UNKNOWN;
+    }
 
-  // Set data
-  if(x) {
-    *x = priv->absx;
-  }
-  if(y) {
-    *y = priv->absy;
-  }
+    // Check current position
+    if(priv->absx < 0) {
+        priv->absx = 0;
+    }
+    if(priv->absy < 0) {
+        priv->absy = 0;
+    }
 
-  // Return button state
-  return priv->button;
+    // Set data
+    if(x) {
+        *x = priv->absx;
+    }
+    if(y) {
+        *y = priv->absy;
+    }
+
+    // Return button state
+    return priv->button;
 }
 
 /* ******************************************************************** */
@@ -319,52 +319,52 @@ sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
  * to this function (ie. it is cummulative).
  */
 sint oi_mouse_relative(uchar index, sint *x, sint *y) {
-  oi_privmouse *priv;
-  uchar i;
+    oi_privmouse *priv;
+    uchar i;
 
-  // Default coordinates
-  if(x) {
-    *x = 0;
-  }
-  if(y) {
-    *y = 0;
-  }
-
-  // Get device index
-  i = index;
-  if(i == 0) {
-    for(i=1; i<OI_MAX_DEVICES; i++) {
-      if(device_priv(i, OI_PRO_MOUSE)) {
-	break;
-      }
+    // Default coordinates
+    if(x) {
+        *x = 0;
+    }
+    if(y) {
+        *y = 0;
     }
 
-    // End reached
-    if(i==OI_MAX_DEVICES) {
-      return OIP_UNKNOWN;
+    // Get device index
+    i = index;
+    if(i == 0) {
+        for(i=1; i<OI_MAX_DEVICES; i++) {
+            if(device_priv(i, OI_PRO_MOUSE)) {
+                break;
+            }
+        }
+
+        // End reached
+        if(i==OI_MAX_DEVICES) {
+            return OIP_UNKNOWN;
+        }
     }
-  }
 
-  // Get device data
-  priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
-  if(!priv) {
-    return OIP_UNKNOWN;
-  }
+    // Get device data
+    priv = (oi_privmouse*)device_priv(i, OI_PRO_MOUSE);
+    if(!priv) {
+        return OIP_UNKNOWN;
+    }
 
-  // Set data
-  if(x) {
-    *x = priv->relx;
-  }
-  if(y) {
-    *y = priv->rely;
-  }
+    // Set data
+    if(x) {
+        *x = priv->relx;
+    }
+    if(y) {
+        *y = priv->rely;
+    }
 
-  // Reset deltas
-  priv->relx = 0;
-  priv->rely = 0;
+    // Reset deltas
+    priv->relx = 0;
+    priv->rely = 0;
 
-  // Return button state
-  return priv->button;
+    // Return button state
+    return priv->button;
 }
 
 /* ******************************************************************** */
@@ -383,57 +383,57 @@ sint oi_mouse_relative(uchar index, sint *x, sint *y) {
  * movement event.
  */
 sint oi_mouse_warp(uchar index, sint x, sint y) {
-  oi_device *dev;
-  uchar i;
-  int e;
+    oi_device *dev;
+    uchar i;
+    int e;
 
-  // Clip coordinates
-  if(x < 0) {
-    x = 0;
-  }
-  else if(x > appstate_width()) {
-    x = appstate_width() -1;
-  } 
-  if(y < 0) {
-    y = 0;
-  }
-  else if(y > appstate_height()) {
-    y = appstate_height() - 1;
-  }
-  e = OI_ERR_NO_DEVICE;
-  
-  // Parse all devices
-  for(i=1; i<OI_MAX_DEVICES; i++) {  
+    // Clip coordinates
+    if(x < 0) {
+        x = 0;
+    }
+    else if(x > appstate_width()) {
+        x = appstate_width() -1;
+    }
+    if(y < 0) {
+        y = 0;
+    }
+    else if(y > appstate_height()) {
+        y = appstate_height() - 1;
+    }
+    e = OI_ERR_NO_DEVICE;
 
-    // Only touch a single device?
-    if(index != 0) {
-      i = index;
+    // Parse all devices
+    for(i=1; i<OI_MAX_DEVICES; i++) {
+
+        // Only touch a single device?
+        if(index != 0) {
+            i = index;
+        }
+
+        // Get device
+        dev = device_get(i);
+        if(dev && (dev->provides & OI_PRO_MOUSE)) {
+
+            // If mouse is hidden and grabbed, don't physically move it
+            if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
+               (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
+                mouse_move(x, y, FALSE, FALSE, i);
+            }
+
+            // Warp default mouse device - driver must generate motion event!
+            else if(dev->warp) {
+                e = dev->warp(dev, x, y);
+            }
+        }
+
+        // Only touch a single device?
+        if(index != 0) {
+            return e;
+        }
     }
 
-    // Get device
-    dev = device_get(i);
-    if(dev && (dev->provides & OI_PRO_MOUSE)) {
-      
-      // If mouse is hidden and grabbed, don't physically move it
-      if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
-	 (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
-	mouse_move(x, y, FALSE, FALSE, i);  
-      }
-      
-      // Warp default mouse device - driver must generate motion event!
-      else if(dev->warp) {
-	e = dev->warp(dev, x, y);
-      }
-    }
-
-    // Only touch a single device?
-    if(index != 0) {
-      return e;
-    }
-  }
-
-  // Done, return whatever
-  return e;
+    // Done, return whatever
+    return e;
 }
 
 /* ******************************************************************** */
@@ -449,29 +449,29 @@ sint oi_mouse_warp(uchar index, sint x, sint y) {
  * buttons and motion.
  */
 char *oi_mouse_getname(oi_mouse button) {
-  // Dead simple
-  switch(button) {
-  case OIP_BUTTON_LEFT:
-    return "mouse_button_left";
+    // Dead simple
+    switch(button) {
+    case OIP_BUTTON_LEFT:
+        return "mouse_button_left";
 
-  case OIP_BUTTON_RIGHT:
-    return "mouse_button_right";
+    case OIP_BUTTON_RIGHT:
+        return "mouse_button_right";
 
-  case OIP_BUTTON_MIDDLE:
-    return "mouse_button_middle";
+    case OIP_BUTTON_MIDDLE:
+        return "mouse_button_middle";
 
-  case OIP_WHEEL_UP:
-    return "mouse_wheel_up";
+    case OIP_WHEEL_UP:
+        return "mouse_wheel_up";
 
-  case OIP_WHEEL_DOWN:
-    return "mouse_wheel_down";
+    case OIP_WHEEL_DOWN:
+        return "mouse_wheel_down";
 
-  case OIP_MOTION:
-    return "mouse_motion";
+    case OIP_MOTION:
+        return "mouse_motion";
 
-  default:
-    return "mouse_unknown";
-  }
+    default:
+        return "mouse_unknown";
+    }
 }
 
 /* ******************************************************************** */
@@ -486,42 +486,42 @@ char *oi_mouse_getname(oi_mouse button) {
  * Translate symbolic string into mouse code.
  */
 oi_mouse oi_mouse_getcode(char *name) {
-  // Dummies
-  if(!name) {
-    return OIP_UNKNOWN;
-  }
-  if((strlen(name) < OI_MIN_KEYLENGTH) ||
-     (strlen(name) > OI_MAX_KEYLENGTH)) {
-    return OIP_UNKNOWN;
-  }
+    // Dummies
+    if(!name) {
+        return OIP_UNKNOWN;
+    }
+    if((strlen(name) < OI_MIN_KEYLENGTH) ||
+       (strlen(name) > OI_MAX_KEYLENGTH)) {
+        return OIP_UNKNOWN;
+    }
 
-  // Check prefix
-  if(strncmp(name, "mouse_", 6) != 0) {
+    // Check prefix
+    if(strncmp(name, "mouse_", 6) != 0) {
+        return OIP_UNKNOWN;
+    }
+
+    // Do the comparisons
+    if(strcmp(name, "mouse_button_left") == 0) {
+        return OIP_BUTTON_LEFT;
+    }
+    if(strcmp(name, "mouse_button_right") == 0) {
+        return OIP_BUTTON_RIGHT;
+    }
+    if(strcmp(name, "mouse_button_middle") == 0) {
+        return OIP_BUTTON_MIDDLE;
+    }
+    if(strcmp(name, "mouse_wheel_up") == 0) {
+        return OIP_WHEEL_UP;
+    }
+    if(strcmp(name, "mouse_wheel_down") == 0) {
+        return OIP_WHEEL_DOWN;
+    }
+    if(strcmp(name, "mouse_motion") == 0) {
+        return OIP_MOTION;
+    }
+
+    // We shouldn't reach this point
     return OIP_UNKNOWN;
-  }
-
-  // Do the comparisons
-  if(strcmp(name, "mouse_button_left") == 0) {
-    return OIP_BUTTON_LEFT;
-  }
-  if(strcmp(name, "mouse_button_right") == 0) {
-    return OIP_BUTTON_RIGHT;
-  }
-  if(strcmp(name, "mouse_button_middle") == 0) {
-    return OIP_BUTTON_MIDDLE;
-  }
-  if(strcmp(name, "mouse_wheel_up") == 0) {
-    return OIP_WHEEL_UP;
-  }
-  if(strcmp(name, "mouse_wheel_down") == 0) {
-    return OIP_WHEEL_DOWN;
-  }
-  if(strcmp(name, "mouse_motion") == 0) {
-    return OIP_MOTION;
-  }
-
-  // We shouldn't reach this point
-  return OIP_UNKNOWN;
 }
 
 /* ******************************************************************** */

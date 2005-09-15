@@ -52,20 +52,20 @@ struct oi_privjoy;
  * - O: Optional, set to NULL to disable usage
  */
 typedef struct oi_device {
-  sint index;                                                        /**< Device index (M,A) */
-  char *name;                                                        /**< Short device name (D,A) */
-  char *desc;                                                        /**< Description of device (D,A) */
-  uint provides;                                                     /**< Provide-flag (D,A) */
-  void *private;                                                     /**< Private driver data (D,O) */
-  struct oi_joyconfig *joyconfig;                                    /**< Joystick configuration (D,O) */
-  sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (F) */
-  sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (F) */
-  void (*process)(struct oi_device *dev);                            /**< Pump events into queue (F) */
-  sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (F,O) */
-  sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (F,O) */
-  sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (F,O) */
-  sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (F,O) */
-  sint (*reset)(struct oi_device *dev);                              /**< Reset internal state (F,O) */
+    sint index;                                                        /**< Device index (M,A) */
+    char *name;                                                        /**< Short device name (D,A) */
+    char *desc;                                                        /**< Description of device (D,A) */
+    uint provides;                                                     /**< Provide-flag (D,A) */
+    void *private;                                                     /**< Private driver data (D,O) */
+    struct oi_joyconfig *joyconfig;                                    /**< Joystick configuration (D,O) */
+    sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (F) */
+    sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (F) */
+    void (*process)(struct oi_device *dev);                            /**< Pump events into queue (F) */
+    sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (F,O) */
+    sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (F,O) */
+    sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (F,O) */
+    sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (F,O) */
+    sint (*reset)(struct oi_device *dev);                              /**< Reset internal state (F,O) */
 } oi_device;
 
 
@@ -79,11 +79,11 @@ typedef struct oi_device {
  * The fields with a "fcnptr"-note are function pointers.
  */
 typedef struct oi_bootstrap {
-  char *name;                                                        /**< Short device name */
-  char *desc;                                                        /**< Device description */
-  sint provides;                                                     /**< Device provide-flag */
-  sint (*avail)(uint flags);                                         /**< Is device available (fcnptr) */
-  struct oi_device *(*create)();                                     /**< Return device structure (fcnptr) */
+    char *name;                                                        /**< Short device name */
+    char *desc;                                                        /**< Device description */
+    sint provides;                                                     /**< Device provide-flag */
+    sint (*avail)(uint flags);                                         /**< Is device available (fcnptr) */
+    struct oi_device *(*create)();                                     /**< Return device structure (fcnptr) */
 } oi_bootstrap;
 
 
@@ -164,7 +164,7 @@ void joystick_pump();
  * about joysticks like number of buttonts etc.
  *
  * The "kind[index]" number should be looked up in as oi_joyaxis
- * to determine which type of axis it is. Counting these 
+ * to determine which type of axis it is. Counting these
  * axis-ids is also the correct way  to determine number of
  * sticks/throttles/etc. There may be OI_AXIS_NONE types anywere
  * in the array.
@@ -175,10 +175,10 @@ void joystick_pump();
  * So far, Linux does as balls and hats are two-axis
  */
 typedef struct oi_joyconfig {
-  char *name;                              /**< Name of joystick */
-  uchar buttons;                           /**< Number of buttons */
-  oi_joytype kind[OI_JOY_NUM_AXES];        /**< Axis "type" mapping */
-  uchar pair[OI_JOY_NUM_AXES];             /**< Ball/stick/hat pairing */
+    char *name;                              /**< Name of joystick */
+    uchar buttons;                           /**< Number of buttons */
+    oi_joytype kind[OI_JOY_NUM_AXES];        /**< Axis "type" mapping */
+    uchar pair[OI_JOY_NUM_AXES];             /**< Ball/stick/hat pairing */
 } oi_joyconfig;
 
 /* ******************************************************************** */
@@ -200,9 +200,9 @@ inline void action_statepost(oi_event *evt);
  * keypresses to generate multiple events (or even a combo).
  */
 typedef struct oi_aclink {
-  uint action;                                                       /**< Action id */
-  uchar device;                                                      /**< Device index */
-  struct oi_aclink *next;                                            /**< Next pointer */
+    uint action;                                                       /**< Action id */
+    uchar device;                                                      /**< Device index */
+    struct oi_aclink *next;                                            /**< Next pointer */
 } oi_aclink;
 
 /* ******************************************************************** */

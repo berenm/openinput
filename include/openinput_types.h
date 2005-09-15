@@ -52,9 +52,9 @@ typedef signed int                sint;    /**< Signed int */
  * @{
  */
 typedef enum {
-  OI_DISABLE                      = 0,    /**< False/disable */
-  OI_ENABLE                       = 1,    /**< True/enable */
-  OI_QUERY                        = 2     /**< Don't change, return current */
+    OI_DISABLE                     = 0,    /**< False/disable */
+    OI_ENABLE                      = 1,    /**< True/enable */
+    OI_QUERY                       = 2     /**< Don't change, return current */
 } oi_bool;
 /** @} */
 
@@ -65,9 +65,9 @@ typedef enum {
  * @brief Init string parameters for window_id
  * @{
  */
-#define OI_I_CONN              'c' /**< Server connection handle */
-#define OI_I_SCRN              's' /**< Screen handle */
-#define OI_I_WINID             'w' /**< Window handle */
+#define OI_I_CONN                  'c' /**< Server connection handle */
+#define OI_I_SCRN                  's' /**< Screen handle */
+#define OI_I_WINID                 'w' /**< Window handle */
 /** @} */
 
 
@@ -77,12 +77,12 @@ typedef enum {
  * @brief Device provide flags
  * @{
  */
-#define OI_PRO_UNKNOWN           1 /**< Unknown/test type device */
-#define OI_PRO_WINDOW            2 /**< Window stuff (move/state/size) */
-#define OI_PRO_SYSTEM            4 /**< System events (segfault/interrupt/etc) */
-#define OI_PRO_KEYBOARD          8 /**< Keyboard input device */
-#define OI_PRO_MOUSE            16 /**< Pointer input device (mouse) */
-#define OI_PRO_JOYSTICK         32 /**< Joystick input device */
+#define OI_PRO_UNKNOWN              1 /**< Unknown/test type device */
+#define OI_PRO_WINDOW               2 /**< Window stuff (move/state/size) */
+#define OI_PRO_SYSTEM               4 /**< System events (segfault/interrupt/etc) */
+#define OI_PRO_KEYBOARD             8 /**< Keyboard input device */
+#define OI_PRO_MOUSE               16 /**< Pointer input device (mouse) */
+#define OI_PRO_JOYSTICK            32 /**< Joystick input device */
 /** @} */
 
 
@@ -92,9 +92,9 @@ typedef enum {
  * @brief Application activation
  * @{
  */
-#define OI_FOCUS_MOUSE          1 /**< Window has mouse focus */
-#define OI_FOCUS_INPUT          2 /**< Window has keyboard (input) focus */
-#define OI_FOCUS_VISIBLE        4 /**< Window is visible */
+#define OI_FOCUS_MOUSE              1 /**< Window has mouse focus */
+#define OI_FOCUS_INPUT              2 /**< Window has keyboard (input) focus */
+#define OI_FOCUS_VISIBLE            4 /**< Window is visible */
 /** @} */
 
 
@@ -123,7 +123,7 @@ typedef enum {
 #define OI_ERR_NO_NAME          7 /**< No such event name exists */
 #define OI_ERR_INTERNAL         8 /**< Fatal internal error */
 /** @} */
- 
+
 /* ******************************************************************** */
 
 #endif

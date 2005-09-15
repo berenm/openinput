@@ -54,18 +54,18 @@
 
 // Bootstrap global
 oi_bootstrap linuxjoy_bootstrap = {
-  "linuxjoy",
-  "GNU/Linux joystick driver",
-  OI_PRO_JOYSTICK,
-  linuxjoy_avail,
-  linuxjoy_device
+    "linuxjoy",
+    "GNU/Linux joystick driver",
+    OI_PRO_JOYSTICK,
+    linuxjoy_avail,
+    linuxjoy_device
 };
 
 // Joystick to be initialized next
 static uchar init_next = 0;
 
 /* ******************************************************************** */
- 
+
 /**
  * @ingroup DLinuxjoy
  * @brief Check if POSIX signals exists
@@ -79,27 +79,27 @@ static uchar init_next = 0;
  * exist. If a single device is found, we assume it's available.
  */
 sint linuxjoy_avail(uint flags) {
-  sint i;
-  sint fd;
+    sint i;
+    sint fd;
 
-  debug("linuxjoy_avail");
+    debug("linuxjoy_avail");
 
-  // Simply try to open a joystick
-  fd = -1;
-  for(i=init_next; i<DLJS_MAX_DEVS; i++) {
-    fd = linuxjoy_getfd(i);
+    // Simply try to open a joystick
+    fd = -1;
+    for(i=init_next; i<DLJS_MAX_DEVS; i++) {
+        fd = linuxjoy_getfd(i);
 
-    debug("linuxjoy_avail: testing /dev/input/js%u, fd:%i", i, fd);
+        debug("linuxjoy_avail: testing /dev/input/js%u, fd:%i", i, fd);
 
-    // Ok, got on, close it and bail
-    if(fd != -1) {
-      close(fd);
-      break;
+        // Ok, got on, close it and bail
+        if(fd != -1) {
+            close(fd);
+            break;
+        }
     }
-  }
 
-  // If filedescriptor isn't -1, a joystick exists
-  return (fd != -1);
+    // If filedescriptor isn't -1, a joystick exists
+    return (fd != -1);
 }
 
 /* ******************************************************************** */
@@ -117,49 +117,49 @@ sint linuxjoy_avail(uint flags) {
  * Device parameters are overridden in the device->init() function.
  */
 oi_device *linuxjoy_device() {
-  oi_device *dev;
-  linuxjoy_private *priv;
-  oi_joyconfig *conf;
+    oi_device *dev;
+    linuxjoy_private *priv;
+    oi_joyconfig *conf;
 
-  debug("linuxjoy_device");
+    debug("linuxjoy_device");
 
-  // Alloc device data
-  dev = (oi_device*)malloc(sizeof(oi_device));
-  priv = (linuxjoy_private*)malloc(sizeof(linuxjoy_private));
-  conf = (oi_joyconfig*)malloc(sizeof(oi_joyconfig));
-  if(!dev || !priv || !conf) {
-    debug("linuxjoy_device: device creation failed");
-    if(dev) {
-      free(dev);
+    // Alloc device data
+    dev = (oi_device*)malloc(sizeof(oi_device));
+    priv = (linuxjoy_private*)malloc(sizeof(linuxjoy_private));
+    conf = (oi_joyconfig*)malloc(sizeof(oi_joyconfig));
+    if(!dev || !priv || !conf) {
+        debug("linuxjoy_device: device creation failed");
+        if(dev) {
+            free(dev);
+        }
+        if(priv) {
+            free(priv);
+        }
+        if(conf) {
+            free(conf);
+        }
+        return NULL;
     }
-    if(priv) {
-      free(priv);
-    }
-    if(conf) {
-      free(conf);
-    }
-    return NULL;
-  }
 
-  // Clear structures
-  memset(dev, 0, sizeof(oi_device));
-  memset(priv, 0, sizeof(linuxjoy_private));
-  memset(conf, 0, sizeof(oi_joyconfig));
+    // Clear structures
+    memset(dev, 0, sizeof(oi_device));
+    memset(priv, 0, sizeof(linuxjoy_private));
+    memset(conf, 0, sizeof(oi_joyconfig));
 
-  // Set members
-  dev->private = priv;
-  dev->joyconfig = conf;
-  dev->init = linuxjoy_init;
-  dev->destroy = linuxjoy_destroy;
-  dev->process = linuxjoy_process;  
-  dev->grab = NULL;
-  dev->hide = NULL;
-  dev->warp = NULL;
-  dev->winsize = NULL;
-  dev->reset = linuxjoy_reset;
-  
-  // Done
-  return dev;
+    // Set members
+    dev->private = priv;
+    dev->joyconfig = conf;
+    dev->init = linuxjoy_init;
+    dev->destroy = linuxjoy_destroy;
+    dev->process = linuxjoy_process;
+    dev->grab = NULL;
+    dev->hide = NULL;
+    dev->warp = NULL;
+    dev->winsize = NULL;
+    dev->reset = linuxjoy_reset;
+
+    // Done
+    return dev;
 }
 
 /* ******************************************************************** */
@@ -178,71 +178,71 @@ oi_device *linuxjoy_device() {
  * Try to open next joystick.
  */
 sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
-  sint i;
-  sint fd;
-  uchar ok;
-  char *name;
-  linuxjoy_private *priv;
+    sint i;
+    sint fd;
+    uchar ok;
+    char *name;
+    linuxjoy_private *priv;
 
-  debug("linuxjoy_init");
+    debug("linuxjoy_init");
 
-  // We can handle more than one device!
-  device_moreavail(TRUE);
+    // We can handle more than one device!
+    device_moreavail(TRUE);
 
-  // Find next
-  fd = -1;
-  for(i=init_next; i<DLJS_MAX_DEVS; i++) {
-    fd = linuxjoy_getfd(i);
-    if(fd != -1) {
-      break;
+    // Find next
+    fd = -1;
+    for(i=init_next; i<DLJS_MAX_DEVS; i++) {
+        fd = linuxjoy_getfd(i);
+        if(fd != -1) {
+            break;
+        }
     }
-  }
 
-  // No matter what, don't try this device again
-  init_next++;
+    // No matter what, don't try this device again
+    init_next++;
 
-  // Bail now if no fd was found
-  if(fd == -1) {
-    return OI_ERR_NO_DEVICE;
-  }
-  debug("linuxjoy_init: file opened");
-
-  // Ok, time to fetch the greasy device details
-  priv = (linuxjoy_private*)dev->private;
-  priv->fd = fd;
-  priv->id = i;
-  
-  // Get description using IOCTL (see linux/Documentation/input/joystick-api.h)
-  name = (char*)malloc(DLJS_NAME_SIZE);
-  memset(name, 0, DLJS_NAME_SIZE);
-  if(ioctl(fd, JSIOCGNAME(DLJS_NAME_SIZE), name) < 0) {
-    sprintf(name, "Unknown joystick #%u", i);
-  }
-  debug("linuxjoy_init: kernel description '%s'", name);
-
-  // Find joystick
-  ok = FALSE;
-  for(i=0; i<TABLESIZE(linuxjoy_specs); i++) {
-    if(strcmp(name, linuxjoy_specs[i].name) == 0) {
-      // Transfer settings
-      dev->joyconfig->name = linuxjoy_specs[i].name;
-      dev->joyconfig->buttons = linuxjoy_specs[i].buttons;
-      for(i=0; i<OI_JOY_NUM_AXES; i++) {
-	dev->joyconfig->kind[i] = linuxjoy_specs[i].kind[i];
-	dev->joyconfig->pair[i] = linuxjoy_specs[i].pair[i];
-      }
-      ok = TRUE;
-      break;
+    // Bail now if no fd was found
+    if(fd == -1) {
+        return OI_ERR_NO_DEVICE;
     }
-  }
+    debug("linuxjoy_init: file opened");
 
-  // If joystick was unknown, try the default/fallback handler
-  if(!ok) {
-    linuxjoy_fallback(dev, name, fd);
-  }
+    // Ok, time to fetch the greasy device details
+    priv = (linuxjoy_private*)dev->private;
+    priv->fd = fd;
+    priv->id = i;
 
-  // Done at last!
-  return OI_ERR_OK;
+    // Get description using IOCTL (see linux/Documentation/input/joystick-api.h)
+    name = (char*)malloc(DLJS_NAME_SIZE);
+    memset(name, 0, DLJS_NAME_SIZE);
+    if(ioctl(fd, JSIOCGNAME(DLJS_NAME_SIZE), name) < 0) {
+        sprintf(name, "Unknown joystick #%u", i);
+    }
+    debug("linuxjoy_init: kernel description '%s'", name);
+
+    // Find joystick
+    ok = FALSE;
+    for(i=0; i<TABLESIZE(linuxjoy_specs); i++) {
+        if(strcmp(name, linuxjoy_specs[i].name) == 0) {
+            // Transfer settings
+            dev->joyconfig->name = linuxjoy_specs[i].name;
+            dev->joyconfig->buttons = linuxjoy_specs[i].buttons;
+            for(i=0; i<OI_JOY_NUM_AXES; i++) {
+                dev->joyconfig->kind[i] = linuxjoy_specs[i].kind[i];
+                dev->joyconfig->pair[i] = linuxjoy_specs[i].pair[i];
+            }
+            ok = TRUE;
+            break;
+        }
+    }
+
+    // If joystick was unknown, try the default/fallback handler
+    if(!ok) {
+        linuxjoy_fallback(dev, name, fd);
+    }
+
+    // Done at last!
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -261,67 +261,67 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
  * If that fails, be very, very, very conservative
  */
 void linuxjoy_fallback(oi_device *dev, char *name, int fd) {
-  uchar ok;
-  sint noaxes;
-  sint nohats;
-  sint nobtns;
-  sint i;
-  sint j;
+    uchar ok;
+    sint noaxes;
+    sint nohats;
+    sint nobtns;
+    sint i;
+    sint j;
 
-  // Conservative defaults
-  ok = FALSE;
-  noaxes = 2;
-  nobtns = 2;
-  nohats = 0;
+    // Conservative defaults
+    ok = FALSE;
+    noaxes = 2;
+    nobtns = 2;
+    nohats = 0;
 
-  /* See if joystick is run by the "generic analog" kernel driver.
-   * If so, we can get the number of axes/buttons/hats by decoding
-   * the name. Kernel name is "Analog X-axis Y-button Z-hat".
-   */
-  if((strstr(name, "Analog")==name) && strstr(name, "-hat")) {
-    // Try to decode number of axes and hats
-    if(sscanf(name, "Analog %d-axis %d-button %d-hat", &noaxes, &nobtns, &nohats) == 3) {
-      debug("linuxjoy_fallback: analog kernel driver axes:%u btns:%u hats:%u",
-	    noaxes, nobtns, nohats);
-      ok = TRUE;
+    /* See if joystick is run by the "generic analog" kernel driver.
+     * If so, we can get the number of axes/buttons/hats by decoding
+     * the name. Kernel name is "Analog X-axis Y-button Z-hat".
+     */
+    if((strstr(name, "Analog")==name) && strstr(name, "-hat")) {
+        // Try to decode number of axes and hats
+        if(sscanf(name, "Analog %d-axis %d-button %d-hat", &noaxes, &nobtns, &nohats) == 3) {
+            debug("linuxjoy_fallback: analog kernel driver axes:%u btns:%u hats:%u",
+                  noaxes, nobtns, nohats);
+            ok = TRUE;
+        }
     }
-  }
 
-  // Non-analog driver, probe kernel for details
-  if(!ok) {
-    // Get number of axes using IOCTL
-    if(ioctl(fd, JSIOCGAXES, &noaxes) < 0) {
-      noaxes = 2;
+    // Non-analog driver, probe kernel for details
+    if(!ok) {
+        // Get number of axes using IOCTL
+        if(ioctl(fd, JSIOCGAXES, &noaxes) < 0) {
+            noaxes = 2;
+        }
+        debug("linuxjoy_init: axes '%u'", noaxes);
+
+        // Get number of buttons using IOCTL
+        if(ioctl(fd, JSIOCGBUTTONS, &nobtns) < 0) {
+            nobtns = 2;
+        }
+        debug("linuxjoy_init: buttons '%u'", nobtns);
     }
-    debug("linuxjoy_init: axes '%u'", noaxes);
-  
-    // Get number of buttons using IOCTL
-    if(ioctl(fd, JSIOCGBUTTONS, &nobtns) < 0) {
-      nobtns = 2;
+
+    // Buttons are easy
+    dev->joyconfig->buttons = nobtns;
+
+    // Fill axes mapping - under Linux, sticks are always first
+    j = 0;
+    for(i=0; (i<noaxes) && (j<OI_JOY_NUM_AXES); i++) {
+        // Standard stick axis, no pair
+        dev->joyconfig->kind[j] = OIJ_STICK;
+        dev->joyconfig->pair[j] = 0;
+        j++;
     }
-    debug("linuxjoy_init: buttons '%u'", nobtns);
-  }
 
-  // Buttons are easy
-  dev->joyconfig->buttons = nobtns;
-  
-  // Fill axes mapping - under Linux, sticks are always first
-  j = 0;
-  for(i=0; (i<noaxes) && (j<OI_JOY_NUM_AXES); i++) {
-    // Standard stick axis, no pair
-    dev->joyconfig->kind[j] = OIJ_STICK;
-    dev->joyconfig->pair[j] = 0;
-    j++;
-  }
-
-  // Axes after sticks are hats, which are two-axis (ie. paired)
-  for(i=0; (i<nohats) && (j<OI_JOY_NUM_AXES); i++) {
-    dev->joyconfig->kind[j] = OIJ_HAT;
-    dev->joyconfig->pair[j] = j+1;
-    dev->joyconfig->kind[j+1] = OIJ_NONE;
-    dev->joyconfig->pair[j+1] = 0;
-    j += 2;
-  }
+    // Axes after sticks are hats, which are two-axis (ie. paired)
+    for(i=0; (i<nohats) && (j<OI_JOY_NUM_AXES); i++) {
+        dev->joyconfig->kind[j] = OIJ_HAT;
+        dev->joyconfig->pair[j] = j+1;
+        dev->joyconfig->kind[j+1] = OIJ_NONE;
+        dev->joyconfig->pair[j+1] = 0;
+        j += 2;
+    }
 }
 
 /* ******************************************************************** */
@@ -338,37 +338,37 @@ void linuxjoy_fallback(oi_device *dev, char *name, int fd) {
  * the system default.
  */
 sint linuxjoy_destroy(oi_device *dev) {
-  linuxjoy_private *priv;
+    linuxjoy_private *priv;
 
-  debug("linuxjoy_destroy");
-  
-  // Free device
-  if(dev) {
+    debug("linuxjoy_destroy");
 
-    // Firstly, free the private data
-    priv = (linuxjoy_private*)dev->private;
-    if(priv) {
-      // Close file
-      if(priv->fd != -1) {
-	close(priv->fd);
-      }
+    // Free device
+    if(dev) {
 
-      // Free custom name and description
-      if(priv->name) {
-	free(priv->name);
-      }
+        // Firstly, free the private data
+        priv = (linuxjoy_private*)dev->private;
+        if(priv) {
+            // Close file
+            if(priv->fd != -1) {
+                close(priv->fd);
+            }
+
+            // Free custom name and description
+            if(priv->name) {
+                free(priv->name);
+            }
+        }
+
+        // Secondly, free the joystick configuration
+        if(dev->joyconfig) {
+            free(dev->joyconfig);
+        }
+
+        free(dev);
+        dev = NULL;
     }
 
-    // Secondly, free the joystick configuration
-    if(dev->joyconfig) {
-      free(dev->joyconfig);
-    }
-
-    free(dev);
-    dev = NULL;
-  }
-
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -385,35 +385,35 @@ sint linuxjoy_destroy(oi_device *dev) {
  * signal is pending.
  */
 void linuxjoy_process(oi_device *dev) {
-  static struct js_event jse;
-  int i;
-  linuxjoy_private *priv;
+    static struct js_event jse;
+    int i;
+    linuxjoy_private *priv;
 
-  if(!oi_runstate()) {
-    debug("linuxjoy_process: oi_running false");
-    return;
-  }
-  
-  // Prepare
-  priv = (linuxjoy_private*)dev->private;
-
-  // We're in non-blocking mode, so empty the event queue
-  while((i = read(priv->fd, &jse, sizeof(struct js_event))) > 0) {
-    // Button
-    if(jse.type & JS_EVENT_BUTTON) {
-      // Inject event into joystick state manager
-      joystick_button(dev->index, jse.number, jse.value, TRUE);
+    if(!oi_runstate()) {
+        debug("linuxjoy_process: oi_running false");
+        return;
     }
-    
-    // Axis
-    else if(jse.type & JS_EVENT_AXIS) {
-      // Inject event into joystick state manager
-      joystick_axis(dev->index, jse.number, jse.value, OI_QUERY, TRUE);
-    }
-  }
 
-  // Do some debugging
-  debug("joystick_process: errorcode '%i'", errno);
+    // Prepare
+    priv = (linuxjoy_private*)dev->private;
+
+    // We're in non-blocking mode, so empty the event queue
+    while((i = read(priv->fd, &jse, sizeof(struct js_event))) > 0) {
+        // Button
+        if(jse.type & JS_EVENT_BUTTON) {
+            // Inject event into joystick state manager
+            joystick_button(dev->index, jse.number, jse.value, TRUE);
+        }
+
+        // Axis
+        else if(jse.type & JS_EVENT_AXIS) {
+            // Inject event into joystick state manager
+            joystick_axis(dev->index, jse.number, jse.value, OI_QUERY, TRUE);
+        }
+    }
+
+    // Do some debugging
+    debug("joystick_process: errorcode '%i'", errno);
 }
 
 /* ******************************************************************** */
@@ -428,16 +428,16 @@ void linuxjoy_process(oi_device *dev) {
  * Open /dev/input/jsX with X=num and return the file descriptor.
  */
 int linuxjoy_getfd(uchar num) {
-  char path[128];
+    char path[128];
 
-  // Dummy
-  if(num >= DLJS_MAX_DEVS) {
-    return -1;
-  }
+    // Dummy
+    if(num >= DLJS_MAX_DEVS) {
+        return -1;
+    }
 
-  // Make path and open it
-  sprintf(path, "/dev/input/js%u", num);
-  return open(path, O_RDONLY | O_NONBLOCK, 0);
+    // Make path and open it
+    sprintf(path, "/dev/input/js%u", num);
+    return open(path, O_RDONLY | O_NONBLOCK, 0);
 }
 
 /* ******************************************************************** */
@@ -454,13 +454,13 @@ int linuxjoy_getfd(uchar num) {
  * Resync the driver-device states.
  */
 sint linuxjoy_reset(oi_device *dev) {
-  linuxjoy_private *priv;
-  priv = (linuxjoy_private*)dev->private;
-  debug("linuxjoy_reset");
+    linuxjoy_private *priv;
+    priv = (linuxjoy_private*)dev->private;
+    debug("linuxjoy_reset");
 
-  // Fixme
+    // Fixme
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

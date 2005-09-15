@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
   oi_init("c:0 s:0 w:0", OI_FLAG_NOWINDOW);
   printf("*** openinput initialized\n");
 
+  printf("test: '%s'\n", oi_key_getname(OIK_A));
+
   // Run through all keys
   for(k=OIK_FIRST; k<OIK_LAST; k++) {
 

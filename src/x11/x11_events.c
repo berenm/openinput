@@ -39,7 +39,7 @@
  *
  * @param dev pointer to device interface
  * @param xev X mouse motion event
- * 
+ *
  * When the mouse is grabbed and the cursor is hidden we
  * are in "relative mouse motion mode", as the user expects
  * the mouse to generate events even if the window border is hit
@@ -50,57 +50,57 @@
  * events.
  */
 inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
-  x11_private *priv;
-  int deltax;
-  int deltay;
-  int i;
+    x11_private *priv;
+    int deltax;
+    int deltay;
+    int i;
 
-  priv = (x11_private*)dev->private;
+    priv = (x11_private*)dev->private;
 
-  // Calculate motion and store current positon
-  deltax = xev->xmotion.x - priv->lastx;
-  deltay = xev->xmotion.y - priv->lasty;
-  priv->lastx = xev->xmotion.x;
-  priv->lasty = xev->xmotion.y;
+    // Calculate motion and store current positon
+    deltax = xev->xmotion.x - priv->lastx;
+    deltay = xev->xmotion.y - priv->lasty;
+    priv->lastx = xev->xmotion.x;
+    priv->lasty = xev->xmotion.y;
 
-  // Post it
-  mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
+    // Post it
+    mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
 
-  // Only warp mouse if we're near the edge of the window
-  if((xev->xmotion.x < SX11_FUDGE) ||
-     (xev->xmotion.x > (priv->width - SX11_FUDGE)) ||
-     (xev->xmotion.y < SX11_FUDGE) ||
-     (xev->xmotion.y > (priv->height - SX11_FUDGE))) {
+    // Only warp mouse if we're near the edge of the window
+    if((xev->xmotion.x < SX11_FUDGE) ||
+       (xev->xmotion.x > (priv->width - SX11_FUDGE)) ||
+       (xev->xmotion.y < SX11_FUDGE) ||
+       (xev->xmotion.y > (priv->height - SX11_FUDGE))) {
 
-    // Apply the SDL optimization: Events may have accumulated
-    while(XCheckTypedEvent(priv->disp, MotionNotify, xev)) {
-      // Treat as normal movement like above
-      deltax = xev->xmotion.x - priv->lastx;
-      deltay = xev->xmotion.y - priv->lasty;
-      priv->lastx = xev->xmotion.x;
-      priv->lasty = xev->xmotion.y;
+        // Apply the SDL optimization: Events may have accumulated
+        while(XCheckTypedEvent(priv->disp, MotionNotify, xev)) {
+            // Treat as normal movement like above
+            deltax = xev->xmotion.x - priv->lastx;
+            deltay = xev->xmotion.y - priv->lasty;
+            priv->lastx = xev->xmotion.x;
+            priv->lasty = xev->xmotion.y;
 
-      // Post it
-      mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
+            // Post it
+            mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
+        }
+
+        // Center (warp) mouse
+        priv->lastx = priv->width / 2;
+        priv->lasty = priv->height / 2;
+        XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0,
+                     priv->lastx, priv->lasty);
+
+        // Remove warp-generated motion events
+        for ( i=0; i<10; ++i ) {
+            XMaskEvent(priv->disp, PointerMotionMask, xev);
+            if((xev->xmotion.x > (priv->lastx - SX11_FUDGE)) &&
+               (xev->xmotion.x < (priv->lastx + SX11_FUDGE)) &&
+               (xev->xmotion.y > (priv->lasty - SX11_FUDGE)) &&
+               (xev->xmotion.y < (priv->lasty + SX11_FUDGE))) {
+                break;
+            }
+        }
     }
-
-    // Center (warp) mouse
-    priv->lastx = priv->width / 2;
-    priv->lasty = priv->height / 2;
-    XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0,
-		 priv->lastx, priv->lasty);
-
-    // Remove warp-generated motion events
-    for ( i=0; i<10; ++i ) {
-      XMaskEvent(priv->disp, PointerMotionMask, xev);
-      if((xev->xmotion.x > (priv->lastx - SX11_FUDGE)) &&
-	 (xev->xmotion.x < (priv->lastx + SX11_FUDGE)) &&
-	 (xev->xmotion.y > (priv->lasty - SX11_FUDGE)) &&
-	 (xev->xmotion.y < (priv->lasty + SX11_FUDGE))) {
-	break;
-      }
-    }
-  }
 }
 
 /* ******************************************************************** */
@@ -118,33 +118,33 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
  * X-server - this technique was borrowed from SDL. Thanks!
  */
 inline sint x11_pending(Display *d) {
-  // Flush to pump the X pipeline
-  XFlush(d);
-  
-  // Standard X non-blocking check
-  if(XEventsQueued(d, QueuedAlready)) {
-    return TRUE;
-  }
+    // Flush to pump the X pipeline
+    XFlush(d);
 
-  // Bruteforce-attack the X server to make it talk (thanks SDL!)
-  {
-    static struct timeval time;
-    int fd;
-    fd_set set;
-    
-    fd = ConnectionNumber(d);
-    FD_ZERO(&set);
-    FD_SET(fd, &set);
-    
-    // Charge!
-    if(select(fd+1, &set, NULL, NULL, &time) == 1) {
-      // Ok, perform the blocking X call
-      return XPending(d);
+    // Standard X non-blocking check
+    if(XEventsQueued(d, QueuedAlready)) {
+        return TRUE;
     }
-  }
 
-  // Nothing is pending
-  return FALSE;
+    // Bruteforce-attack the X server to make it talk (thanks SDL!)
+    {
+        static struct timeval time;
+        int fd;
+        fd_set set;
+
+        fd = ConnectionNumber(d);
+        FD_ZERO(&set);
+        FD_SET(fd, &set);
+
+        // Charge!
+        if(select(fd+1, &set, NULL, NULL, &time) == 1) {
+            // Ok, perform the blocking X call
+            return XPending(d);
+        }
+    }
+
+    // Nothing is pending
+    return FALSE;
 }
 
 /* ******************************************************************** */
@@ -156,31 +156,31 @@ inline sint x11_pending(Display *d) {
  * @param d display handle
  * @param evt X event
  *
- * Make sure that the repeated key-down events from 
+ * Make sure that the repeated key-down events from
  * the X server is thrown away. OpenInput has it's internal
  * keyrepeat system if you want repeat-events.
  */
 inline schar x11_keyrepeat(Display *d, XEvent *evt) {
-  XEvent pev;
-  schar rep;
+    XEvent pev;
+    schar rep;
 
-  rep = FALSE;
+    rep = FALSE;
 
-  if(XPending(d)) {
-    XPeekEvent(d, &pev);
+    if(XPending(d)) {
+        XPeekEvent(d, &pev);
 
-    // Same key down within threshold
-    if((pev.type == KeyPress) &&
-       (pev.xkey.keycode == evt->xkey.keycode) &&
-       ((pev.xkey.time - evt->xkey.time) < SX11_REP_THRESHOLD)) {
+        // Same key down within threshold
+        if((pev.type == KeyPress) &&
+           (pev.xkey.keycode == evt->xkey.keycode) &&
+           ((pev.xkey.time - evt->xkey.time) < SX11_REP_THRESHOLD)) {
 
-      debug("x11_keyrepeat: repeating key detected");
-      rep = 1;
-      XNextEvent(d, &pev);
+            debug("x11_keyrepeat: repeating key detected");
+            rep = 1;
+            XNextEvent(d, &pev);
+        }
     }
-  }
-  
-  return(rep);
+
+    return(rep);
 }
 
 /* ******************************************************************** */
@@ -204,164 +204,164 @@ inline schar x11_keyrepeat(Display *d, XEvent *evt) {
  * X11 scancode into a OpenInput symbolic key.
  */
 inline void x11_dispatch(oi_device *dev, Display *d) {
-  XEvent xev;
-  
-  // Fetch the event
-  XNextEvent(d, &xev);
+    XEvent xev;
 
-  // Handle
-  switch(xev.type) {
-    
-    // Mouse enters/leaves window
-  case EnterNotify:
-  case LeaveNotify:
-    debug("x11_dispatch: enter/leave_notify (in/down:%i)", xev.type == EnterNotify);
-    
-    // We're not interested in grab mode events
-    if((xev.xcrossing.mode != NotifyGrab) &&
-       (xev.xcrossing.mode != NotifyUngrab)) {
-      
-      // Move if grabbed, otherwise change focus
-      if(oi_app_grab(OI_QUERY) == OI_ENABLE) {
-	mouse_move(dev->index, xev.xcrossing.x, xev.xcrossing.y, FALSE, TRUE);
-      }
-      else {
-	appstate_focus(dev->index,
-		       OI_FOCUS_MOUSE,
-		       xev.type == EnterNotify,
-		       TRUE);
-      }
+    // Fetch the event
+    XNextEvent(d, &xev);
+
+    // Handle
+    switch(xev.type) {
+
+        // Mouse enters/leaves window
+    case EnterNotify:
+    case LeaveNotify:
+        debug("x11_dispatch: enter/leave_notify (in/down:%i)", xev.type == EnterNotify);
+
+        // We're not interested in grab mode events
+        if((xev.xcrossing.mode != NotifyGrab) &&
+           (xev.xcrossing.mode != NotifyUngrab)) {
+
+            // Move if grabbed, otherwise change focus
+            if(oi_app_grab(OI_QUERY) == OI_ENABLE) {
+                mouse_move(dev->index, xev.xcrossing.x, xev.xcrossing.y, FALSE, TRUE);
+            }
+            else {
+                appstate_focus(dev->index,
+                               OI_FOCUS_MOUSE,
+                               xev.type == EnterNotify,
+                               TRUE);
+            }
+        }
+        break;
+
+
+        // Input focus gained/lost
+    case FocusIn:
+    case FocusOut:
+        debug("x11_dispatch: focus_in/out (in/down:%i)", xev.type == FocusIn);
+        appstate_focus(dev->index,
+                       OI_FOCUS_INPUT,
+                       xev.type == FocusIn,
+                       TRUE);
+        break;
+
+
+        // Generated on EnterWindow and FocusIn
+    case KeymapNotify:
+        debug("x11_dispatch: keymap_notify");
+        // Do a full reset of keystate/modstates
+        x11_keystate(dev, d, xev.xkeymap.key_vector);
+        break;
+
+        // Mouse motion
+    case MotionNotify:
+        debug("x11_dispatch: motion_notify");
+        // Mouse grabbed and hidden, using relative motion
+        if(((x11_private*)dev->private)->relative == (SX11_GRAB | SX11_HIDE)) {
+            x11_relative_mouse(dev, &xev);
+        }
+        else {
+            mouse_move(dev->index, xev.xmotion.x, xev.xmotion.y, FALSE, TRUE);
+        }
+
+        break;
+
+
+        // Mouse button pressed
+    case ButtonPress:
+    case ButtonRelease:
+        debug("x11_dispatch: button_press/release (in/down:%i)", xev.type == ButtonPress);
+        mouse_button(dev->index,
+                     xev.xbutton.button,
+                     xev.type == ButtonPress,
+                     TRUE);
+        break;
+
+
+        // Keyboard pressed
+    case KeyPress:
+    case KeyRelease:
+        debug("x11_dispatch: key_press/release (in/down:%i)", xev.type == KeyPress);
+        {
+            oi_keysym keysym;
+            x11_private *priv;
+
+            priv = (x11_private*)dev->private;
+
+            // Do not post repeated keys
+            if(!x11_keyrepeat(priv->disp, &xev)) {
+
+                // Decode key and send it to the state manager
+                x11_translate(priv->disp,
+                              &xev.xkey,
+                              xev.xkey.keycode,
+                              &keysym);
+                keyboard_update(dev->index,
+                                &keysym,
+                                xev.type == KeyPress,
+                                TRUE);
+            }
+        }
+        break;
+
+
+        // Window gets iconified
+    case UnmapNotify:
+        debug("x11_dispatch: unmap_notify");
+        appstate_focus(dev->index, FALSE, OI_FOCUS_INPUT | OI_FOCUS_VISIBLE, TRUE);
+        break;
+
+
+        // Window gets restored (uniconified)
+    case MapNotify:
+        debug("x11_dispatch: map_notify");
+        appstate_focus(dev->index, TRUE, OI_FOCUS_VISIBLE, TRUE);
+        break;
+
+
+        // Window was resized or moved
+    case ConfigureNotify:
+        debug("x11_dispatch: configure_notify");
+        // Only post update if anything changed
+        if((((x11_private*)dev->private)->width != xev.xconfigure.width) &&
+           (((x11_private*)dev->private)->height != xev.xconfigure.height)) {
+
+            appstate_resize(dev->index, xev.xconfigure.width, xev.xconfigure.height, TRUE);
+            ((x11_private*)dev->private)->width = xev.xconfigure.width;
+            ((x11_private*)dev->private)->height = xev.xconfigure.height;
+        }
+        break;
+
+
+        // We should quit -- or other messages
+    case ClientMessage:
+        debug("x11_dispatch: client_message");
+        // Window manager close window
+        if((xev.xclient.format == 32) &&
+           (xev.xclient.data.l[0] == ((x11_private*)dev->private)->wm_delete_window)) {
+            oi_event ev;
+            ev.type = OI_QUIT;
+            queue_add(&ev);
+        }
+        break;
+
+
+        // Redraw required
+    case Expose:
+        debug("x11_dispatch: expose");
+        {
+            oi_event ev;
+            ev.type = OI_EXPOSE;
+            queue_add(&ev);
+        }
+        break;
+
+
+        // Unhandled event
+    default:
+        debug("x11_dispatch: unhandled event type %i", xev.type);
+        break;
     }
-    break;
-    
-
-    // Input focus gained/lost
-  case FocusIn:
-  case FocusOut:
-    debug("x11_dispatch: focus_in/out (in/down:%i)", xev.type == FocusIn);
-    appstate_focus(dev->index,
-		   OI_FOCUS_INPUT,
-		   xev.type == FocusIn,
-		   TRUE);
-    break;
-
-    
-    // Generated on EnterWindow and FocusIn
-  case KeymapNotify:
-    debug("x11_dispatch: keymap_notify");
-    // Do a full reset of keystate/modstates
-    x11_keystate(dev, d, xev.xkeymap.key_vector);
-    break;
-
-    // Mouse motion
-  case MotionNotify:
-    debug("x11_dispatch: motion_notify");
-    // Mouse grabbed and hidden, using relative motion
-    if(((x11_private*)dev->private)->relative == (SX11_GRAB | SX11_HIDE)) {
-      x11_relative_mouse(dev, &xev);
-    }
-    else {
-      mouse_move(dev->index, xev.xmotion.x, xev.xmotion.y, FALSE, TRUE);
-    }
-
-    break;
-
-
-    // Mouse button pressed
-  case ButtonPress:
-  case ButtonRelease:
-    debug("x11_dispatch: button_press/release (in/down:%i)", xev.type == ButtonPress);
-    mouse_button(dev->index,
-		 xev.xbutton.button,
-		 xev.type == ButtonPress,
-		 TRUE);
-    break;
-
-
-    // Keyboard pressed
-  case KeyPress:
-  case KeyRelease:
-    debug("x11_dispatch: key_press/release (in/down:%i)", xev.type == KeyPress);
-    {
-      oi_keysym keysym;
-      x11_private *priv;
-      
-      priv = (x11_private*)dev->private;
-
-      // Do not post repeated keys
-      if(!x11_keyrepeat(priv->disp, &xev)) {
-	
-	// Decode key and send it to the state manager
-	x11_translate(priv->disp,
-		      &xev.xkey,
-		      xev.xkey.keycode,
-		      &keysym);
-	keyboard_update(dev->index, 
-			&keysym,
-			xev.type == KeyPress,
-			TRUE);
-      }
-    }
-    break;
-
-
-    // Window gets iconified
-  case UnmapNotify:
-    debug("x11_dispatch: unmap_notify");
-    appstate_focus(dev->index, FALSE, OI_FOCUS_INPUT | OI_FOCUS_VISIBLE, TRUE);
-    break;
-
-
-    // Window gets restored (uniconified)
-  case MapNotify:
-    debug("x11_dispatch: map_notify");
-    appstate_focus(dev->index, TRUE, OI_FOCUS_VISIBLE, TRUE);
-    break;
-
-
-    // Window was resized or moved
-  case ConfigureNotify:
-    debug("x11_dispatch: configure_notify"); 
-    // Only post update if anything changed
-    if((((x11_private*)dev->private)->width != xev.xconfigure.width) &&
-       (((x11_private*)dev->private)->height != xev.xconfigure.height)) {
-
-      appstate_resize(dev->index, xev.xconfigure.width, xev.xconfigure.height, TRUE);
-      ((x11_private*)dev->private)->width = xev.xconfigure.width;
-      ((x11_private*)dev->private)->height = xev.xconfigure.height;
-    }
-    break;
-    
-
-    // We should quit -- or other messages
-  case ClientMessage:
-    debug("x11_dispatch: client_message");
-    // Window manager close window
-    if((xev.xclient.format == 32) &&
-       (xev.xclient.data.l[0] == ((x11_private*)dev->private)->wm_delete_window)) {
-      oi_event ev;
-      ev.type = OI_QUIT;
-      queue_add(&ev);
-    }    
-    break;
-
-    
-    // Redraw required
-  case Expose:
-    debug("x11_dispatch: expose");
-    {
-      oi_event ev;
-      ev.type = OI_EXPOSE;
-      queue_add(&ev);
-    }
-    break;
-    
-    
-    // Unhandled event
-  default:
-    debug("x11_dispatch: unhandled event type %i", xev.type);
-    break;
-  }
 }
 
 /* ******************************************************************** */

@@ -58,9 +58,9 @@ void linuxjoy_fallback(oi_device *dev, char *name, int fd);
  * Note that this driver can handle several joysticks!
  */
 typedef struct linuxjoy_private {
-  sint fd;                       /**< File descriptor */
-  uchar id;                      /**< Device index, ie. the X in /dev/input/jsX */
-  char *name;                    /**< Kernel device name */
+    sint fd;                       /**< File descriptor */
+    uchar id;                      /**< Device index, ie. the X in /dev/input/jsX */
+    char *name;                    /**< Kernel device name */
 } linuxjoy_private;
 
 /* ******************************************************************** */

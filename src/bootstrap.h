@@ -55,25 +55,25 @@ extern oi_bootstrap linuxjoy_bootstrap;
  */
 static oi_bootstrap *bootstrap[] = {
 
-  // Begin list
+    // Begin list
 #ifdef ENABLE_FOO
-  &foo_bootstrap,
+    &foo_bootstrap,
 #endif
 
 #ifdef ENABLE_X11
-  &x11_bootstrap,
+    &x11_bootstrap,
 #endif
 
 #ifdef ENABLE_UNIXSIGNAL
-  &unixsignal_bootstrap,
+    &unixsignal_bootstrap,
 #endif
 
 #ifdef ENABLE_LINUXJOY
-  &linuxjoy_bootstrap,
+    &linuxjoy_bootstrap,
 #endif
 
-  // Terminate list
-  NULL
+    // Terminate list
+    NULL
 };
 #endif
 

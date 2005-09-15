@@ -59,15 +59,15 @@
  * joystick events.
  */
 typedef enum {
-  OIJ_NONE                     = 0,                 /**< Not an axis/button */
-  OIJ_GEN_BUTTON               = 1,                 /**< Generic button */
-  OIJ_GEN_AXIS                 = 2,                 /**< Generic axis */
-  OIJ_STICK                    = 3,                 /**< A classic stick (axis) */
-  OIJ_HAT                      = 4,                 /**< Positional button (axis) */
-  OIJ_RUDDER                   = 5,                 /**< Yaw-stick (axis) */
-  OIJ_THROTTLE                 = 6,                 /**< Throttle/trimmer (axis) */
-  OIJ_BALL                     = 7,                 /**< Trackball (relative events, 2-axis) */
-  OIJ_LAST                                          /**< Last joystick class type */
+    OIJ_NONE                = 0,      /**< Not an axis/button */
+    OIJ_GEN_BUTTON          = 1,      /**< Generic button */
+    OIJ_GEN_AXIS            = 2,      /**< Generic axis */
+    OIJ_STICK               = 3,      /**< A classic stick (axis) */
+    OIJ_HAT                 = 4,      /**< Positional button (axis) */
+    OIJ_RUDDER              = 5,      /**< Yaw-stick (axis) */
+    OIJ_THROTTLE            = 6,      /**< Throttle/trimmer (axis) */
+    OIJ_BALL                = 7,      /**< Trackball (relative events, 2-axis) */
+    OIJ_LAST                          /**< Last joystick class type */
 } oi_joytype;
 
 
@@ -88,7 +88,6 @@ typedef enum {
 #define OI_JOY_MAKE_CODE(t,i)  (OI_JOY_ENCODE_TYPE((t)) + OI_JOY_ENCODE_INDEX((i))) /**< Make joystick code given type and index (in that order) */
 #define OI_JOY_NONE_CODE OI_JOY_MAKE_CODE(OIJ_NONE, 0) /**< The 'none' code that never matches */
 /** @} */
-
 
 /* ******************************************************************** */
 

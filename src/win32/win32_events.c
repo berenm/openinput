@@ -49,12 +49,12 @@ static win32_private *private;
  * Actually, Win32 is fscking lame!
  */
 void win32_setdevhook(oi_device *dev) {
-  device = dev;
-  private = (win32_private*)dev->private;
+    device = dev;
+    private = (win32_private*)dev->private;
 }
 
 /* ******************************************************************** */
- 
+
 /**
  * @ingroup DWin32
  * @brief The window procedure
@@ -73,191 +73,191 @@ void win32_setdevhook(oi_device *dev) {
  * old application handler is called if we catch an event.
  */
 LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-  // Handle
-  switch(msg) {
+    // Handle
+    switch(msg) {
 
 
-    // Receive/loose focus
-  case WM_ACTIVATE:
-    {
-      uint minimize;
-      uint gain;
-      uint mask;
+        // Receive/loose focus
+    case WM_ACTIVATE:
+        {
+            uint minimize;
+            uint gain;
+            uint mask;
 
-      minimize = HIWORD(wparam);
-      gain = !minimize && (LOWORD(wparam) != WA_INACTIVE);
-      mask = OI_FOCUS_INPUT;
-      debug("win32_wndproc: activate - minimize:%u gain:%u", minimize, gain);
+            minimize = HIWORD(wparam);
+            gain = !minimize && (LOWORD(wparam) != WA_INACTIVE);
+            mask = OI_FOCUS_INPUT;
+            debug("win32_wndproc: activate - minimize:%u gain:%u", minimize, gain);
 
-      // Visibility changes on gain and loose+minimize
-      if(gain || (!gain && minimize)) {
-	mask |= OI_FOCUS_VISIBLE;
-      }
-      
-      // Update keyboard state on focus gain
-      if(gain) {
-	win32_keystate(device);
-      }
-      
-      // Post (index, gain, mask, post)
-      appstate_focus(device->index, gain, mask, TRUE);		     
+            // Visibility changes on gain and loose+minimize
+            if(gain || (!gain && minimize)) {
+                mask |= OI_FOCUS_VISIBLE;
+            }
+
+            // Update keyboard state on focus gain
+            if(gain) {
+                win32_keystate(device);
+            }
+
+            // Post (index, gain, mask, post)
+            appstate_focus(device->index, gain, mask, TRUE);
+        }
+        return 0;
+
+
+        // Mouse leaves window
+    case WM_MOUSELEAVE:
+        {
+            debug("win32_wndproc: mouse lease");
+            appstate_focus(device->index, FALSE, OI_FOCUS_MOUSE, TRUE);
+        }
+        return 0;
+
+
+        // Window moved or resized
+    case WM_SIZE:
+    case WM_MOVE:
+        {
+            debug("win32_wndproc: size/move");
+            win32_movesize();
+        }
+        return 0;
+
+
+        // Keyboard presses and releases event
+    case WM_SYSKEYDOWN:
+    case WM_KEYDOWN:
+    case WM_SYSKEYUP:
+    case WM_KEYUP:
+        {
+            oi_keysym keysym;
+            uchar state;
+
+            state = (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN);
+            debug("win32_wndproc: key up/down - down:%u", state);
+
+            // Don't post repeated keys
+            if(state && (lparam & DW32_REPKEYMASK)) {
+                return 0;
+            }
+
+            // Translate and post
+            win32_translate(private, wparam, lparam, state, &keysym);
+            keyboard_update(device->index, &keysym, state, TRUE);
+        }
+        return 0;
+
+
+        // Mouse motion
+    case WM_MOUSEMOVE:
+        {
+            sshort x;
+            sshort y;
+            debug("win32_wndproc: mouse move");
+
+            // Did the mouse enter the window?
+            if(!(oi_app_focus() & OI_FOCUS_MOUSE)) {
+                win32_trackmouse();
+                appstate_focus(device->index, TRUE, OI_FOCUS_MOUSE, TRUE);
+            }
+
+            // Standard movement handling
+            x = LOWORD(lparam);
+            y = HIWORD(lparam);
+            if(private->relative == (DW32_GRAB|DW32_HIDE)) {
+                win32_relative_mouse(x, y);
+            }
+            else {
+                mouse_move(device->index, x, y, FALSE, TRUE);
+            }
+        }
+        return 0;
+
+
+        // Left mouse button
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+        {
+            debug("win32_wndproc: left mouse button");
+            mouse_button(device->index, OIP_BUTTON_LEFT,
+                         msg == WM_LBUTTONDOWN, TRUE);
+        }
+        return 0;
+
+
+        // Middle mouse button
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+        {
+            debug("win32_wndproc: middle mouse button");
+            mouse_button(device->index, OIP_BUTTON_MIDDLE,
+                         msg == WM_MBUTTONDOWN, TRUE);
+        }
+        return 0;
+
+
+        // Right mouse button
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+        {
+            debug("win32_wndproc: right mouse button");
+            mouse_button(device->index, OIP_BUTTON_RIGHT,
+                         msg == WM_RBUTTONDOWN, TRUE);
+        }
+        return 0;
+
+
+        // Mouse wheel
+    case WM_MOUSEWHEEL:
+        {
+            oi_mouse btn;
+
+            debug("win32_wndproc: mouse wheel");
+            if((sshort)HIWORD(wparam) > 0) {
+                btn = OIP_WHEEL_UP;
+            }
+            else {
+                btn = OIP_WHEEL_DOWN;
+            }
+            mouse_button(device->index, btn, TRUE, TRUE);
+        }
+        return 0;
+
+
+        // Close
+    case WM_CLOSE:
+    case WM_DESTROY:
+        {
+            debug("win32_wndproc: close/destroy");
+            oi_event ev;
+            ev.type = OI_QUIT;
+            queue_add(&ev);
+            PostQuitMessage(0);
+        }
+        return 0;
+
+
+        // Erase background
+    case WM_ERASEBKGND:
+        {
+            debug("win32_wndproc: erase background");
+            oi_event ev;
+            ev.type = OI_EXPOSE;
+            queue_add(&ev);
+        }
+        return 0;
+
+
+        // Unhandled event, send to old handler
+    default:
+        if(private->old_wndproc) {
+            return CallWindowProc(private->old_wndproc, hwnd, msg, wparam, lparam);
+        }
+        break;
     }
-    return 0;
 
-
-    // Mouse leaves window
-  case WM_MOUSELEAVE:
-    {
-      debug("win32_wndproc: mouse lease");
-      appstate_focus(device->index, FALSE, OI_FOCUS_MOUSE, TRUE);
-    }
-    return 0;
-
-
-    // Window moved or resized
-  case WM_SIZE:
-  case WM_MOVE:
-    {
-      debug("win32_wndproc: size/move");
-      win32_movesize();
-    }
-    return 0;
-
-
-    // Keyboard presses and releases event
-  case WM_SYSKEYDOWN:
-  case WM_KEYDOWN: 
-  case WM_SYSKEYUP:
-  case WM_KEYUP:
-    {
-      oi_keysym keysym;
-      uchar state;
-
-      state = (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN);
-      debug("win32_wndproc: key up/down - down:%u", state);
-      
-      // Don't post repeated keys
-      if(state && (lparam & DW32_REPKEYMASK)) {
-	return 0;
-      }
-
-      // Translate and post
-      win32_translate(private, wparam, lparam, state, &keysym);
-      keyboard_update(device->index, &keysym, state, TRUE);
-    }
-    return 0;
-
-
-    // Mouse motion
-  case WM_MOUSEMOVE:
-    {
-      sshort x;
-      sshort y;
-      debug("win32_wndproc: mouse move");
-
-      // Did the mouse enter the window?
-      if(!(oi_app_focus() & OI_FOCUS_MOUSE)) {
-	win32_trackmouse();
-	appstate_focus(device->index, TRUE, OI_FOCUS_MOUSE, TRUE);
-      }
-
-      // Standard movement handling
-      x = LOWORD(lparam);
-      y = HIWORD(lparam);
-      if(private->relative == (DW32_GRAB|DW32_HIDE)) {
-	win32_relative_mouse(x, y);
-      }
-      else {
-	mouse_move(device->index, x, y, FALSE, TRUE);
-      }
-    }
-    return 0;
-
-
-    // Left mouse button
-  case WM_LBUTTONDOWN:
-  case WM_LBUTTONUP:
-    {
-      debug("win32_wndproc: left mouse button");
-      mouse_button(device->index, OIP_BUTTON_LEFT,
-		   msg == WM_LBUTTONDOWN, TRUE);
-    }
-    return 0;
-
-    
-    // Middle mouse button
-  case WM_MBUTTONDOWN:
-  case WM_MBUTTONUP:
-    {
-      debug("win32_wndproc: middle mouse button");
-      mouse_button(device->index, OIP_BUTTON_MIDDLE,
-		   msg == WM_MBUTTONDOWN, TRUE);
-    }
-    return 0;
-
-
-    // Right mouse button
-  case WM_RBUTTONDOWN:
-  case WM_RBUTTONUP:
-    {
-      debug("win32_wndproc: right mouse button");
-      mouse_button(device->index, OIP_BUTTON_RIGHT,
-		   msg == WM_RBUTTONDOWN, TRUE);
-    }
-    return 0;
-
-
-    // Mouse wheel
-  case WM_MOUSEWHEEL:
-    {
-      oi_mouse btn;
-
-      debug("win32_wndproc: mouse wheel");
-      if((sshort)HIWORD(wparam) > 0) {
-	btn = OIP_WHEEL_UP;
-      }
-      else {
-	btn = OIP_WHEEL_DOWN;
-      }
-      mouse_button(device->index, btn, TRUE, TRUE);
-    }
-    return 0;
-    
-    
-    // Close
-  case WM_CLOSE:
-  case WM_DESTROY:
-    {
-      debug("win32_wndproc: close/destroy");
-      oi_event ev;
-      ev.type = OI_QUIT;
-      queue_add(&ev);
-      PostQuitMessage(0);
-    }
-    return 0;
-
-
-    // Erase background
-  case WM_ERASEBKGND:
-    {
-      debug("win32_wndproc: erase background");
-      oi_event ev;
-      ev.type = OI_EXPOSE;
-      queue_add(&ev);
-    }
-    return 0;
-    
-    
-    // Unhandled event, send to old handler
-  default:
-    if(private->old_wndproc) {
-      return CallWindowProc(private->old_wndproc, hwnd, msg, wparam, lparam);
-    }
-    break;
-  }
-
-  // The catch-all default handler
-  return DefWindowProc(hwnd, msg, wparam, lparam);
+    // The catch-all default handler
+    return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 /* ******************************************************************** */
@@ -270,13 +270,13 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
  * must enable mouse tracking.
  */
 void win32_trackmouse() {
-  TRACKMOUSEEVENT tme;
+    TRACKMOUSEEVENT tme;
 
-  tme.cbSize = sizeof(tme);
-  tme.dwFlags = TME_LEAVE;
-  tme.hwndTrack = private->hwnd;
-  
-  TrackMouseEvent(&tme);
+    tme.cbSize = sizeof(tme);
+    tme.dwFlags = TME_LEAVE;
+    tme.hwndTrack = private->hwnd;
+
+    TrackMouseEvent(&tme);
 }
 
 /* ******************************************************************** */
@@ -295,23 +295,23 @@ void win32_trackmouse() {
  * We do this by warping the mouse to the window center
  */
 inline void win32_relative_mouse(uint x, uint y) {
-  POINT cen;
-  sshort rx;
-  sshort ry;
+    POINT cen;
+    sshort rx;
+    sshort ry;
 
-  // Get center and relative motion
-  cen.x = private->width/2;
-  cen.y = private->height/2;
-  rx = x - cen.x;
-  ry = y - cen.y;
-  
-  // Movement did happen
-  if(rx || ry) {
-    // Center cursor
-    ClientToScreen(private->hwnd, &cen);
-    SetCursorPos(cen.x, cen.y);
-    mouse_move(device->index, rx, ry, TRUE, TRUE);
-  }
+    // Get center and relative motion
+    cen.x = private->width/2;
+    cen.y = private->height/2;
+    rx = x - cen.x;
+    ry = y - cen.y;
+
+    // Movement did happen
+    if(rx || ry) {
+        // Center cursor
+        ClientToScreen(private->hwnd, &cen);
+        SetCursorPos(cen.x, cen.y);
+        mouse_move(device->index, rx, ry, TRUE, TRUE);
+    }
 }
 
 /* ******************************************************************** */
@@ -325,26 +325,26 @@ inline void win32_relative_mouse(uint x, uint y) {
  * can be updated.
  */
 void win32_movesize() {
-  RECT rc;
+    RECT rc;
 
-  // Get "outer" position
-  GetWindowRect(private->hwnd, &rc);
-  private->winx = rc.left;
-  private->winy = rc.top;
+    // Get "outer" position
+    GetWindowRect(private->hwnd, &rc);
+    private->winx = rc.left;
+    private->winy = rc.top;
 
-  // Store new boundaries for mouse grabbing
-  GetClientRect(private->hwnd, &private->rect);
-    
-  // Did anything change?
-  if((private->width == private->rect.right) &&
-     (private->height == private->rect.bottom)) {
-    return;
-  }
+    // Store new boundaries for mouse grabbing
+    GetClientRect(private->hwnd, &private->rect);
 
-  // Update and post event
-  private->width = rc.right;
-  private->height = rc.bottom;
-  appstate_resize(device->index, private->width, private->height, TRUE);
+    // Did anything change?
+    if((private->width == private->rect.right) &&
+       (private->height == private->rect.bottom)) {
+        return;
+    }
+
+    // Update and post event
+    private->width = rc.right;
+    private->height = rc.bottom;
+    appstate_resize(device->index, private->width, private->height, TRUE);
 }
 
 /* ******************************************************************** */

@@ -40,14 +40,14 @@
  * Note that the joysticks below have are probably incorrect!
  */
 const oi_joyconfig linuxjoy_specs[] = {
-  { "MadCatz Panther XL",
-    8,
-    {2, 2, 2, 4, 0, 4, 0, 7},
-    {0, 0, 0, 4, 0, 6} },
-  { "SideWinder Precision Pro",
-    8,
-    {2, 2, 2, 2, 4, 0, 7},
-    {0, 0, 0, 0, 5} }
+    { "MadCatz Panther XL",
+      8,
+      {2, 2, 2, 4, 0, 4, 0, 7},
+      {0, 0, 0, 4, 0, 6} },
+    { "SideWinder Precision Pro",
+      8,
+      {2, 2, 2, 2, 4, 0, 7},
+      {0, 0, 0, 0, 5} }
 };
 
 

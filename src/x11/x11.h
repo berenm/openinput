@@ -51,7 +51,7 @@ sint x11_fatal(Display *d);
 inline sint x11_pending(Display *d);
 inline void x11_dispatch(oi_device *dev, Display *d);
 inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
-				KeyCode kc, oi_keysym *keysym);
+                                KeyCode kc, oi_keysym *keysym);
 void x11_initkeymap();
 void x11_keystate(oi_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, oi_device *dev);
@@ -68,22 +68,22 @@ inline schar x11_keyrepeat(Display *d, XEvent *evt);
  * display, screen and window handles.
  */
 typedef struct x11_private {
-  Display *disp;             /**< Display handle */
-  Window win;                /**< Window handle  */
-  Screen *screen;            /**< Screen handle (unused) */
-  Cursor cursor;             /**< The invisible cursor */
-  Atom wm_delete_window;     /**< Close-window protocol atom */
-  uint mask_lmeta;           /**< Variable mask for key */
-  uint mask_rmeta;           /**< Variable mask for key */
-  uint mask_lalt;            /**< Variable mask for key */
-  uint mask_ralt;            /**< Variable mask for key */
-  uint mask_num;             /**< Variable mask for key */
-  uint mask_altgr;           /**< Variable mask for key */
-  uchar relative;            /**< Relative mouse motion */
-  int lastx;                 /**< Last mouse x positon */
-  int lasty;                 /**< Last mouse y position */
-  int width;                 /**< Window width */
-  int height;                /**< Window height */
+    Display *disp;             /**< Display handle */
+    Window win;                /**< Window handle  */
+    Screen *screen;            /**< Screen handle (unused) */
+    Cursor cursor;             /**< The invisible cursor */
+    Atom wm_delete_window;     /**< Close-window protocol atom */
+    uint mask_lmeta;           /**< Variable mask for key */
+    uint mask_rmeta;           /**< Variable mask for key */
+    uint mask_lalt;            /**< Variable mask for key */
+    uint mask_ralt;            /**< Variable mask for key */
+    uint mask_num;             /**< Variable mask for key */
+    uint mask_altgr;           /**< Variable mask for key */
+    uchar relative;            /**< Relative mouse motion */
+    int lastx;                 /**< Last mouse x positon */
+    int lasty;                 /**< Last mouse y position */
+    int width;                 /**< Window width */
+    int height;                /**< Window height */
 } x11_private;
 
 /* ******************************************************************** */

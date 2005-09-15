@@ -44,16 +44,16 @@
 
 // Bootstrap global
 oi_bootstrap foo_bootstrap = {
-  "foo",
-  "Foo test system",
-  OI_PRO_UNKNOWN,
-  foo_avail,
-  foo_device
+    "foo",
+    "Foo test system",
+    OI_PRO_UNKNOWN,
+    foo_avail,
+    foo_device
 };
 
 
 /* ******************************************************************** */
- 
+
 /**
  * @ingroup DFoo
  * @brief Check availablity of foo device
@@ -66,9 +66,9 @@ oi_bootstrap foo_bootstrap = {
  * The foo device driver always exists (if compiled in).
  */
 sint foo_avail(uint flags) {
-  debug("foo_avail");
+    debug("foo_avail");
 
-  return TRUE;
+    return TRUE;
 }
 
 /* ******************************************************************** */
@@ -80,47 +80,47 @@ sint foo_avail(uint flags) {
  * @returns pointer to allocated device interface
  *
  * This is a bootstrap function.
- * 
+ *
  * Alloc and initialize the device driver abstration
  * interface.
  */
 oi_device *foo_device() {
-  oi_device *dev;
-  foo_private *priv;
+    oi_device *dev;
+    foo_private *priv;
 
-  debug("foo_device");
+    debug("foo_device");
 
-  // Alloc device and private data
-  dev = (oi_device*)malloc(sizeof(oi_device));
-  priv = (foo_private*)malloc(sizeof(foo_private));
-  if((dev == NULL) || (priv == NULL)) {
-    debug("foo_device: device creation failed");
-    if(dev) {
-      free(dev);
+    // Alloc device and private data
+    dev = (oi_device*)malloc(sizeof(oi_device));
+    priv = (foo_private*)malloc(sizeof(foo_private));
+    if((dev == NULL) || (priv == NULL)) {
+        debug("foo_device: device creation failed");
+        if(dev) {
+            free(dev);
+        }
+        if(priv) {
+            free(priv);
+        }
+        return NULL;
     }
-    if(priv) {
-      free(priv);
-    }
-    return NULL;
-  }
 
-  // Clear structures
-  memset(dev, 0, sizeof(oi_device));
-  memset(priv, 0, sizeof(foo_private));
+    // Clear structures
+    memset(dev, 0, sizeof(oi_device));
+    memset(priv, 0, sizeof(foo_private));
 
-  // Set members
-  dev->init = foo_init;
-  dev->destroy = foo_destroy;
-  dev->process = foo_process;  
-  dev->grab = foo_grab;
-  dev->hide = foo_hidecursor;
-  dev->warp = foo_warp;
-  dev->winsize = foo_winsize;
-  dev->reset = foo_reset;
-  dev->private = priv;
-  
-  // Done
-  return dev;
+    // Set members
+    dev->init = foo_init;
+    dev->destroy = foo_destroy;
+    dev->process = foo_process;
+    dev->grab = foo_grab;
+    dev->hide = foo_hidecursor;
+    dev->warp = foo_warp;
+    dev->winsize = foo_winsize;
+    dev->reset = foo_reset;
+    dev->private = priv;
+
+    // Done
+    return dev;
 }
 
 /* ******************************************************************** */
@@ -136,33 +136,33 @@ oi_device *foo_device() {
  *
  * This is a device interface function.
  *
- * Initialize the foo test driver - initializes 
+ * Initialize the foo test driver - initializes
  * the private structure and other states.
  */
 sint foo_init(oi_device *dev, char *window_id, uint flags) {
-  uint val;
-  foo_private *priv;
+    uint val;
+    foo_private *priv;
 
-  debug("foo_init: window '%s', flags %i", window_id, flags);
-  
-  // Sniff the handles
-  val = device_windowid(window_id, OI_I_CONN);
-  debug("foo_init: conn (c) parameter %i", val);
+    debug("foo_init: window '%s', flags %i", window_id, flags);
 
-  val = device_windowid(window_id, OI_I_SCRN);
-  debug("foo_init: scrn (s) parameter %i", val);
+    // Sniff the handles
+    val = device_windowid(window_id, OI_I_CONN);
+    debug("foo_init: conn (c) parameter %i", val);
 
-  val = device_windowid(window_id, OI_I_WINID);
-  debug("foo_init: winid (w) parameter %i", val);
+    val = device_windowid(window_id, OI_I_SCRN);
+    debug("foo_init: scrn (s) parameter %i", val);
 
-  // Set some stupid private values
-  priv = (foo_private*)dev->private;
-  priv->grabstatus = FALSE;
-  priv->cursorstatus = FALSE;
-  priv->x = 0;
-  priv->y = 0;
+    val = device_windowid(window_id, OI_I_WINID);
+    debug("foo_init: winid (w) parameter %i", val);
 
-  return OI_ERR_OK;
+    // Set some stupid private values
+    priv = (foo_private*)dev->private;
+    priv->grabstatus = FALSE;
+    priv->cursorstatus = FALSE;
+    priv->x = 0;
+    priv->y = 0;
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -179,19 +179,19 @@ sint foo_init(oi_device *dev, char *window_id, uint flags) {
  * Close down driver freeing any allocated memory.
  */
 sint foo_destroy(oi_device *dev) {
-  debug("foo_destroy");
-  
-  // Free device
-  if(dev) {
-    // Private data
-    if(dev->private) {
-      free(dev->private);
-    }
-    free(dev);
-    dev = NULL;
-  }
+    debug("foo_destroy");
 
-  return OI_ERR_OK;
+    // Free device
+    if(dev) {
+        // Private data
+        if(dev->private) {
+            free(dev->private);
+        }
+        free(dev);
+        dev = NULL;
+    }
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -211,25 +211,25 @@ sint foo_destroy(oi_device *dev) {
  * also be performed.
  */
 void foo_process(oi_device *dev) {
-  static oi_event ev;
+    static oi_event ev;
 
-  debug("foo_process");
+    debug("foo_process");
 
-  if(!oi_runstate()) {
-    debug("foo_process: oi_running false");
-    return;
-  }
+    if(!oi_runstate()) {
+        debug("foo_process: oi_running false");
+        return;
+    }
 
-  // Since this is a test device, generate an event
-  ev.type = OI_KEYDOWN;
-  ev.key.device = dev->index;
-  ev.key.state = 1;
-  ev.key.keysym.scancode = 65;
-  ev.key.keysym.sym = OIK_A;
-  ev.key.keysym.mod = OIM_NONE;
-  
-  // Post event
-  queue_add(&ev);
+    // Since this is a test device, generate an event
+    ev.type = OI_KEYDOWN;
+    ev.key.device = dev->index;
+    ev.key.state = 1;
+    ev.key.keysym.scancode = 65;
+    ev.key.keysym.sym = OIK_A;
+    ev.key.keysym.mod = OIM_NONE;
+
+    // Post event
+    queue_add(&ev);
 }
 
 /* ******************************************************************** */
@@ -249,12 +249,12 @@ void foo_process(oi_device *dev) {
  * in debug-mode, the state change can be verified.
  */
 sint foo_grab(oi_device *dev, sint on) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
-  priv->grabstatus = on;
+    foo_private *priv;
+    priv = (foo_private*)dev->private;
+    debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
+    priv->grabstatus = on;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -275,12 +275,12 @@ sint foo_grab(oi_device *dev, sint on) {
  * and in debug-mode, the state change can be verified.
  */
 sint foo_hidecursor(oi_device *dev, sint on) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
-  priv->cursorstatus = on;
-  
-  return OI_ERR_OK;
+    foo_private *priv;
+    priv = (foo_private*)dev->private;
+    debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
+    priv->cursorstatus = on;
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -301,13 +301,13 @@ sint foo_hidecursor(oi_device *dev, sint on) {
  * is changed, and can be verified in debug-mode.
  */
 sint foo_warp(oi_device *dev, sint x, sint y) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_warp: warp pointer to %i, %i", x, y);
-  priv->x = x;
-  priv->y = y;
+    foo_private *priv;
+    priv = (foo_private*)dev->private;
+    debug("foo_warp: warp pointer to %i, %i", x, y);
+    priv->x = x;
+    priv->y = y;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -328,15 +328,15 @@ sint foo_warp(oi_device *dev, sint x, sint y) {
  * virtual mouse pointer coordinate (set using the warp function).
  */
 sint foo_winsize(oi_device *dev, sint *w, sint *h) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_winsize");
+    foo_private *priv;
+    priv = (foo_private*)dev->private;
+    debug("foo_winsize");
 
-  // Just for fun, return the mouse position
-  *w = priv->x;
-  *h = priv->y;
+    // Just for fun, return the mouse position
+    *w = priv->x;
+    *h = priv->y;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -354,16 +354,16 @@ sint foo_winsize(oi_device *dev, sint *w, sint *h) {
  * a test device, simply just reset the coordinates etc.
  */
 sint foo_reset(oi_device *dev) {
-  foo_private *priv;
-  priv = (foo_private*)dev->private;
-  debug("foo_reset");
+    foo_private *priv;
+    priv = (foo_private*)dev->private;
+    debug("foo_reset");
 
-  priv->grabstatus = FALSE;
-  priv->cursorstatus = FALSE;
-  priv->x = 0;
-  priv->y = 0;
+    priv->grabstatus = FALSE;
+    priv->cursorstatus = FALSE;
+    priv->x = 0;
+    priv->y = 0;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */

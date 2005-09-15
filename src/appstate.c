@@ -1,5 +1,5 @@
 /*
- * appstate.c : Application state (focus/grab/cursor) interface 
+ * appstate.c : Application state (focus/grab/cursor) interface
  *
  * This file is a part of the OpenInput library.
  * Copyright (C) 2005  Jakob Kjaer <makob@makob.dk>.
@@ -45,42 +45,42 @@ static sint win_height;
  * Must be called on library initialization.
  */
 sint appstate_init() {
-  int i;
+    int i;
 
-  // Ok, our focus is complete
-  focus = OI_FOCUS_MOUSE | OI_FOCUS_INPUT | OI_FOCUS_VISIBLE;
+    // Ok, our focus is complete
+    focus = OI_FOCUS_MOUSE | OI_FOCUS_INPUT | OI_FOCUS_VISIBLE;
 
-  // Not grabbed, and cursor is visible
-  grab = FALSE;
-  cursor = TRUE;
+    // Not grabbed, and cursor is visible
+    grab = FALSE;
+    cursor = TRUE;
 
-  // Find default/first window device
-  i = 1;
-  while((windowdev = device_get(i)) != NULL) {
-    if((windowdev->provides & OI_PRO_WINDOW) == OI_PRO_WINDOW) {
-      break;
+    // Find default/first window device
+    i = 1;
+    while((windowdev = device_get(i)) != NULL) {
+        if((windowdev->provides & OI_PRO_WINDOW) == OI_PRO_WINDOW) {
+            break;
+        }
+        i++;
     }
-    i++;
-  }
 
-  // We really want a window
-  if(windowdev == NULL) {
-    return OI_ERR_NO_DEVICE;
-  }
+    // We really want a window
+    if(windowdev == NULL) {
+        return OI_ERR_NO_DEVICE;
+    }
 
-  // Get window metrics
-  if(windowdev->winsize) {
-    windowdev->winsize(windowdev, &win_width, &win_height);
-  }
-  else {
-    // No winsize function, very bad
-    return OI_ERR_NOT_IMPLEM;
-  }
+    // Get window metrics
+    if(windowdev->winsize) {
+        windowdev->winsize(windowdev, &win_width, &win_height);
+    }
+    else {
+        // No winsize function, very bad
+        return OI_ERR_NOT_IMPLEM;
+    }
 
-  debug("appstate_init: window device is '%s'", windowdev->name);
+    debug("appstate_init: window device is '%s'", windowdev->name);
 
-  // Done
-  return OI_ERR_OK;
+    // Done
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -99,39 +99,38 @@ sint appstate_init() {
  * #OI_FOCUS_VISIBLE
  */
 void appstate_focus(uchar index, sint gain, sint state, uchar post) {
-  sint newfocus;
+    sint newfocus;
 
-  // Loose or gain
-  newfocus = focus;
-  if(gain) {
-    newfocus |= state;
-  }
-  else {
-    newfocus = focus - (focus & state);
-  }
+    // Loose or gain
+    newfocus = focus;
+    if(gain) {
+        newfocus |= state;
+    }
+    else {
+        newfocus = focus - (focus & state);
+    }
 
-  // If nothing changed, bail out
-  if(newfocus == focus) {
-    return;
-  }
+    // If nothing changed, bail out
+    if(newfocus == focus) {
+        return;
+    }
 
-  // Store state
-  focus = newfocus;
+    // Store state
+    focus = newfocus;
 
-  // Postal services
-  if(post) {
-    oi_event ev;
-    ev.type = OI_ACTIVE;
-    ev.active.device = index;
-    ev.active.gain = gain & TRUE;
-    ev.active.state = state;
-    queue_add(&ev);
-  }
+    // Postal services
+    if(post) {
+        oi_event ev;
+        ev.type = OI_ACTIVE;
+        ev.active.device = index;
+        ev.active.gain = gain & TRUE;
+        ev.active.state = state;
+        queue_add(&ev);
+    }
 }
 
 /* ******************************************************************** */
 
-// Update window size changes
 /**
  * @ingroup IAppstate
  * @brief Update application window size state
@@ -144,23 +143,23 @@ void appstate_focus(uchar index, sint gain, sint state, uchar post) {
  * Update the window size state.
  */
 void appstate_resize(uchar index, sint w, sint h, uchar post) {
-  // Store state
-  win_width = w;
-  win_height = h;
+    // Store state
+    win_width = w;
+    win_height = h;
 
-  // Postal services
-  if(post) {
-    oi_event ev;
-    ev.type = OI_RESIZE;
-    ev.resize.device = index;
-    ev.resize.width = w;
-    ev.resize.height = h;
-    queue_add(&ev);
-  }
+    // Postal services
+    if(post) {
+        oi_event ev;
+        ev.type = OI_RESIZE;
+        ev.resize.device = index;
+        ev.resize.width = w;
+        ev.resize.height = h;
+        queue_add(&ev);
+    }
 }
 
 /* ******************************************************************** */
-   
+
 /**
  * @ingroup IAppstate
  * @brief Get application window width
@@ -168,7 +167,7 @@ void appstate_resize(uchar index, sint w, sint h, uchar post) {
  * @returns window width (pixels)
  */
 inline sint appstate_width() {
-  return win_width;
+    return win_width;
 }
 
 /* ******************************************************************** */
@@ -180,7 +179,7 @@ inline sint appstate_width() {
  * @returns window height (pixels)
  */
 inline sint appstate_height() {
-  return win_height;
+    return win_height;
 }
 
 /* ******************************************************************** */
@@ -195,7 +194,7 @@ inline sint appstate_height() {
  * #OI_FOCUS_VISIBLE
  */
 sint oi_app_focus() {
-  return focus;
+    return focus;
 }
 
 /* ******************************************************************** */
@@ -211,50 +210,49 @@ sint oi_app_focus() {
  * be queried using #OI_QUERY
  */
 oi_bool oi_app_cursor(oi_bool q) {
-  int hide;
-
-  switch(q) {
-  case OI_ENABLE:
-    hide = FALSE;
-    break;
-    
-  case OI_DISABLE:
-    hide = TRUE;
-    break;
-
-  case OI_QUERY:
-    if(cursor) {
-      return OI_ENABLE;
-    }
-    else {
-      return OI_DISABLE;
-    }
-  }
-  
-  // Set cursor mode on all devices
-  {
+    int hide;
+    int i;
     oi_device *dev;
-    int i = 1;
-    while((dev = device_get(i)) != NULL) {
-      // Hide is an optional function
-      if(dev->hide) {
-	dev->hide(dev, hide);
-      }
 
-      // When unhiding, warp the mouse due to fudge
-      if(!hide && dev->warp) {
-	sint x;
-	sint y;
-	oi_mouse_absolute(0, &x, &y);
-	dev->warp(dev, x, y);
-      }
-      i++;
+    switch(q) {
+    case OI_ENABLE:
+        hide = FALSE;
+        break;
+
+    case OI_DISABLE:
+        hide = TRUE;
+        break;
+
+    case OI_QUERY:
+        if(cursor) {
+            return OI_ENABLE;
+        }
+        else {
+            return OI_DISABLE;
+        }
     }
-  }
-  
-  // Remember mode
-  cursor = hide;
-  return q;
+
+    // Set cursor mode on all devices
+    i = 1;
+    while((dev = device_get(i)) != NULL) {
+        // Hide is an optional function
+        if(dev->hide) {
+            dev->hide(dev, hide);
+        }
+
+        // When unhiding, warp the mouse due to fudge
+        if(!hide && dev->warp) {
+            sint x;
+            sint y;
+            oi_mouse_absolute(0, &x, &y);
+            dev->warp(dev, x, y);
+        }
+        i++;
+    }
+
+    // Remember mode
+    cursor = hide;
+    return q;
 }
 
 /* ******************************************************************** */
@@ -262,7 +260,7 @@ oi_bool oi_app_cursor(oi_bool q) {
 /**
  * @ingroup PAppstate
  * @brief Grab or release the mouse cursor
- * 
+ *
  * @param q enable/disable/query grabbing, see @ref PBool
  * @returns state of grabbing, OI_QUERY on error
  *
@@ -270,42 +268,41 @@ oi_bool oi_app_cursor(oi_bool q) {
  * also be queried using #OI_QUERY
  */
 oi_bool oi_app_grab(oi_bool q) {
-  int eat;
-  
-  switch(q) {
-  case OI_ENABLE:
-    eat = TRUE;
-    break;
-    
-  case OI_DISABLE:
-    eat = FALSE;
-    break;
-
-  case OI_QUERY:
-    if(grab) {
-      return OI_ENABLE;
-    }
-    else {
-      return OI_DISABLE;
-    }
-  }
-  
-  // Set cursor mode on all devices
-  {
+    int eat;
+    int i;
     oi_device *dev;
-    int i = 1;
-    while((dev = device_get(i)) != NULL) {
-      // Grab is an optional function
-      if(dev->grab) {      
-	dev->grab(dev, eat);
-      }
-      i++;
+
+    switch(q) {
+    case OI_ENABLE:
+        eat = TRUE;
+        break;
+
+    case OI_DISABLE:
+        eat = FALSE;
+        break;
+
+    case OI_QUERY:
+        if(grab) {
+            return OI_ENABLE;
+        }
+        else {
+            return OI_DISABLE;
+        }
     }
-  }
-  
-  // Remember mode
-  grab = eat;
-  return q;
+
+    // Set cursor mode on all devices
+    i = 1;
+    while((dev = device_get(i)) != NULL) {
+        // Grab is an optional function
+        if(dev->grab) {
+            dev->grab(dev, eat);
+        }
+        i++;
+    }
+
+    // Remember mode
+    grab = eat;
+    return q;
 }
 
 /* ******************************************************************** */

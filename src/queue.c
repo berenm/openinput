@@ -30,9 +30,9 @@
 
 // Globals
 static struct {
-  oi_event events[OI_MAX_EVENTS];
-  sshort head;
-  sshort tail;
+    oi_event events[OI_MAX_EVENTS];
+    sshort head;
+    sshort tail;
 } queue;
 
 /* ******************************************************************** */
@@ -49,17 +49,17 @@ static struct {
  * of the queue to exist (to generate discovery events).
  */
 sint queue_init() {
-  debug("queue_init");
-  
-  // Clear event queue
-  queue.head = 0;
-  queue.tail = 0;
-  memset(queue.events, 0, sizeof(queue.events));
+    debug("queue_init");
 
-  //FIXME: Mutexes and threads should gracefully be started here
+    // Clear event queue
+    queue.head = 0;
+    queue.tail = 0;
+    memset(queue.events, 0, sizeof(queue.events));
 
-  // All done
-  return OI_ERR_OK;
+    //FIXME: Mutexes and threads should gracefully be started here
+
+    // All done
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -73,8 +73,8 @@ sint queue_init() {
  * Mutual exclusion lock of event queue.
  */
 inline sint queue_lock() {
-  //FIXME: Implement this
-  return OI_ERR_NOT_IMPLEM;
+    //FIXME: Implement this
+    return OI_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
@@ -88,8 +88,8 @@ inline sint queue_lock() {
  * Mutual exclusion unlock of event queue.
  */
 inline sint queue_unlock() {
-  //FIXME: Implement this
-  return OI_ERR_NOT_IMPLEM;
+    //FIXME: Implement this
+    return OI_ERR_NOT_IMPLEM;
 }
 
 /* ******************************************************************** */
@@ -108,40 +108,40 @@ inline sint queue_unlock() {
  * care of a lot of other nice stuff for you.
  */
 sint queue_add(oi_event *evt) {
-  int tail, add;
+    int tail, add;
 
-  //FIXME Generate action events on keyboard/mouse
-  if((evt->type == OI_KEYUP) ||
-     (evt->type == OI_KEYDOWN) ||
-     (evt->type == OI_MOUSEMOVE) ||
-     (evt->type == OI_MOUSEBUTTONUP) ||
-     (evt->type == OI_MOUSEBUTTONDOWN)) {
-    action_process(evt);
-  }
+    //FIXME Generate action events on keyboard/mouse
+    if((evt->type == OI_KEYUP) ||
+       (evt->type == OI_KEYDOWN) ||
+       (evt->type == OI_MOUSEMOVE) ||
+       (evt->type == OI_MOUSEBUTTONUP) ||
+       (evt->type == OI_MOUSEBUTTONDOWN)) {
+        action_process(evt);
+    }
 
-  //FIXME: Check mask before we add the event
+    //FIXME: Check mask before we add the event
 
-  // Find position for insertion
-  tail = (queue.tail+1)%OI_MAX_EVENTS;
+    // Find position for insertion
+    tail = (queue.tail+1)%OI_MAX_EVENTS;
 
-  // Overflow, drop it
-  if(tail == queue.head) {
-    add = 0;
-  }
-  
-  // Insert it by COPYING!
-  else {
-    queue.events[queue.tail] = *evt;
-    add = 1;
-    // SDL does some special windowmanager event handling here
+    // Overflow, drop it
+    if(tail == queue.head) {
+        add = 0;
+    }
 
-    debug("queue_add: type %i added at position %i",
-	  evt->type, queue.tail);
+    // Insert it by COPYING!
+    else {
+        queue.events[queue.tail] = *evt;
+        add = 1;
+        // SDL does some special windowmanager event handling here
 
-    queue.tail = tail;
-  }
+        debug("queue_add: type %i added at position %i",
+              evt->type, queue.tail);
 
-  return add;
+        queue.tail = tail;
+    }
+
+    return add;
 }
 
 /* ******************************************************************** */
@@ -159,41 +159,41 @@ sint queue_add(oi_event *evt) {
  */
 sint queue_cut(ushort where) {
 
-  // Cut head
-  if(where == queue.head) {
-    // Simply increase head
-    queue.head = (queue.head+1)%OI_MAX_EVENTS;
-    return queue.head;
-  }
-  
-  // Cut tail
-  if(((where+1)%OI_MAX_EVENTS) == queue.tail) {
-    queue.tail = where;
-    return queue.tail;
-  }
-
-  // Cut somewhere in between
-  else {
-    sint next;
-    sint here;
-
-    // Wrap around negative tail
-    --queue.tail;
-    if(queue.tail < 0) {
-      queue.tail = OI_MAX_EVENTS-1;
+    // Cut head
+    if(where == queue.head) {
+        // Simply increase head
+        queue.head = (queue.head+1)%OI_MAX_EVENTS;
+        return queue.head;
     }
 
-    // Shift everything backwards
-    for(here=where; here!=queue.tail; here=next) {
-      next = (here+1)%OI_MAX_EVENTS;
-
-      // We use COPYING here
-      queue.events[here] = queue.events[next];
+    // Cut tail
+    if(((where+1)%OI_MAX_EVENTS) == queue.tail) {
+        queue.tail = where;
+        return queue.tail;
     }
 
-    // Done
-    return where;
-  }
+    // Cut somewhere in between
+    else {
+        sint next;
+        sint here;
+
+        // Wrap around negative tail
+        --queue.tail;
+        if(queue.tail < 0) {
+            queue.tail = OI_MAX_EVENTS-1;
+        }
+
+        // Shift everything backwards
+        for(here=where; here!=queue.tail; here=next) {
+            next = (here+1)%OI_MAX_EVENTS;
+
+            // We use COPYING here
+            queue.events[here] = queue.events[next];
+        }
+
+        // Done
+        return where;
+    }
 }
 
 /* ******************************************************************** */
@@ -214,44 +214,44 @@ sint queue_cut(ushort where) {
  * using queue_cut.
  */
 sint queue_peep(oi_event *evts, sint num, uint mask, sint remove) {
-  oi_event tmpevt;
-  int here;
-  int copy;
+    oi_event tmpevt;
+    int here;
+    int copy;
 
-  // User wants to know if events for the mask are pending
-  if((evts == NULL) || (num <= 0)) {
-    evts = &tmpevt;
-    num = 1;
-    remove = 0;
-  }
-
-  // Start from head, continue till tail or num reached
-  here = queue.head;
-  copy = 0;
-  while((copy < num) && (here != queue.tail)) {
-    // Check mask
-    if(mask & OI_EVENT_MASK(queue.events[here].type)) {
-
-      // Transfer to user by COPYING
-      evts[copy] = queue.events[here];
-      copy++;
-
-      // With or without removal
-      if(remove) {
-	here = queue_cut(here);
-      }
-      else {
-	here = (here+1)%OI_MAX_EVENTS;
-      }
+    // User wants to know if events for the mask are pending
+    if((evts == NULL) || (num <= 0)) {
+        evts = &tmpevt;
+        num = 1;
+        remove = 0;
     }
 
-    // Mask does not match, fetch next event in queue
-    else {
-      here = (here+1)%OI_MAX_EVENTS;
+    // Start from head, continue till tail or num reached
+    here = queue.head;
+    copy = 0;
+    while((copy < num) && (here != queue.tail)) {
+        // Check mask
+        if(mask & OI_EVENT_MASK(queue.events[here].type)) {
+
+            // Transfer to user by COPYING
+            evts[copy] = queue.events[here];
+            copy++;
+
+            // With or without removal
+            if(remove) {
+                here = queue_cut(here);
+            }
+            else {
+                here = (here+1)%OI_MAX_EVENTS;
+            }
+        }
+
+        // Mask does not match, fetch next event in queue
+        else {
+            here = (here+1)%OI_MAX_EVENTS;
+        }
     }
-  }
-  
-  return copy;
+
+    return copy;
 }
 
 /* ******************************************************************** */

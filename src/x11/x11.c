@@ -48,11 +48,11 @@
 
 // Bootstrap global
 oi_bootstrap x11_bootstrap = {
-  "x11",
-  "X11 Window system",
-  OI_PRO_KEYBOARD | OI_PRO_MOUSE | OI_PRO_WINDOW,
-  x11_avail,
-  x11_device,
+    "x11",
+    "X11 Window system",
+    OI_PRO_KEYBOARD | OI_PRO_MOUSE | OI_PRO_WINDOW,
+    x11_avail,
+    x11_device,
 };
 
 /* ******************************************************************** */
@@ -70,25 +70,25 @@ oi_bootstrap x11_bootstrap = {
  * tells us of the X11 system can be used.
  */
 sint x11_avail(uint flags) {
-  Display *disp;
+    Display *disp;
 
-  debug("x11_avail");
+    debug("x11_avail");
 
-  // Check flags
-  if(flags & OI_FLAG_NOWINDOW) {
-    return FALSE;
-  }
+    // Check flags
+    if(flags & OI_FLAG_NOWINDOW) {
+        return FALSE;
+    }
 
-  // Check for X11 existence
-  disp = XOpenDisplay(NULL);
-  if(disp != NULL) {
-    // Got it, close display again
-    XCloseDisplay(disp);
-    return TRUE;
-  }
-  else {
-    return FALSE;
-  }
+    // Check for X11 existence
+    disp = XOpenDisplay(NULL);
+    if(disp != NULL) {
+        // Got it, close display again
+        XCloseDisplay(disp);
+        return TRUE;
+    }
+    else {
+        return FALSE;
+    }
 }
 
 /* ******************************************************************** */
@@ -104,41 +104,41 @@ sint x11_avail(uint flags) {
  * Create the internal data structure and the device interface.
  */
 oi_device *x11_device() {
-  oi_device *dev;
-  x11_private *priv;
+    oi_device *dev;
+    x11_private *priv;
 
-  debug("x11_device");
+    debug("x11_device");
 
-  // Alloc
-  dev = (oi_device*)malloc(sizeof(oi_device));
-  priv = (x11_private*)malloc(sizeof(x11_private));
-  if((dev == NULL) || (priv == NULL)) {
-    debug("x11_device: device creation failed");
-    if(dev) {
-      free(dev);
+    // Alloc
+    dev = (oi_device*)malloc(sizeof(oi_device));
+    priv = (x11_private*)malloc(sizeof(x11_private));
+    if((dev == NULL) || (priv == NULL)) {
+        debug("x11_device: device creation failed");
+        if(dev) {
+            free(dev);
+        }
+        if(priv) {
+            free(priv);
+        }
+        return NULL;
     }
-    if(priv) {
-      free(priv);
-    }
-    return NULL;
-  }
 
-  // Clear structures
-  memset(dev, 0, sizeof(oi_device));
-  memset(priv, 0, sizeof(x11_private));
+    // Clear structures
+    memset(dev, 0, sizeof(oi_device));
+    memset(priv, 0, sizeof(x11_private));
 
-  // Set members
-  dev->private = priv;
-  dev->init = x11_init;
-  dev->destroy = x11_destroy;
-  dev->process = x11_process;  
-  dev->grab = x11_grab;
-  dev->hide = x11_hidecursor;
-  dev->warp = x11_warp;
-  dev->winsize = x11_winsize;
-  
-  // Done
-  return dev;
+    // Set members
+    dev->private = priv;
+    dev->init = x11_init;
+    dev->destroy = x11_destroy;
+    dev->process = x11_process;
+    dev->grab = x11_grab;
+    dev->hide = x11_hidecursor;
+    dev->warp = x11_warp;
+    dev->winsize = x11_winsize;
+
+    // Done
+    return dev;
 }
 
 /* ******************************************************************** */
@@ -164,46 +164,46 @@ oi_device *x11_device() {
  * in order to sync states between X11 and OpenInput.
  */
 sint x11_init(oi_device *dev, char *window_id, uint flags) {
-  x11_private *priv;
+    x11_private *priv;
 
-  priv = (x11_private*)dev->private;
-  debug("x11_init");
+    priv = (x11_private*)dev->private;
+    debug("x11_init");
 
-  // Parse the window_id flags
-  priv->disp = (Display*)device_windowid(window_id, OI_I_CONN);
-  priv->screen = (Screen*)device_windowid(window_id, OI_I_SCRN);
-  priv->win = (Window)device_windowid(window_id, OI_I_WINID);
+    // Parse the window_id flags
+    priv->disp = (Display*)device_windowid(window_id, OI_I_CONN);
+    priv->screen = (Screen*)device_windowid(window_id, OI_I_SCRN);
+    priv->win = (Window)device_windowid(window_id, OI_I_WINID);
 
-  // We require conn and winid parameters
-  if(!(priv->disp) || !(priv->win)) {
-    debug("x11_init: conn (c) and winid (w) parameters required\n");
-    return OI_ERR_NO_DEVICE;
-  }
+    // We require conn and winid parameters
+    if(!(priv->disp) || !(priv->win)) {
+        debug("x11_init: conn (c) and winid (w) parameters required\n");
+        return OI_ERR_NO_DEVICE;
+    }
 
-  // Install error handlers
-  XSetErrorHandler(x11_error);
-  XSetIOErrorHandler(x11_fatal);
+    // Install error handlers
+    XSetErrorHandler(x11_error);
+    XSetIOErrorHandler(x11_fatal);
 
-  // Initialize blank-cursor, keymapper table, modifier mask and key state
-  priv->cursor = x11_mkcursor(priv->disp, priv->win);
-  priv->relative = 0;
-  x11_initkeymap();
-  x11_modmasks(priv->disp, dev);
-  x11_keystate(dev, priv->disp, NULL);
-  
-  // Start receiving events
-  XSelectInput(priv->disp, priv->win, FocusChangeMask | KeyPressMask |
-	       KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
-	       KeymapStateMask | ButtonPressMask | ButtonReleaseMask |
-	       PointerMotionMask | EnterWindowMask | LeaveWindowMask );
+    // Initialize blank-cursor, keymapper table, modifier mask and key state
+    priv->cursor = x11_mkcursor(priv->disp, priv->win);
+    priv->relative = 0;
+    x11_initkeymap();
+    x11_modmasks(priv->disp, dev);
+    x11_keystate(dev, priv->disp, NULL);
 
-  // Get "close window" window manager protocol atom
-  priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
-  XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);  
+    // Start receiving events
+    XSelectInput(priv->disp, priv->win, FocusChangeMask | KeyPressMask |
+                 KeyReleaseMask | PropertyChangeMask | StructureNotifyMask |
+                 KeymapStateMask | ButtonPressMask | ButtonReleaseMask |
+                 PointerMotionMask | EnterWindowMask | LeaveWindowMask );
 
-  debug("x11_init: initialized");
+    // Get "close window" window manager protocol atom
+    priv->wm_delete_window = XInternAtom(priv->disp, "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(priv->disp, priv->win, &(priv->wm_delete_window), 1);
 
-  return OI_ERR_OK;
+    debug("x11_init: initialized");
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -221,27 +221,27 @@ sint x11_init(oi_device *dev, char *window_id, uint flags) {
  * allocated memory and the hidden cursor.
  */
 sint x11_destroy(oi_device *dev) {
-  x11_private *priv;
+    x11_private *priv;
 
-  debug("x11_destroy");
+    debug("x11_destroy");
 
-  if(dev) {
-    priv = (x11_private*)dev->private;
+    if(dev) {
+        priv = (x11_private*)dev->private;
 
-    // Private members
-    if(priv) {
-      if(priv->cursor) {
-	XFreeCursor(priv->disp, priv->cursor);
-      }
-      free(priv);
+        // Private members
+        if(priv) {
+            if(priv->cursor) {
+                XFreeCursor(priv->disp, priv->cursor);
+            }
+            free(priv);
+        }
+
+        // Device struct
+        free(dev);
+        dev = NULL;
     }
 
-    // Device struct
-    free(dev);
-    dev = NULL;
-  }
-  
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -259,14 +259,14 @@ sint x11_destroy(oi_device *dev) {
  * is handled in the dispatcher.
  */
 void x11_process(oi_device *dev) {
-  x11_private *priv;
+    x11_private *priv;
 
-  priv = (x11_private*)dev->private;
+    priv = (x11_private*)dev->private;
 
-  // Process all pending events
-  while(oi_runstate() && x11_pending(priv->disp)) {
-    x11_dispatch(dev, priv->disp);
-  }
+    // Process all pending events
+    while(oi_runstate() && x11_pending(priv->disp)) {
+        x11_dispatch(dev, priv->disp);
+    }
 }
 
 /* ******************************************************************** */
@@ -285,46 +285,46 @@ void x11_process(oi_device *dev) {
  * the hook-window.
  */
 sint x11_grab(oi_device *dev, sint on) {
-  x11_private *priv;
-  int i;
+    x11_private *priv;
+    int i;
 
-  priv = (x11_private*)dev->private;
-  debug("x11_grab: state:%i", on);
+    priv = (x11_private*)dev->private;
+    debug("x11_grab: state:%i", on);
 
-  if(on) {
-    // Raise window and focus it
-    XRaiseWindow(priv->disp, priv->win);
-    XSetInputFocus(priv->disp, priv->win, RevertToParent, CurrentTime);
+    if(on) {
+        // Raise window and focus it
+        XRaiseWindow(priv->disp, priv->win);
+        XSetInputFocus(priv->disp, priv->win, RevertToParent, CurrentTime);
 
-    // Grab input
-    XGrabKeyboard(priv->disp, priv->win, TRUE,
-		  GrabModeAsync, GrabModeAsync, CurrentTime);
-    
-    // Wait for succesfull grabbing of mouse 
-    while(1) {
-      i = XGrabPointer(priv->disp, priv->win, TRUE,
-		       ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-		       GrabModeAsync, GrabModeAsync,
-		       priv->win, None, CurrentTime);
-      if(i == GrabSuccess) {
-	break;
-      }
-      usleep(OI_SLEEP);
+        // Grab input
+        XGrabKeyboard(priv->disp, priv->win, TRUE,
+                      GrabModeAsync, GrabModeAsync, CurrentTime);
+
+        // Wait for succesfull grabbing of mouse
+        while(1) {
+            i = XGrabPointer(priv->disp, priv->win, TRUE,
+                             ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+                             GrabModeAsync, GrabModeAsync,
+                             priv->win, None, CurrentTime);
+            if(i == GrabSuccess) {
+                break;
+            }
+            usleep(OI_SLEEP);
+        }
+
+        // Set flag for possible relative mouse
+        priv->relative |= SX11_GRAB;
+    }
+    else {
+        // Simply ungrab both
+        XUngrabKeyboard(priv->disp, CurrentTime);
+        XUngrabPointer(priv->disp, CurrentTime);
+
+        // Fix relative mouse motion
+        priv->relative &= ~SX11_GRAB;
     }
 
-    // Set flag for possible relative mouse
-    priv->relative |= SX11_GRAB;
-  }
-  else {
-    // Simply ungrab both
-    XUngrabKeyboard(priv->disp, CurrentTime);
-    XUngrabPointer(priv->disp, CurrentTime);
-
-    // Fix relative mouse motion
-    priv->relative &= ~SX11_GRAB;
-  }
-
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -345,24 +345,24 @@ sint x11_grab(oi_device *dev, sint on) {
  * to the default X pointer.
  */
 sint x11_hidecursor(oi_device *dev, sint on) {
-  x11_private *priv;
+    x11_private *priv;
 
-  debug("x11_hidecursor: state:%i", on);
-  priv = (x11_private*)dev->private;
+    debug("x11_hidecursor: state:%i", on);
+    priv = (x11_private*)dev->private;
 
-  // Hide - set blank cursor
-  if(on) {
-    XDefineCursor(priv->disp, priv->win, priv->cursor);
-    priv->relative |= SX11_HIDE;
-  }
+    // Hide - set blank cursor
+    if(on) {
+        XDefineCursor(priv->disp, priv->win, priv->cursor);
+        priv->relative |= SX11_HIDE;
+    }
 
-  // Show - set default cursor
-  else {
-    XDefineCursor(priv->disp, priv->win, None);
-    priv->relative &= ~SX11_HIDE;
-  }
+    // Show - set default cursor
+    else {
+        XDefineCursor(priv->disp, priv->win, None);
+        priv->relative &= ~SX11_HIDE;
+    }
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -382,17 +382,17 @@ sint x11_hidecursor(oi_device *dev, sint on) {
  * absolute coordinate within the hook-window.
  */
 sint x11_warp(oi_device *dev, sint x, sint y) {
-  x11_private *priv;
+    x11_private *priv;
 
-  priv = (x11_private*)dev->private;
+    priv = (x11_private*)dev->private;
 
-  // Simply go to warp speed
-  XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
-  XSync(priv->disp, False);
-  priv->lastx = x;
-  priv->lasty = y;
+    // Simply go to warp speed
+    XWarpPointer(priv->disp, None, priv->win, 0, 0, 0, 0, x, y);
+    XSync(priv->disp, False);
+    priv->lastx = x;
+    priv->lasty = y;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -412,28 +412,28 @@ sint x11_warp(oi_device *dev, sint x, sint y) {
  * the internal state and return the width and height.
  */
 sint x11_winsize(oi_device *dev, sint *w, sint *h) {
-  x11_private *priv;
-  XWindowAttributes attr;
+    x11_private *priv;
+    XWindowAttributes attr;
 
-  priv = (x11_private*)dev->private;
-  
-  XGetWindowAttributes(priv->disp, priv->win, &attr);
+    priv = (x11_private*)dev->private;
 
-  // Update state
-  priv->width = attr.width;
-  priv->height = attr.height;
+    XGetWindowAttributes(priv->disp, priv->win, &attr);
 
-  // Safely store data
-  if(w) {
-    *w = attr.width;
-  }
-  if(h) {
-    *h = attr.height;
-  }
+    // Update state
+    priv->width = attr.width;
+    priv->height = attr.height;
 
-  debug("x11_winsize: width:%i height:%i", *w, *h);
-  
-  return OI_ERR_OK;
+    // Safely store data
+    if(w) {
+        *w = attr.width;
+    }
+    if(h) {
+        *h = attr.height;
+    }
+
+    debug("x11_winsize: width:%i height:%i", *w, *h);
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -450,27 +450,27 @@ sint x11_winsize(oi_device *dev, sint *w, sint *h) {
  * Force full resync the driver and device state.
  */
 sint x11_reset(oi_device *dev) {
-  x11_private *priv;
-  priv = (x11_private*)dev->private;
-  debug("x11_reset");
-  
-  // Show cursor, grab off
-  x11_grab(dev, FALSE);
-  x11_hidecursor(dev, FALSE);
+    x11_private *priv;
+    priv = (x11_private*)dev->private;
+    debug("x11_reset");
 
-  // Query for modifiers
-  x11_modmasks(priv->disp, dev);
+    // Show cursor, grab off
+    x11_grab(dev, FALSE);
+    x11_hidecursor(dev, FALSE);
 
-  // Sync keyboard state
-  x11_keystate(dev, priv->disp, NULL);
+    // Query for modifiers
+    x11_modmasks(priv->disp, dev);
 
-  // Window size
-  x11_winsize(dev, NULL, NULL);
+    // Sync keyboard state
+    x11_keystate(dev, priv->disp, NULL);
 
-  // Center mouse cursor
-  x11_warp(dev, priv->height/2, priv->width/2);
+    // Window size
+    x11_winsize(dev, NULL, NULL);
 
-  return OI_ERR_OK;
+    // Center mouse cursor
+    x11_warp(dev, priv->height/2, priv->width/2);
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -487,9 +487,9 @@ sint x11_reset(oi_device *dev) {
  * OpenInput is compiled in debug-mode.
  */
 sint x11_error(Display *d, XErrorEvent *e) {
-  debug("x11_error: code %u", e->error_code);
- 
-  return 0;
+    debug("x11_error: code %u", e->error_code);
+
+    return 0;
 }
 
 /* ******************************************************************** */
@@ -506,11 +506,11 @@ sint x11_error(Display *d, XErrorEvent *e) {
  * should terminate.
  */
 sint x11_fatal(Display *d) {
-  debug("x11_fatal: fatal I/O error");
+    debug("x11_fatal: fatal I/O error");
 
-  //FIXME: Send a quit-event
+    //FIXME: Send a quit-event
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -527,30 +527,30 @@ sint x11_fatal(Display *d) {
  * pixmap.
  */
 Cursor x11_mkcursor(Display *d, Window w) {
-  Pixmap pixmap;
-  XColor color;
-  Colormap colmap;
-  Cursor cursor;
-  
-  // Make 1x1 pixmap
-  pixmap = XCreatePixmap(d, DefaultRootWindow(d), 1, 1, 1);
-  
-  // Get the color black
-  colmap = XCreateColormap(d, DefaultScreen(d),
-			   DefaultVisual(d, DefaultScreen(d)),
-			   AllocNone);
-  XParseColor(d, colmap, "black", &color);
-  
-  // Create the cursor
-  cursor = XCreatePixmapCursor(d, pixmap, pixmap,
-			 &color, &color, 1, 1);
+    Pixmap pixmap;
+    XColor color;
+    Colormap colmap;
+    Cursor cursor;
 
-  // Free and sync
-  XFreePixmap(d, pixmap);
-  XFreeColormap(d, colmap);
-  XSync(d, False);
-  
-  return cursor;
+    // Make 1x1 pixmap
+    pixmap = XCreatePixmap(d, DefaultRootWindow(d), 1, 1, 1);
+
+    // Get the color black
+    colmap = XCreateColormap(d, DefaultScreen(d),
+                             DefaultVisual(d, DefaultScreen(d)),
+                             AllocNone);
+    XParseColor(d, colmap, "black", &color);
+
+    // Create the cursor
+    cursor = XCreatePixmapCursor(d, pixmap, pixmap,
+                                 &color, &color, 1, 1);
+
+    // Free and sync
+    XFreePixmap(d, pixmap);
+    XFreeColormap(d, colmap);
+    XSync(d, False);
+
+    return cursor;
 }
 
 /* ******************************************************************** */

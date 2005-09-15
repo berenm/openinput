@@ -42,15 +42,15 @@
  * @{
  */
 typedef enum {
-  OIP_UNKNOWN            = 0, /**< mouse_unknown */
-  OIP_FIRST              = 0, /**< mouse_unknown */
-  OIP_BUTTON_LEFT        = 1, /**< mouse_left */
-  OIP_BUTTON_MIDDLE      = 2, /**< mouse_middle */
-  OIP_BUTTON_RIGHT       = 3, /**< mouse_right */
-  OIP_WHEEL_UP           = 4, /**< mouse_wheel_up */
-  OIP_WHEEL_DOWN         = 5, /**< mouse_wheel_down */
-  OIP_MOTION             = 6, /**< mouse_motion */
-  OIP_LAST                    /**< mouse_unknown */
+    OIP_UNKNOWN            = 0, /**< mouse_unknown */
+    OIP_FIRST              = 0, /**< mouse_unknown */
+    OIP_BUTTON_LEFT        = 1, /**< mouse_left */
+    OIP_BUTTON_MIDDLE      = 2, /**< mouse_middle */
+    OIP_BUTTON_RIGHT       = 3, /**< mouse_right */
+    OIP_WHEEL_UP           = 4, /**< mouse_wheel_up */
+    OIP_WHEEL_DOWN         = 5, /**< mouse_wheel_down */
+    OIP_MOTION             = 6, /**< mouse_motion */
+    OIP_LAST                    /**< mouse_unknown */
 } oi_mouse;
 /** @} */
 

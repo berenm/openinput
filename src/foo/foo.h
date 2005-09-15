@@ -50,10 +50,10 @@ sint foo_reset(oi_device *dev);
  * instance of the device driver.
  */
 typedef struct foo_private {
-  sint grabstatus;   /**< Pointer grabbed or free */
-  sint cursorstatus; /**< Cursor shown of hidden */
-  sint x;            /**< Cursor horizontal position */
-  sint y;            /**< Cursor vertical position */
+    sint grabstatus;   /**< Pointer grabbed or free */
+    sint cursorstatus; /**< Cursor shown of hidden */
+    sint x;            /**< Cursor horizontal position */
+    sint y;            /**< Cursor vertical position */
 } foo_private;
 
 /* ******************************************************************** */

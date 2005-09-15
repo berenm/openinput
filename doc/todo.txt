@@ -1,9 +1,10 @@
 Loose ends and suggestions for improvements
 -------------------------------------------
 
-before-release-things
-- fix test/keynametest
-- win32 test program
+win32 driver/platform
+- write test program
+- test library
+- fix automake (include/noinst/...) in test-dir
 
 library close->reopen
 - does it work?

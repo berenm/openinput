@@ -47,18 +47,18 @@
 
 // Bootstrap global
 oi_bootstrap unixsignal_bootstrap = {
-  "unixsignal",
-  "UNIX signal handler",
-  OI_PRO_UNKNOWN,
-  unixsignal_avail,
-  unixsignal_device
+    "unixsignal",
+    "UNIX signal handler",
+    OI_PRO_UNKNOWN,
+    unixsignal_avail,
+    unixsignal_device
 };
 
 // Private data is global here (it makes no sense with a private struct)
 static int pendingsignal;
 
 /* ******************************************************************** */
- 
+
 /**
  * @ingroup DUnix
  * @brief Check if POSIX signals exists
@@ -71,9 +71,9 @@ static int pendingsignal;
  * Always returns true as this is platform specific.
  */
 sint unixsignal_avail(uint flags) {
-  debug("unixsignal_avail");
+    debug("unixsignal_avail");
 
-  return TRUE;
+    return TRUE;
 }
 
 /* ******************************************************************** */
@@ -89,33 +89,33 @@ sint unixsignal_avail(uint flags) {
  * Create the device interface.
  */
 oi_device *unixsignal_device() {
-  oi_device *dev;
+    oi_device *dev;
 
-  debug("unixsignal_device");
+    debug("unixsignal_device");
 
-  // Alloc device data
-  dev = (oi_device*)malloc(sizeof(oi_device));
-  if(dev == NULL) {
-    debug("unixsignal_device: device creation failed");
-    return NULL;
-  }
+    // Alloc device data
+    dev = (oi_device*)malloc(sizeof(oi_device));
+    if(dev == NULL) {
+        debug("unixsignal_device: device creation failed");
+        return NULL;
+    }
 
-  // Clear structures
-  memset(dev, 0, sizeof(oi_device));
+    // Clear structures
+    memset(dev, 0, sizeof(oi_device));
 
-  // Set members
-  dev->init = unixsignal_init;
-  dev->destroy = unixsignal_destroy;
-  dev->process = unixsignal_process;  
-  dev->grab = NULL;
-  dev->hide = NULL;
-  dev->warp = NULL;
-  dev->winsize = NULL;
-  dev->reset = unixsignal_reset;
-  dev->private = NULL;
-  
-  // Done
-  return dev;
+    // Set members
+    dev->init = unixsignal_init;
+    dev->destroy = unixsignal_destroy;
+    dev->process = unixsignal_process;
+    dev->grab = NULL;
+    dev->hide = NULL;
+    dev->warp = NULL;
+    dev->winsize = NULL;
+    dev->reset = unixsignal_reset;
+    dev->private = NULL;
+
+    // Done
+    return dev;
 }
 
 /* ******************************************************************** */
@@ -134,17 +134,17 @@ oi_device *unixsignal_device() {
  * Setup the signal handlers for interrupt, terminate and segfault.
  */
 sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
-  debug("unixsignal_init");
+    debug("unixsignal_init");
 
-  // Just to be sure, no signal is pending
-  pendingsignal = FALSE;
- 
-  // Install handler for various shutdown-signals
-  signal(SIGINT, unixsignal_handler);  // Interrupt (ctrl+c)
-  signal(SIGTERM, unixsignal_handler); // Terminate (kill)
-  signal(SIGSEGV, unixsignal_handler); // Segfault
+    // Just to be sure, no signal is pending
+    pendingsignal = FALSE;
 
-  return OI_ERR_OK;
+    // Install handler for various shutdown-signals
+    signal(SIGINT, unixsignal_handler);  // Interrupt (ctrl+c)
+    signal(SIGTERM, unixsignal_handler); // Terminate (kill)
+    signal(SIGSEGV, unixsignal_handler); // Segfault
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -162,20 +162,20 @@ sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
  * the system default.
  */
 sint unixsignal_destroy(oi_device *dev) {
-  debug("unixsignal_destroy");
-  
-  // Set default handlers
-  signal(SIGINT, SIG_DFL);
-  signal(SIGTERM, SIG_DFL);
-  signal(SIGSEGV, SIG_DFL);
+    debug("unixsignal_destroy");
 
-  // Free device
-  if(dev) {
-    free(dev);
-    dev = NULL;
-  }
+    // Set default handlers
+    signal(SIGINT, SIG_DFL);
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGSEGV, SIG_DFL);
 
-  return OI_ERR_OK;
+    // Free device
+    if(dev) {
+        free(dev);
+        dev = NULL;
+    }
+
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -192,24 +192,24 @@ sint unixsignal_destroy(oi_device *dev) {
  * signal is pending.
  */
 void unixsignal_process(oi_device *dev) {
-  static oi_event ev;
+    static oi_event ev;
 
-  if(!oi_runstate()) {
-    debug("unixsignal_process: oi_running false");
-    return;
-  }
+    if(!oi_runstate()) {
+        debug("unixsignal_process: oi_running false");
+        return;
+    }
 
-  // Bail out if no signal
-  if(!pendingsignal) {
-    return;
-  }
+    // Bail out if no signal
+    if(!pendingsignal) {
+        return;
+    }
 
-  // Don't forget to clear the flag
-  pendingsignal = FALSE;
+    // Don't forget to clear the flag
+    pendingsignal = FALSE;
 
-  // A signal, send quit event
-  ev.type = OI_QUIT;
-  queue_add(&ev);
+    // A signal, send quit event
+    ev.type = OI_QUIT;
+    queue_add(&ev);
 }
 
 /* ******************************************************************** */
@@ -226,11 +226,11 @@ void unixsignal_process(oi_device *dev) {
  * Reset pending flag.
  */
 sint unixsignal_reset(oi_device *dev) {
-  debug("unixsignal_reset");
+    debug("unixsignal_reset");
 
-  pendingsignal = FALSE;
+    pendingsignal = FALSE;
 
-  return OI_ERR_OK;
+    return OI_ERR_OK;
 }
 
 /* ******************************************************************** */
@@ -247,12 +247,12 @@ sint unixsignal_reset(oi_device *dev) {
  */
 void unixsignal_handler(int signum) {
 
-  if(!pendingsignal) {
-    debug("unixsignal_handler: signal %d received", signum);
-  }
+    if(!pendingsignal) {
+        debug("unixsignal_handler: signal %d received", signum);
+    }
 
-  // Ok, we've fetched a signal
-  pendingsignal = TRUE;
+    // Ok, we've fetched a signal
+    pendingsignal = TRUE;
 }
 
 /* ******************************************************************** */

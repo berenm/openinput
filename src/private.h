@@ -35,11 +35,11 @@
  * for local axis-mapping and other information
  */
 typedef struct oi_privjoy {
-  uint button;                                        /**< Button state mask */
-  sint relaxes[OI_JOY_NUM_AXES];                      /**< Cummulative relative axes values */
-  sint absaxes[OI_JOY_NUM_AXES];                      /**< Absolute axes values */ 
-  sint insaxes[OI_JOY_NUM_AXES];                      /**< Instantaneous relative values */
-  uchar update[OI_JOY_NUM_AXES];                      /**< Post event update */
+    uint button;                                        /**< Button state mask */
+    sint relaxes[OI_JOY_NUM_AXES];                      /**< Cummulative relative axes values */
+    sint absaxes[OI_JOY_NUM_AXES];                      /**< Absolute axes values */
+    sint insaxes[OI_JOY_NUM_AXES];                      /**< Instantaneous relative values */
+    uchar update[OI_JOY_NUM_AXES];                      /**< Post event update */
 } oi_privjoy;
 
 
@@ -51,11 +51,11 @@ typedef struct oi_privjoy {
  * positon/movement state caching.
  */
 typedef struct oi_privmouse {
-  uint button;                                        /**< Button bitmask */
-  sint absx;                                          /**< Absolute horizontal position */
-  sint absy;                                          /**< Absolute vertical position */
-  sint relx;                                          /**< Relative horizontal movement */
-  sint rely;                                          /**< Relative vertical movement */
+    uint button;                                        /**< Button bitmask */
+    sint absx;                                          /**< Absolute horizontal position */
+    sint absy;                                          /**< Absolute vertical position */
+    sint relx;                                          /**< Relative horizontal movement */
+    sint rely;                                          /**< Relative vertical movement */
 } oi_privmouse;
 
 
@@ -67,11 +67,11 @@ typedef struct oi_privmouse {
  * key-down/modifier state caching.
  */
 typedef struct oi_privkey {
-  uchar keystate[OIK_LAST];                           /**< Button state table */
-  uint modstate;                                      /**< Modifier bitmask */
-  uchar rep_first;                                    /**< Repeat first event */
-  uint rep_time;                                      /**< Repeat timestap */
-  oi_event rep_ev;                                    /**< Repeat event */
+    uchar keystate[OIK_LAST];                           /**< Button state table */
+    uint modstate;                                      /**< Modifier bitmask */
+    uchar rep_first;                                    /**< Repeat first event */
+    uint rep_time;                                      /**< Repeat timestap */
+    oi_event rep_ev;                                    /**< Repeat event */
 } oi_privkey;
 
 
@@ -86,9 +86,9 @@ typedef struct oi_privkey {
  * into the device interface (device structure).
  */
 typedef struct oi_private {
-  oi_privkey *key;                                    /**< Keyboard data */
-  oi_privmouse *mouse;                                /**< Mouse data */
-  oi_privjoy *joy;                                    /**< Joystick data */
+    oi_privkey *key;                                    /**< Keyboard data */
+    oi_privmouse *mouse;                                /**< Mouse data */
+    oi_privjoy *joy;                                    /**< Joystick data */
 } oi_private;
 
 /* ******************************************************************** */

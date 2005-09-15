@@ -14,15 +14,16 @@ Version 0.1.0:
 
 Version 0.2.0:
 	Native Win32 input driver
+	General joystick support
 
 Version 0.3.0:
 	DirectInput input driver
 
+Version 0.4.0:
+	OS-X driver support
+
 Version 1.0.0:
 	Generic HID support
-
-Version 1.1.0:
-	OS-X driver support
 
 Version 1.x.0:
 	More input drivers
@@ -31,4 +32,3 @@ Version 2.0.0:
 	Force feedback support
 
 --------------------------------------------------------------------
-
