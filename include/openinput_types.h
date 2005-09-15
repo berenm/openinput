@@ -36,12 +36,35 @@
  * @brief Signed and unsigned chars, ints and shorts
  * @{
  */
+#ifndef uchar
 typedef unsigned char             uchar;   /**< Unsigned char */
+#define uchar
+#endif
+
+#ifndef schar
 typedef signed char               schar;   /**< Signed char */
+#define schar
+#endif
+
+#ifndef ushort
 typedef unsigned short            ushort;  /**< Unsigned short */
+#define ushort
+#endif
+
+#ifndef sshort
 typedef signed short              sshort;  /**< Signed short */
+#define sshort
+#endif
+
+#ifndef sint
 typedef unsigned int              uint;    /**< Unsigned int */
+#define uint
+#endif
+
+#ifndef sint
 typedef signed int                sint;    /**< Signed int */
+#define sint
+#endif
 /** @} */
 
 

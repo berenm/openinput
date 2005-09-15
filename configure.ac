@@ -10,7 +10,7 @@ define(LIBOI_BINARY_AGE, 0)    # Bump on changes, zero on binary breakage
 define(LIBOI_VERSION, OI_MAJOR_VERSION.OI_MINOR_VERSION.OI_PATCH_VERSION)
 
 dnl Initialize autoconf
-AC_INIT([OpenInput], LIBOI_VERSION, [makob@makob.dk], [openinput])
+AC_INIT([openinput], LIBOI_VERSION, [makob@makob.dk], [openinput])
 AC_CANONICAL_TARGET
 
 dnl Check for programs.
@@ -43,7 +43,7 @@ AC_SUBST(OI_PATCH_VERSION)
 AC_SUBST(OI_VERSION)
 
 dnl Initialize automake
-AM_INIT_AUTOMAKE([OpenInput], $OI_VERSION)
+AM_INIT_AUTOMAKE([openinput], $OI_VERSION)
 AC_CONFIG_HEADERS([config.h])
 ARCHDET
 

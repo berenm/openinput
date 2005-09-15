@@ -1,3 +1,10 @@
+SVN head
+
+	* Fix: configurename is now "openinput", fixes a /usr/include/<dir>
+	  bug (thanks discipline)
+	* Fix: #ifndef protection for numerical types in openinput_types.h
+	  (thanks discipline)
+	
 Version 0.2.0 - 2005-09-15
 
 	* Fix: oi_init() should (normally) not bail if managers fail init
