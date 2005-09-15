@@ -4,7 +4,7 @@ AC_PREREQ(2.59)
 dnl Library version
 define(LIBOI_MAJOR_VERSION, 0) # Bump on very huge changes, zero rest
 define(LIBOI_MINOR_VERSION, 2) # Bump on big changes, zero remaining
-define(LIBOI_PATCH_VERSION, 0) # Bump on changes
+define(LIBOI_PATCH_VERSION, 1) # Bump on changes
 define(LIBOI_INFACE_AGE, 0)    # Bump on changes, zero on binary breakage
 define(LIBOI_BINARY_AGE, 0)    # Bump on changes, zero on binary breakage
 define(LIBOI_VERSION, OI_MAJOR_VERSION.OI_MINOR_VERSION.OI_PATCH_VERSION)

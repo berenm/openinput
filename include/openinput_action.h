@@ -38,8 +38,8 @@
  * This structure defines an action-map
  */
 typedef struct oi_actionmap {
-    uint actionid;                 /**< User-defined id, the action */
-    uchar device;                  /**< Device index, 0 for all */
+    unsigned int actionid;         /**< User-defined id, the action */
+    unsigned char device;          /**< Device index, 0 for all */
     char *name;                    /**< Trigger on this named event */
 } oi_actionmap;
 

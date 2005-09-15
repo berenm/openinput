@@ -31,8 +31,8 @@
 // Globals
 static struct {
     oi_event events[OI_MAX_EVENTS];
-    sshort head;
-    sshort tail;
+    unsigned int head;
+    unsigned int tail;
 } queue;
 
 /* ******************************************************************** */
@@ -48,7 +48,7 @@ static struct {
  * be initialized, as device driver bootstrapping may depend
  * of the queue to exist (to generate discovery events).
  */
-sint queue_init() {
+int queue_init() {
     debug("queue_init");
 
     // Clear event queue
@@ -56,7 +56,7 @@ sint queue_init() {
     queue.tail = 0;
     memset(queue.events, 0, sizeof(queue.events));
 
-    //FIXME: Mutexes and threads should gracefully be started here
+    //TODO: Mutexes and threads should gracefully be started here
 
     // All done
     return OI_ERR_OK;
@@ -72,8 +72,8 @@ sint queue_init() {
  *
  * Mutual exclusion lock of event queue.
  */
-inline sint queue_lock() {
-    //FIXME: Implement this
+inline int queue_lock() {
+    //TODO: Implement this
     return OI_ERR_NOT_IMPLEM;
 }
 
@@ -87,8 +87,8 @@ inline sint queue_lock() {
  *
  * Mutual exclusion unlock of event queue.
  */
-inline sint queue_unlock() {
-    //FIXME: Implement this
+inline int queue_unlock() {
+    //TODO: Implement this
     return OI_ERR_NOT_IMPLEM;
 }
 
@@ -107,7 +107,7 @@ inline sint queue_unlock() {
  * the state managers if possible, as these will take
  * care of a lot of other nice stuff for you.
  */
-sint queue_add(oi_event *evt) {
+int queue_add(oi_event *evt) {
     int tail, add;
 
     //FIXME Generate action events on keyboard/mouse
@@ -157,7 +157,7 @@ sint queue_add(oi_event *evt) {
  * Handles both deletion of head, tail and somewhere
  * in between (though the latter is slow).
  */
-sint queue_cut(ushort where) {
+int queue_cut(unsigned int where) {
 
     // Cut head
     if(where == queue.head) {
@@ -174,8 +174,8 @@ sint queue_cut(ushort where) {
 
     // Cut somewhere in between
     else {
-        sint next;
-        sint here;
+        unsigned int next;
+        unsigned int here;
 
         // Wrap around negative tail
         --queue.tail;
@@ -213,10 +213,10 @@ sint queue_cut(ushort where) {
  * "remove" paramter is set, the events are cut from the queue
  * using queue_cut.
  */
-sint queue_peep(oi_event *evts, sint num, uint mask, sint remove) {
+int queue_peep(oi_event *evts, int num, unsigned int mask, char remove) {
     oi_event tmpevt;
-    int here;
-    int copy;
+    unsigned int here;
+    unsigned int copy;
 
     // User wants to know if events for the mask are pending
     if((evts == NULL) || (num <= 0)) {

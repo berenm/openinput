@@ -158,10 +158,10 @@ void win32_initkeymap() {
  * state table and the system...
  */
 void win32_keystate(oi_device *dev) {
-    uint mod;
-    uchar *curstate;
-    uchar keyboard[DW32_KEYTABLE];
-    sint i;
+    unsigned int mod;
+    char *curstate;
+    char keyboard[DW32_KEYTABLE];
+    int i;
     oi_key key;
 
     debug("win32_keystate");
@@ -260,7 +260,7 @@ void win32_keystate(oi_device *dev) {
  * @param priv pointer to private structure
  * @param wparam raw message word param
  * @param lparam raw message long param
- * @param state true (1) if key pressed, false (0) otherwise
+ * @param down true (1) if key pressed, false (0) otherwise
  * @param keysym OpenInput keysym to be filled
  * @returns pointer to the keysym parameter
  *
@@ -269,7 +269,7 @@ void win32_keystate(oi_device *dev) {
  * it's quite fast (constant time).
  */
 inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
-                                  uchar state, oi_keysym *keysym) {
+                                  char down, oi_keysym *keysym) {
     uint vkey;
 
     // Find the virtual key
@@ -299,15 +299,15 @@ inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lpa
 
         // Shift
     case VK_SHIFT:
-        if(((state && !priv->shiftleft) || (!state && priv->shiftleft)) &&
+        if(((down && !priv->shiftleft) || (!down && priv->shiftleft)) &&
            (GetKeyState(VK_LSHIFT) & 0x8000)) {
             vkey = VK_LSHIFT;
-            priv->shiftleft = state;
+            priv->shiftleft = down;
         }
-        else if(((state && !priv->shiftright) || (!state && priv->shiftright)) &&
+        else if(((down && !priv->shiftright) || (!down && priv->shiftright)) &&
                 (GetKeyState(VK_LSHIFT) & 0x8000)) {
             vkey = VK_RSHIFT;
-            priv->shiftright = state;
+            priv->shiftright = down;
         }
         break;
 

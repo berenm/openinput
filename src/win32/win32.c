@@ -67,7 +67,7 @@ oi_bootstrap win32_bootstrap = {
  * tracking handling which is not available on all version
  * of Win95.
  */
-sint win32_avail(uint flags) {
+int win32_avail(unsigned int flags) {
     DWORD ver;
 
     debug("win32_avail");
@@ -156,7 +156,7 @@ oi_device *win32_device() {
  * a new windows procedure, which is how we 'hook' into
  * an existing/pre-created window.
  */
-sint win32_init(oi_device *dev, char *window_id, uint flags) {
+int win32_init(oi_device *dev, char *window_id, unsigned int flags) {
     win32_private *priv;
 
     // Set some stupid private values
@@ -208,7 +208,7 @@ sint win32_init(oi_device *dev, char *window_id, uint flags) {
  * old windows-procedure (message handler) and
  * freeing all private data.
  */
-sint win32_destroy(oi_device *dev) {
+int win32_destroy(oi_device *dev) {
     win32_private *priv;
 
     debug("win32_destroy");
@@ -280,7 +280,7 @@ void win32_process(oi_device *dev) {
  * Grab the mouse pointer, and focus the window
  * to gain keyboard focus aswell.
  */
-sint win32_grab(oi_device *dev, sint on) {
+int win32_grab(oi_device *dev, int on) {
     win32_private *priv;
     POINT pt;
 
@@ -323,7 +323,7 @@ sint win32_grab(oi_device *dev, sint on) {
  *
  * Simply hide/show the mouse pointer.
  */
-sint win32_hidecursor(oi_device *dev, sint on) {
+int win32_hidecursor(oi_device *dev, int on) {
     win32_private *priv;
     priv = (win32_private*)dev->private;
     debug("win32_hidecursor");
@@ -357,7 +357,7 @@ sint win32_hidecursor(oi_device *dev, sint on) {
  * Move (warp) the mouse pointer given coordinates
  * relative to the window.
  */
-sint win32_warp(oi_device *dev, sint x, sint y) {
+int win32_warp(oi_device *dev, int x, int y) {
     win32_private *priv;
     priv = (win32_private*)dev->private;
     debug("win32_warp");
@@ -395,7 +395,7 @@ sint win32_warp(oi_device *dev, sint x, sint y) {
  * window. Both values are cached in the private
  * structure.
  */
-sint win32_winsize(oi_device *dev, sint *w, sint *h) {
+int win32_winsize(oi_device *dev, int *w, int *h) {
     win32_private *priv;
     priv = (win32_private*)dev->private;
     debug("win32_winsize");

@@ -35,7 +35,7 @@
 #include "internal.h"
 
 // Globals
-static uint event_mask = 0;
+static unsigned int event_mask = 0;
 
 /* ******************************************************************** */
 
@@ -51,8 +51,8 @@ static uint event_mask = 0;
  * the first events in the queue but do remove the
  * events from the queue
  */
-sint oi_events_peep(oi_event *evts, sint num) {
-    sint p;
+int oi_events_peep(oi_event *evts, int num) {
+    int p;
 
     queue_lock();
     p = queue_peep(evts, num, ~event_mask, FALSE);
@@ -73,7 +73,7 @@ sint oi_events_peep(oi_event *evts, sint num) {
  *
  * Inject events to the event queue
  */
-sint oi_events_add(oi_event *evts, sint num) {
+int oi_events_add(oi_event *evts, int num) {
     int i;
     int j;
     int tot;
@@ -125,8 +125,8 @@ sint oi_events_add(oi_event *evts, sint num) {
  * -# Unlock queue
  */
 void oi_events_pump() {
-    static uint last = 0;
-    uint now;
+    static unsigned int last = 0;
+    unsigned int now;
 
     // Bail out if 'no time' has passed
     now = oi_getticks();
@@ -160,7 +160,7 @@ void oi_events_pump() {
  * Use the function inside a while()-loop to handle all pending
  * events
  */
-sint oi_events_poll(oi_event *evt) {
+int oi_events_poll(oi_event *evt) {
     int found;
 
     oi_events_pump();
@@ -221,7 +221,7 @@ void oi_events_wait(oi_event *evt) {
  * A mask of 0 (zero) will not filter any events, which
  * is the default.
  */
-void oi_events_setmask(uint mask) {
+void oi_events_setmask(unsigned int mask) {
     oi_event ev;
 
     // Set mask and discard all pending events
@@ -242,7 +242,7 @@ void oi_events_setmask(uint mask) {
  * Return the current event filter mask, see
  * also @ref PEventmask
  */
-uint oi_events_getmask() {
+unsigned int oi_events_getmask() {
     return event_mask;
 }
 

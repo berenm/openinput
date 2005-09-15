@@ -170,13 +170,13 @@ void x11_initkeymap() {
 void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
     char keyret[32];
     KeyCode xcode[OIK_LAST];
-    uint mod;
     Window w;
-    sint i;
-    sint j;
-    uint mask;
-    uchar newstate[OIK_LAST];
-    uchar *curstate;
+    int i;
+    int j;
+    unsigned int mod;
+    unsigned int mask;
+    char newstate[OIK_LAST];
+    char *curstate;
 
     debug("x11_keystate");
 
@@ -360,7 +360,7 @@ inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
             break;
 
         default: // Unhandled
-            debug("x11_translate: unhandled map 0x%04x", (uint)xsym);
+            debug("x11_translate: unhandled map 0x%04x", (unsigned int)xsym);
             break;
         }
     }
@@ -403,8 +403,8 @@ void x11_modmasks(Display *d, oi_device *dev) {
     XModifierKeymap *xmods;
     int i;
     int j;
-    uint n;
-    uint mask;
+    unsigned int n;
+    unsigned int mask;
     x11_private *priv;
 
     priv = (x11_private*)dev->private;

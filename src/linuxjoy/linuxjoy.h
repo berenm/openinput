@@ -27,22 +27,22 @@
 /* ******************************************************************** */
 
 // Bootstrap entries
-sint linuxjoy_avail();
+int linuxjoy_avail();
 oi_device *linuxjoy_device();
 
 /* ******************************************************************** */
 
 // Device entries
-sint linuxjoy_init(oi_device *dev, char *window_id, uint flags);
-sint linuxjoy_enable(oi_device *dev, sint on);
-sint linuxjoy_destroy(oi_device *dev);
+int linuxjoy_init(oi_device *dev, char *window_id, unsigned int flags);
+int linuxjoy_enable(oi_device *dev, int on);
+int linuxjoy_destroy(oi_device *dev);
 void linuxjoy_process(oi_device *dev);
-sint linuxjoy_reset(oi_device *dev);
+int linuxjoy_reset(oi_device *dev);
 
 /* ******************************************************************** */
 
 // Misc local functions
-int linuxjoy_getfd(uchar num);
+int linuxjoy_getfd(unsigned char num);
 void linuxjoy_fallback(oi_device *dev, char *name, int fd);
 
 /* ******************************************************************** */
@@ -58,9 +58,9 @@ void linuxjoy_fallback(oi_device *dev, char *name, int fd);
  * Note that this driver can handle several joysticks!
  */
 typedef struct linuxjoy_private {
-    sint fd;                       /**< File descriptor */
-    uchar id;                      /**< Device index, ie. the X in /dev/input/jsX */
-    char *name;                    /**< Kernel device name */
+    int fd;                      /**< File descriptor */
+    unsigned char id;                    /**< Device index, ie. the X in /dev/input/jsX */
+    char *name;                  /**< Kernel device name */
 } linuxjoy_private;
 
 /* ******************************************************************** */

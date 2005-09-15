@@ -62,7 +62,7 @@ oi_bootstrap linuxjoy_bootstrap = {
 };
 
 // Joystick to be initialized next
-static uchar init_next = 0;
+static unsigned char init_next = 0;
 
 /* ******************************************************************** */
 
@@ -78,9 +78,9 @@ static uchar init_next = 0;
  * The easiest test is to check whether the character devices
  * exist. If a single device is found, we assume it's available.
  */
-sint linuxjoy_avail(uint flags) {
-    sint i;
-    sint fd;
+int linuxjoy_avail(unsigned int flags) {
+    int i;
+    int fd;
 
     debug("linuxjoy_avail");
 
@@ -177,10 +177,10 @@ oi_device *linuxjoy_device() {
  *
  * Try to open next joystick.
  */
-sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
-    sint i;
-    sint fd;
-    uchar ok;
+int linuxjoy_init(oi_device *dev, char *window_id, unsigned int flags) {
+    int i;
+    int fd;
+    char ok;
     char *name;
     linuxjoy_private *priv;
 
@@ -261,12 +261,12 @@ sint linuxjoy_init(oi_device *dev, char *window_id, uint flags) {
  * If that fails, be very, very, very conservative
  */
 void linuxjoy_fallback(oi_device *dev, char *name, int fd) {
-    uchar ok;
-    sint noaxes;
-    sint nohats;
-    sint nobtns;
-    sint i;
-    sint j;
+    char ok;
+    int noaxes;
+    int nohats;
+    int nobtns;
+    int i;
+    int j;
 
     // Conservative defaults
     ok = FALSE;
@@ -337,7 +337,7 @@ void linuxjoy_fallback(oi_device *dev, char *name, int fd) {
  * Free device structure and reset signal handlers to
  * the system default.
  */
-sint linuxjoy_destroy(oi_device *dev) {
+int linuxjoy_destroy(oi_device *dev) {
     linuxjoy_private *priv;
 
     debug("linuxjoy_destroy");
@@ -427,7 +427,7 @@ void linuxjoy_process(oi_device *dev) {
  *
  * Open /dev/input/jsX with X=num and return the file descriptor.
  */
-int linuxjoy_getfd(uchar num) {
+int linuxjoy_getfd(unsigned char num) {
     char path[128];
 
     // Dummy
@@ -453,7 +453,7 @@ int linuxjoy_getfd(uchar num) {
  *
  * Resync the driver-device states.
  */
-sint linuxjoy_reset(oi_device *dev) {
+int linuxjoy_reset(oi_device *dev) {
     linuxjoy_private *priv;
     priv = (linuxjoy_private*)dev->private;
     debug("linuxjoy_reset");

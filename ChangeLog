@@ -1,9 +1,10 @@
-SVN head
+SVN trunk
 
+	* Cleanup: Event structure cleanup
+	* Fix/Change: eliminated numerical types in order to coexist with
+	  the standard library. The renders the API incompatible!
 	* Fix: configurename is now "openinput", fixes a /usr/include/<dir>
 	  bug (thanks discipline)
-	* Fix: #ifndef protection for numerical types in openinput_types.h
-	  (thanks discipline)
 	
 Version 0.2.0 - 2005-09-15
 

@@ -35,7 +35,6 @@ struct oi_privjoy;
 
 /* ******************************************************************** */
 
-
 /**
  * @ingroup IDevstructs
  * @brief Device driver abstraction interface
@@ -52,22 +51,22 @@ struct oi_privjoy;
  * - O: Optional, set to NULL to disable usage
  */
 typedef struct oi_device {
-    sint index;                                                        /**< Device index (M,A) */
-    char *name;                                                        /**< Short device name (D,A) */
-    char *desc;                                                        /**< Description of device (D,A) */
-    uint provides;                                                     /**< Provide-flag (D,A) */
-    void *private;                                                     /**< Private driver data (D,O) */
-    struct oi_joyconfig *joyconfig;                                    /**< Joystick configuration (D,O) */
-    sint (*init)(struct oi_device *dev, char *window_id, uint flags);  /**< Initialize device (F) */
-    sint (*destroy)(struct oi_device *dev);                            /**< Shutdown device (F) */
-    void (*process)(struct oi_device *dev);                            /**< Pump events into queue (F) */
-    sint (*grab)(struct oi_device *dec, sint on);                      /**< Grab input focus (F,O) */
-    sint (*hide)(struct oi_device *dev, sint on);                      /**< Hide/show cursor (F,O) */
-    sint (*warp)(struct oi_device *dev, sint x, sint y);               /**< Warp mouse cursor (F,O) */
-    sint (*winsize)(struct oi_device *dev, sint *w, sint *h);          /**< Query window size (F,O) */
-    sint (*reset)(struct oi_device *dev);                              /**< Reset internal state (F,O) */
+    int index;                                                        /**< Device index (M,A) */
+    char *name;                                                       /**< Short device name (D,A) */
+    char *desc;                                                       /**< Description of device (D,A) */
+    unsigned int provides;                                            /**< Provide-flag (D,A) */
+    void *private;                                                    /**< Private driver data (D,O) */
+    struct oi_joyconfig *joyconfig;                                   /**< Joystick configuration (D,O) */
+    int (*init)(struct oi_device *dev,
+                char *window_id, unsigned int flags);                 /**< Initialize device (F) */
+    int (*destroy)(struct oi_device *dev);                            /**< Shutdown device (F) */
+    void (*process)(struct oi_device *dev);                           /**< Pump events into queue (F) */
+    int (*grab)(struct oi_device *dec, int on);                       /**< Grab input focus (F,O) */
+    int (*hide)(struct oi_device *dev, int on);                       /**< Hide/show cursor (F,O) */
+    int (*warp)(struct oi_device *dev, int x, int y);                 /**< Warp mouse cursor (F,O) */
+    int (*winsize)(struct oi_device *dev, int *w, int *h);            /**< Query window size (F,O) */
+    int (*reset)(struct oi_device *dev);                              /**< Reset internal state (F,O) */
 } oi_device;
-
 
 /**
  * @ingroup IDevstructs
@@ -81,78 +80,148 @@ typedef struct oi_device {
 typedef struct oi_bootstrap {
     char *name;                                                        /**< Short device name */
     char *desc;                                                        /**< Device description */
-    sint provides;                                                     /**< Device provide-flag */
-    sint (*avail)(uint flags);                                         /**< Is device available (fcnptr) */
+    unsigned int provides;                                             /**< Device provide-flag */
+    int (*avail)(unsigned int flags);                                  /**< Is device available (fcnptr) */
     struct oi_device *(*create)();                                     /**< Return device structure (fcnptr) */
 } oi_bootstrap;
 
-
 /* ******************************************************************** */
-
 // Special functions
-inline sint oi_runstate();
-inline uint oi_getticks();
+
+inline char oi_runstate();
+
+inline unsigned int oi_getticks();
 
 /* ******************************************************************** */
-
 // Internal queue functions
-sint queue_init();
-inline sint queue_lock();
-inline sint queue_unlock();
-sint queue_cut(ushort where);
-sint queue_add(oi_event *evt);
-sint queue_peep(oi_event *evts, sint num, uint mask, sint remove);
+
+int queue_init();
+
+inline int queue_lock();
+
+inline int queue_unlock();
+
+int queue_cut(unsigned int where);
+
+int queue_add(oi_event *evt);
+
+int queue_peep(oi_event *evts,
+               int num,
+               unsigned int mask,
+               char remove);
 
 /* ******************************************************************** */
-
 // Device handling
-sint device_init();
-void device_bootstrap(char *window_id, uint flags);
-sint device_register(oi_bootstrap *boot, char *window_id, uint flags);
-oi_device *device_get(sint index);
+
+int device_init();
+
+void device_bootstrap(char *window_id,
+                      unsigned int flags);
+
+int device_register(oi_bootstrap *boot,
+                    char *window_id,
+                    unsigned int flags);
+
+oi_device *device_get(unsigned char index);
+
 inline void device_pumpall();
-uint device_windowid(char *str, char tok);
-sint device_destroy(sint index);
-void device_moreavail(sint more);
-void *device_priv(sint index, uint man);
+
+unsigned int device_windowid(char *str,
+                             char tok);
+
+int device_destroy(unsigned char index);
+
+void device_moreavail(char more);
+
+void *device_priv(unsigned char index,
+                  unsigned int manager);
 
 /* ******************************************************************** */
-
 // Application state
-sint appstate_init();
-void appstate_focus(uchar index, sint gain, sint state, uchar post);
-void appstate_resize(uchar index, sint w, sint h, uchar post);
-inline sint appstate_width();
-inline sint appstate_height();
+
+int appstate_init();
+
+void appstate_focus(unsigned char index,
+                    char gain,
+                    unsigned int state,
+                    char post);
+
+void appstate_resize(unsigned char index,
+                     int w,
+                     int h,
+                     char post);
+
+inline int appstate_width();
+
+inline int appstate_height();
 
 /* ******************************************************************** */
-
 // Mouse state
-sint mouse_init();
-void mouse_manage(struct oi_privmouse **mouse, uint provide);
-void mouse_move(uchar index, sint x, sint y, sint relative, uchar post);
-void mouse_button(uchar index, oi_mouse btn, sint state, uchar post);
+
+int mouse_init();
+
+void mouse_manage(struct oi_privmouse **mouse,
+                  unsigned int provide);
+
+void mouse_move(unsigned char index,
+                int x,
+                int y,
+                char relative,
+                char post);
+
+void mouse_button(unsigned char index,
+                  oi_mouse btn,
+                  char down,
+                  char post);
 
 /* ******************************************************************** */
-
 // Keyboard state
-sint keyboard_init();
-void keyboard_manage(struct oi_privkey **key, uint provide);
-sint keyboard_fillnames(char **kn);
-void keyboard_update(uchar index, oi_keysym *keysym, sint state, uchar post);
+
+int keyboard_init();
+
+void keyboard_manage(struct oi_privkey **key,
+                     unsigned int provide);
+
+int keyboard_fillnames(char **kn);
+
+void keyboard_update(unsigned char index,
+                     oi_keysym *keysym,
+                     char down,
+                     char post);
+
 void keyboard_dorepeat();
-void keyboard_setmodifier(uchar index, uint newmod);
-inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last);
+
+void keyboard_setmodifier(unsigned char index,
+                          unsigned int newmod);
+
+inline oi_key keyboard_scangetkey(char *name,
+                                  oi_key first,
+                                  oi_key last);
 
 /* ******************************************************************** */
-
 // Joystick state
-sint joystick_init();
-sint joystick_close();
-void joystick_manage(struct oi_privjoy **joy, uint provide);
-void joystick_axis(uchar index, uchar axis, sint value, oi_bool relative, uchar post);
-void joystick_button(uchar index, uchar btn, uchar state, uchar post);
-sint joystick_hatpos(sint x, sint y);
+
+int joystick_init();
+
+int joystick_close();
+
+void joystick_manage(struct oi_privjoy **joy,
+                     unsigned int provide);
+
+void joystick_axis(unsigned char index,
+                   unsigned char axis,
+                   int value,
+                   oi_bool relative,
+                   char post);
+
+void joystick_button(unsigned char index,
+                     unsigned char btn,
+                     char down,
+                     char post);
+
+int joystick_hatpos(int x,
+                    int y);
+
 void joystick_pump();
 
 /**
@@ -175,20 +244,27 @@ void joystick_pump();
  * So far, Linux does as balls and hats are two-axis
  */
 typedef struct oi_joyconfig {
-    char *name;                              /**< Name of joystick */
-    uchar buttons;                           /**< Number of buttons */
-    oi_joytype kind[OI_JOY_NUM_AXES];        /**< Axis "type" mapping */
-    uchar pair[OI_JOY_NUM_AXES];             /**< Ball/stick/hat pairing */
+    char *name;                                                       /**< Name of joystick */
+    unsigned char buttons;                                            /**< Number of buttons */
+    oi_joytype kind[OI_JOY_NUM_AXES];                                 /**< Axis "type" mapping */
+    unsigned char pair[OI_JOY_NUM_AXES];                              /**< Ball/stick/hat pairing */
 } oi_joyconfig;
 
 /* ******************************************************************** */
-
 // Action state
-sint action_init();
+
+int action_init();
+
 void action_clearreal();
+
 void action_process(oi_event *evt);
-void action_cleartable(struct oi_aclink *tab[], uint num);
-struct oi_aclink *action_tail(struct oi_aclink **head, uint alloc);
+
+void action_cleartable(struct oi_aclink *tab[],
+                       int num);
+
+struct oi_aclink *action_tail(struct oi_aclink **head,
+                              char alloc);
+
 inline void action_statepost(oi_event *evt);
 
 /**
@@ -200,8 +276,8 @@ inline void action_statepost(oi_event *evt);
  * keypresses to generate multiple events (or even a combo).
  */
 typedef struct oi_aclink {
-    uint action;                                                       /**< Action id */
-    uchar device;                                                      /**< Device index */
+    unsigned int action;                                               /**< Action id */
+    unsigned char device;                                              /**< Device index */
     struct oi_aclink *next;                                            /**< Next pointer */
 } oi_aclink;
 
@@ -231,14 +307,14 @@ void debug(char *format, ...);
  * @brief Various constants for internal library use
  * @{
  */
-#define OI_MAX_DEVICES 64                                           /**< Max number of attached devices */
-#define OI_MAX_EVENTS 128                                           /**< Size of event queue */
-#define OI_SLEEP 1                                                  /**< Ms to sleep in busy wait-loop */
-#define OI_MIN_KEYLENGTH 5                                          /**< Min symbolic event name */
-#define OI_MAX_KEYLENGTH 20                                         /**< Max symbolic event name */
+#define OI_MAX_DEVICES 64                                              /**< Max number of attached devices */
+#define OI_MAX_EVENTS 128                                              /**< Size of event queue */
+#define OI_SLEEP 1                                                     /**< Ms to sleep in busy wait-loop */
+#define OI_MIN_KEYLENGTH 5                                             /**< Min symbolic event name */
+#define OI_MAX_KEYLENGTH 20                                            /**< Max symbolic event name */
 
-#define OI_JOY_TAB_AXES 0                                           /**< Lookup table offset for joystick axes */
-#define OI_JOY_TAB_BTNS 1                                           /**< Lookup table offset for joystick buttons */
+#define OI_JOY_TAB_AXES 0                                              /**< Lookup table offset for joystick axes */
+#define OI_JOY_TAB_BTNS 1                                              /**< Lookup table offset for joystick buttons */
 /**
  * @}
  */

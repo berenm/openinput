@@ -30,11 +30,11 @@
 
 // Globals
 static oi_device *windowdev;
-static sint focus;
+static unsigned int focus;
 static oi_bool grab;
 static oi_bool cursor;
-static sint win_width;
-static sint win_height;
+static int win_width;
+static int win_height;
 
 /* ******************************************************************** */
 
@@ -44,8 +44,8 @@ static sint win_height;
  *
  * Must be called on library initialization.
  */
-sint appstate_init() {
-    int i;
+int appstate_init() {
+    unsigned char i;
 
     // Ok, our focus is complete
     focus = OI_FOCUS_MOUSE | OI_FOCUS_INPUT | OI_FOCUS_VISIBLE;
@@ -54,7 +54,7 @@ sint appstate_init() {
     grab = FALSE;
     cursor = TRUE;
 
-    // Find default/first window device
+    // Find default/first window device which we assume is "the root"
     i = 1;
     while((windowdev = device_get(i)) != NULL) {
         if((windowdev->provides & OI_PRO_WINDOW) == OI_PRO_WINDOW) {
@@ -98,8 +98,8 @@ sint appstate_init() {
  * Rhree types of focus exists: #OI_FOCUS_MOUSE #OI_FOCUS_INPUT and
  * #OI_FOCUS_VISIBLE
  */
-void appstate_focus(uchar index, sint gain, sint state, uchar post) {
-    sint newfocus;
+void appstate_focus(unsigned char index, char gain, unsigned int state, char post) {
+    unsigned int newfocus;
 
     // Loose or gain
     newfocus = focus;
@@ -124,7 +124,7 @@ void appstate_focus(uchar index, sint gain, sint state, uchar post) {
         ev.type = OI_ACTIVE;
         ev.active.device = index;
         ev.active.gain = gain & TRUE;
-        ev.active.state = state;
+        ev.active.state = focus;
         queue_add(&ev);
     }
 }
@@ -142,7 +142,7 @@ void appstate_focus(uchar index, sint gain, sint state, uchar post) {
  *
  * Update the window size state.
  */
-void appstate_resize(uchar index, sint w, sint h, uchar post) {
+void appstate_resize(unsigned char index, int w, int h, char post) {
     // Store state
     win_width = w;
     win_height = h;
@@ -166,7 +166,7 @@ void appstate_resize(uchar index, sint w, sint h, uchar post) {
  *
  * @returns window width (pixels)
  */
-inline sint appstate_width() {
+inline int appstate_width() {
     return win_width;
 }
 
@@ -178,7 +178,7 @@ inline sint appstate_width() {
  *
  * @returns window height (pixels)
  */
-inline sint appstate_height() {
+inline int appstate_height() {
     return win_height;
 }
 
@@ -193,7 +193,7 @@ inline sint appstate_height() {
  * A bitmask comprised of #OI_FOCUS_MOUSE #OI_FOCUS_INPUT or
  * #OI_FOCUS_VISIBLE
  */
-sint oi_app_focus() {
+unsigned int oi_app_focus() {
     return focus;
 }
 
@@ -210,8 +210,8 @@ sint oi_app_focus() {
  * be queried using #OI_QUERY
  */
 oi_bool oi_app_cursor(oi_bool q) {
-    int hide;
-    int i;
+    char hide;
+    unsigned char i;
     oi_device *dev;
 
     switch(q) {
@@ -242,8 +242,8 @@ oi_bool oi_app_cursor(oi_bool q) {
 
         // When unhiding, warp the mouse due to fudge
         if(!hide && dev->warp) {
-            sint x;
-            sint y;
+            int x;
+            int y;
             oi_mouse_absolute(0, &x, &y);
             dev->warp(dev, x, y);
         }
@@ -268,8 +268,8 @@ oi_bool oi_app_cursor(oi_bool q) {
  * also be queried using #OI_QUERY
  */
 oi_bool oi_app_grab(oi_bool q) {
-    int eat;
-    int i;
+    char eat;
+    unsigned char i;
     oi_device *dev;
 
     switch(q) {

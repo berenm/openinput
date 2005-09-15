@@ -50,7 +50,7 @@ static char *joybases[] = {
  * Called on library initialization. The function prepares
  * the joystick manager for use.
  */
-sint joystick_init() {
+int joystick_init() {
     int i;
     char target[100];
 
@@ -82,7 +82,7 @@ sint joystick_init() {
  * This function must be called on library shutdown such that
  * the joystick symbolic name table can be freed.
  */
-sint joystick_close() {
+int joystick_close() {
     int i;
 
     // Free symbolic joystick type class names
@@ -115,7 +115,7 @@ sint joystick_close() {
  * The structure might also not be created, depending on whether
  * the device provides joystick as determined by the provide-mask
  */
-void joystick_manage(oi_privjoy **joy, uint provide) {
+void joystick_manage(oi_privjoy **joy, unsigned int provide) {
     // Only care about keyboard
     if(!(provide & OI_PRO_JOYSTICK)) {
         return;
@@ -156,11 +156,11 @@ void joystick_manage(oi_privjoy **joy, uint provide) {
  * "joystick_pump" to combine multi-axes things (balls, sticks, etc.) into
  * a single event.
  */
-void joystick_axis(uchar index, uchar axis, sint value, oi_bool relative, uchar post) {
-    sint corval;
+void joystick_axis(unsigned char index, unsigned char axis, int value, oi_bool relative, char post) {
     oi_privjoy *priv;
     oi_joyconfig *conf;
-    uchar rel;
+    int corval;
+    char rel;
 
     // Get private data or bail
     priv = device_priv(index, OI_PRO_JOYSTICK);
@@ -225,14 +225,14 @@ void joystick_axis(uchar index, uchar axis, sint value, oi_bool relative, uchar 
  *
  * @param index device index
  * @param btn button index
- * @param state pressed (true) or released (false)
+ * @param down true (1) on button press, false (0) otherwise
  * @param post true (1) to post event, false (0) otherwise
  *
  * Feed joystick button press/release into joystick state manager.
  */
-void joystick_button(uchar index, uchar btn, uchar state, uchar post) {
-    uint newbut;
-    uchar type;
+void joystick_button(unsigned char index, unsigned char btn, char down, char post) {
+    unsigned int newbut;
+    unsigned char type;
     oi_privjoy *priv;
 
     // Get private data or bail
@@ -243,7 +243,7 @@ void joystick_button(uchar index, uchar btn, uchar state, uchar post) {
 
     // Calculate button mask
     newbut = priv->button;
-    if(state) {
+    if(down) {
         type = OI_JOYBUTTONUP;
         newbut |= OI_BUTTON_MASK(btn);
     }
@@ -276,14 +276,14 @@ void joystick_button(uchar index, uchar btn, uchar state, uchar post) {
  * y-axes for trackballs, hats etc.
  */
 void joystick_pump() {
-    uchar index;
+    unsigned char index;
     oi_device *dev;
     oi_privjoy *priv;
     oi_joyconfig *conf;
     oi_event ev;
-    uchar axis;
-    sint abs;
-    sint rel;
+    unsigned char axis;
+    int abs;
+    int rel;
 
     // Parse all devices
     for(index=1; index<OI_MAX_DEVICES; index++) {
@@ -376,13 +376,13 @@ void joystick_pump() {
  * multiple axes.  This function converts two-axis hats to the
  * discrete joystick hat position values found as OI_HAT_*.
  */
-sint joystick_hatpos(sint x, sint y) {
-    const sint hatpos[3][3] = {
+int joystick_hatpos(int x, int y) {
+    const int hatpos[3][3] = {
         {OI_HAT_UPLEFT, OI_HAT_UP, OI_HAT_UPRIGHT},
         {OI_HAT_LEFT, OI_HAT_CENTER, OI_HAT_RIGHT},
         {OI_HAT_DOWNLEFT, OI_HAT_DOWN, OI_HAT_DOWNRIGHT} };
-    uchar cx;
-    uchar cy;
+    int cx;
+    int cy;
 
     // Clip
     if(x < 0) {
@@ -425,10 +425,10 @@ sint joystick_hatpos(sint x, sint y) {
  * to this function (ie. the cummulative, relative motion).
  * If device or axis is not found, the value returned is 0.
  */
-uint oi_joy_relative(uchar index, uchar axis, sint *value, sint *second) {
+unsigned int oi_joy_relative(unsigned char index, unsigned char axis, int *value, int *second) {
     oi_privjoy *priv;
     oi_joyconfig *conf;
-    uchar i;
+    unsigned char i;
 
     // Default value
     if(value) {
@@ -503,10 +503,10 @@ uint oi_joy_relative(uchar index, uchar axis, sint *value, sint *second) {
  * button state (as a bitmask). If the device or axis can not be found
  * the value returned is zero.
  */
-uint oi_joy_absolute(uchar index, uchar axis, sint *value, sint *second) {
+unsigned int oi_joy_absolute(unsigned char index, unsigned char axis, int *value, int *second) {
     oi_privjoy *priv;
     oi_joyconfig *conf;
-    uchar i;
+    unsigned char i;
 
     // Default value
     if(value) {
@@ -574,12 +574,12 @@ uint oi_joy_absolute(uchar index, uchar axis, sint *value, sint *second) {
  * Get the symbolic string name of a joystick button/axis defined
  * by the given code.
  */
-char *oi_joy_getname(uint code) {
+char *oi_joy_getname(unsigned int code) {
     oi_joytype t;
-    uint i;
+    unsigned char i;
 
     t = OI_JOY_DECODE_TYPE(code);
-    i = OI_JOY_DECODE_INDEX(code);
+    i = (unsigned char)OI_JOY_DECODE_INDEX(code);
     debug("oi_joystick_getname: decoded type:%u index:%u", t, i);
 
     // Dummy checks (return joy_unknown on error)
@@ -608,7 +608,7 @@ char *oi_joy_getname(uint code) {
  *
  * Translate symbolic string to joystick code.
  */
-uint oi_joy_getcode(char *name) {
+unsigned int oi_joy_getcode(char *name) {
     int i;
 
     // Dummy checks
@@ -660,11 +660,11 @@ uint oi_joy_getcode(char *name) {
  * Get basic information about a joystick device such as the vendor-supplied
  * name, the number of buttons and axes.
  */
-sint oi_joy_info(uchar index, char **name, uchar *buttons, uchar *axes) {
+int oi_joy_info(unsigned char index, char **name, int *buttons, int *axes) {
     oi_device *dev;
     oi_joyconfig *conf;
-    uchar i;
-    uchar j;
+    unsigned char i;
+    unsigned char j;
 
     // Find first keyboard if index is zero
     i = index;
@@ -740,10 +740,10 @@ sint oi_joy_info(uchar index, char **name, uchar *buttons, uchar *axes) {
  * reveal enough information to fully support the different kinds of
  * axes etc.)
  */
-sint op_joy_axessetup(uchar index, oi_joytype *type[], uchar *pair[], uchar *num) {
+int op_joy_axessetup(unsigned char index, oi_joytype *type[], unsigned char *pair[], int *num) {
     oi_device *dev;
     oi_joyconfig *conf;
-    uchar i;
+    unsigned char i;
 
     // Find first keyboard if index is zero
     i = index;

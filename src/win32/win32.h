@@ -27,17 +27,17 @@
 /* ******************************************************************** */
 
 // Bootstrap
-sint win32_avail();
+int win32_avail();
 oi_device *win32_device();
 
 // Device
-sint win32_init(oi_device *dev, char *window_id, uint flags);
-sint win32_destroy(oi_device *dev);
+int win32_init(oi_device *dev, char *window_id, unsigned int flags);
+int win32_destroy(oi_device *dev);
 void win32_process(oi_device *dev);
-sint win32_grab(oi_device *dev, sint on);
-sint win32_hidecursor(oi_device *dev, sint on);
-sint win32_warp(oi_device *dev, sint x, sint y);
-sint win32_winsize(oi_device *dev, sint *w, sint *h);
+int win32_grab(oi_device *dev, int on);
+int win32_hidecursor(oi_device *dev, int on);
+int win32_warp(oi_device *dev, int x, int y);
+int win32_winsize(oi_device *dev, int *w, int *h);
 
 /* ******************************************************************** */
 
@@ -46,11 +46,13 @@ struct win32_private;
 void win32_setdevhook(oi_device *dev);
 void win32_initkeymap();
 void win32_keystate(oi_device *dev);
-inline oi_keysym *win32_translate(struct win32_private *priv, WPARAM wparam, LPARAM lparam,
-                                  uchar state, oi_keysym *keysym);
-LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+inline oi_keysym *win32_translate(struct win32_private *priv,
+                                  WPARAM wparam, LPARAM lparam,
+                                  char down, oi_keysym *keysym);
+LONG CALLBACK win32_wndproc(HWND hwnd, UNSIGNED INT msg,
+                            WPARAM wparam, LPARAM lparam);
 void win32_trackmouse();
-inline void win32_relative_mouse(uint x, uint y);
+inline void win32_relative_mouse(int x, int y);
 void win32_movesize();
 
 /* ******************************************************************** */
@@ -63,16 +65,16 @@ void win32_movesize();
  * instance of the device driver.
  */
 typedef struct win32_private {
-    HWND hwnd;                     /**< Window handle */
-    WNDPROC old_wndproc;           /**< Old window procedure handle */
-    RECT rect;                     /**< Window bounds for mouse clipping */
-    uchar relative;                /**< Relative mouse movement */
-    sint winx;                     /**< Window x coordinate */
-    sint winy;                     /**< Window y coordinate */
-    sint width;                    /**< Window width */
-    sint height;                   /**< Window height */
-    uchar shiftleft;               /**< Previous left shift button state */
-    uchar shiftright;              /**< Previous right shift button state */
+    HWND hwnd;                    /**< Window handle */
+    WNDPROC old_wndproc;          /**< Old window procedure handle */
+    RECT rect;                    /**< Window bounds for mouse clipping */
+    unsigned int relative;        /**< Relative mouse movement bitmask */
+    int winx;                     /**< Window x coordinate */
+    int winy;                     /**< Window y coordinate */
+    int width;                    /**< Window width */
+    int height;                   /**< Window height */
+    char shiftleft;               /**< Previous left shift button state */
+    char shiftright;              /**< Previous right shift button state */
 } win32_private;
 
 /* ******************************************************************** */

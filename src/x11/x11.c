@@ -69,7 +69,7 @@ oi_bootstrap x11_bootstrap = {
  * We try to open a dummy-connection to the X-server. That
  * tells us of the X11 system can be used.
  */
-sint x11_avail(uint flags) {
+int x11_avail(unsigned int flags) {
     Display *disp;
 
     debug("x11_avail");
@@ -163,7 +163,7 @@ oi_device *x11_device() {
  * The X11 keymap is also read, and a full reset is performed
  * in order to sync states between X11 and OpenInput.
  */
-sint x11_init(oi_device *dev, char *window_id, uint flags) {
+int x11_init(oi_device *dev, char *window_id, unsigned int flags) {
     x11_private *priv;
 
     priv = (x11_private*)dev->private;
@@ -220,7 +220,7 @@ sint x11_init(oi_device *dev, char *window_id, uint flags) {
  * Shutdown the X11 driver by releasing all
  * allocated memory and the hidden cursor.
  */
-sint x11_destroy(oi_device *dev) {
+int x11_destroy(oi_device *dev) {
     x11_private *priv;
 
     debug("x11_destroy");
@@ -284,7 +284,7 @@ void x11_process(oi_device *dev) {
  * Grab or release input (keyboard) and pointer (mouse) inside
  * the hook-window.
  */
-sint x11_grab(oi_device *dev, sint on) {
+int x11_grab(oi_device *dev, int on) {
     x11_private *priv;
     int i;
 
@@ -313,7 +313,7 @@ sint x11_grab(oi_device *dev, sint on) {
         }
 
         // Set flag for possible relative mouse
-        priv->relative |= SX11_GRAB;
+        priv->relative |= DX11_GRAB;
     }
     else {
         // Simply ungrab both
@@ -321,7 +321,7 @@ sint x11_grab(oi_device *dev, sint on) {
         XUngrabPointer(priv->disp, CurrentTime);
 
         // Fix relative mouse motion
-        priv->relative &= ~SX11_GRAB;
+        priv->relative &= ~DX11_GRAB;
     }
 
     return OI_ERR_OK;
@@ -344,7 +344,7 @@ sint x11_grab(oi_device *dev, sint on) {
  * found in the private data). Otherwise, we simply revert
  * to the default X pointer.
  */
-sint x11_hidecursor(oi_device *dev, sint on) {
+int x11_hidecursor(oi_device *dev, int on) {
     x11_private *priv;
 
     debug("x11_hidecursor: state:%i", on);
@@ -353,13 +353,13 @@ sint x11_hidecursor(oi_device *dev, sint on) {
     // Hide - set blank cursor
     if(on) {
         XDefineCursor(priv->disp, priv->win, priv->cursor);
-        priv->relative |= SX11_HIDE;
+        priv->relative |= DX11_HIDE;
     }
 
     // Show - set default cursor
     else {
         XDefineCursor(priv->disp, priv->win, None);
-        priv->relative &= ~SX11_HIDE;
+        priv->relative &= ~DX11_HIDE;
     }
 
     return OI_ERR_OK;
@@ -381,7 +381,7 @@ sint x11_hidecursor(oi_device *dev, sint on) {
  * Warp (move) the mouse pointer to the given
  * absolute coordinate within the hook-window.
  */
-sint x11_warp(oi_device *dev, sint x, sint y) {
+int x11_warp(oi_device *dev, int x, int y) {
     x11_private *priv;
 
     priv = (x11_private*)dev->private;
@@ -411,7 +411,7 @@ sint x11_warp(oi_device *dev, sint x, sint y) {
  * Read the current size of the hook-window, update
  * the internal state and return the width and height.
  */
-sint x11_winsize(oi_device *dev, sint *w, sint *h) {
+int x11_winsize(oi_device *dev, int *w, int *h) {
     x11_private *priv;
     XWindowAttributes attr;
 
@@ -449,7 +449,7 @@ sint x11_winsize(oi_device *dev, sint *w, sint *h) {
  *
  * Force full resync the driver and device state.
  */
-sint x11_reset(oi_device *dev) {
+int x11_reset(oi_device *dev) {
     x11_private *priv;
     priv = (x11_private*)dev->private;
     debug("x11_reset");
@@ -486,7 +486,7 @@ sint x11_reset(oi_device *dev) {
  * Reports non-fatal errors to standard-error when
  * OpenInput is compiled in debug-mode.
  */
-sint x11_error(Display *d, XErrorEvent *e) {
+int x11_error(Display *d, XErrorEvent *e) {
     debug("x11_error: code %u", e->error_code);
 
     return 0;
@@ -505,11 +505,10 @@ sint x11_error(Display *d, XErrorEvent *e) {
  * connection to the X server, in which case the application
  * should terminate.
  */
-sint x11_fatal(Display *d) {
+int x11_fatal(Display *d) {
     debug("x11_fatal: fatal I/O error");
 
-    //FIXME: Send a quit-event
-
+    //FIXME: Send a quit-event?
     return OI_ERR_OK;
 }
 

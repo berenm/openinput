@@ -27,15 +27,15 @@
 /* ******************************************************************** */
 
 // Bootstrap
-sint unixsignal_avail();
+int unixsignal_avail();
 oi_device *unixsignal_device();
 
 // Device
-sint unixsignal_init(oi_device *dev, char *window_id, uint flags);
-sint unixsignal_enable(oi_device *dev, sint on);
-sint unixsignal_destroy(oi_device *dev);
+int unixsignal_init(oi_device *dev, char *window_id, unsigned int flags);
+int unixsignal_enable(oi_device *dev, int on);
+int unixsignal_destroy(oi_device *dev);
 void unixsignal_process(oi_device *dev);
-sint unixsignal_reset(oi_device *dev);
+int unixsignal_reset(oi_device *dev);
 
 // Handler
 void unixsignal_handler(int signum);

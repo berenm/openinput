@@ -41,7 +41,7 @@
  * Called on library initialization. The function prepares
  * the mouse manager for use.
  */
-sint mouse_init() {
+int mouse_init() {
     debug("mouse_init");
 
     // Done
@@ -68,7 +68,7 @@ sint mouse_init() {
  * The structure might also not be created, depending on whether
  * the device provides a mice as determined by the provide-mask
  */
-void mouse_manage(oi_privmouse **mouse, uint provide) {
+void mouse_manage(oi_privmouse **mouse, unsigned int provide) {
     // Only care about keyboard
     if(!(provide & OI_PRO_MOUSE)) {
         return;
@@ -106,12 +106,12 @@ void mouse_manage(oi_privmouse **mouse, uint provide) {
  * Device drivers which resembles pointer devices probably wants
  * to use this function to inject events into the library.
  */
-void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
+void mouse_move(unsigned char index, int x, int y, char relative, char post) {
     oi_privmouse *priv;
-    sint nx;
-    sint ny;
-    sint rx;
-    sint ry;
+    int nx;
+    int ny;
+    int rx;
+    int ry;
 
     // Get private per-device data
     priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
@@ -160,8 +160,6 @@ void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
     priv->relx += rx;
     priv->rely += ry;
 
-    //FIXME some platforms may need manual pushing of cursor
-
     // Postal services
     if(post) {
         oi_event ev;
@@ -170,7 +168,6 @@ void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
         ev.move.state = priv->button;
         ev.move.x = priv->absx;
         ev.move.y = priv->absy;
-        // Only send relative, not cummulative, ticks (thanks discipline!)
         ev.move.relx = rx;
         ev.move.rely = ry;
 
@@ -186,15 +183,15 @@ void mouse_move(uchar index, sint x, sint y, sint relative, uchar post) {
  *
  * @param index device index
  * @param btn button index
- * @param state pressed (true) or released (false)
+ * @param down true (1) if button is pressed false (0) otherwise
  * @param post true (1) to send event, false (0) otherwise
  *
  * Feed mouse button press/release into mouse state manager.
  */
-void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
+void mouse_button(unsigned char index, oi_mouse btn, char down, char post) {
     oi_privmouse *priv;
     oi_mouse newbutton;
-    uchar type;
+    unsigned char type;
 
     // Get per-device private data
     priv = (oi_privmouse*)device_priv(index, OI_PRO_MOUSE);
@@ -204,7 +201,7 @@ void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
 
     newbutton = priv->button;
 
-    if(state) {
+    if(down) {
         // Down
         type = OI_MOUSEBUTTONDOWN;
         newbutton |= OI_BUTTON_MASK(btn);
@@ -251,9 +248,9 @@ void mouse_button(uchar index, oi_mouse btn, sint state, uchar post) {
  * (stored in the integer pointers) and the current
  * button state as a button mask.
  */
-sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
+int oi_mouse_absolute(unsigned char index, int *x, int *y) {
     oi_privmouse *priv;
-    uchar i;
+    unsigned char i;
 
     // Default coordinates
     if(x) {
@@ -318,9 +315,9 @@ sint oi_mouse_absolute(uchar index, sint *x, sint *y) {
  * Get the relative mouse motion since last call
  * to this function (ie. it is cummulative).
  */
-sint oi_mouse_relative(uchar index, sint *x, sint *y) {
+int oi_mouse_relative(unsigned char index, int *x, int *y) {
     oi_privmouse *priv;
-    uchar i;
+    unsigned char i;
 
     // Default coordinates
     if(x) {
@@ -382,9 +379,9 @@ sint oi_mouse_relative(uchar index, sint *x, sint *y) {
  * position. The function generates a mouse
  * movement event.
  */
-sint oi_mouse_warp(uchar index, sint x, sint y) {
+int oi_mouse_warp(unsigned char index, int x, int y) {
     oi_device *dev;
-    uchar i;
+    unsigned char i;
     int e;
 
     // Clip coordinates

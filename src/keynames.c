@@ -41,7 +41,7 @@
  *
  * And yup - this function is lengthy but quite trivial!
  */
-sint keyboard_fillnames(char **kn) {
+int keyboard_fillnames(char **kn) {
     int i;
 
     // Fill all with the unknown key

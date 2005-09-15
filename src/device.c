@@ -33,9 +33,9 @@
 // Globals
 static oi_device *devices[OI_MAX_DEVICES];
 static oi_private *private[OI_MAX_DEVICES];
-static uchar devices_run[OI_MAX_DEVICES];
-static uint num_devices;
-static sint more_avail;
+static char devices_run[OI_MAX_DEVICES];
+static int num_devices;
+static char more_avail;
 
 // Include the bootstrap table
 #define _DEVICE_FILLER_
@@ -53,8 +53,8 @@ static sint more_avail;
  * Called on library initialization. This functions prepares the
  * device manager before devices are booted and initialized.
  */
-sint device_init() {
-    uchar i;
+int device_init() {
+    unsigned char i;
 
     for(i=0; i<OI_MAX_DEVICES; i++) {
         devices[i] = NULL;
@@ -79,10 +79,10 @@ sint device_init() {
  * This function parses the bootstrap table and
  * registers (bootstraps and initializes) all devices.
  */
-void device_bootstrap(char *window_id, uint flags) {
-    uint i;
-    uint j;
-    sint ok;
+void device_bootstrap(char *window_id, unsigned int flags) {
+    unsigned int i;
+    unsigned int j;
+    int ok;
 
     debug("device_bootstrap");
 
@@ -147,7 +147,7 @@ void device_bootstrap(char *window_id, uint flags) {
  * is automatically called for all "available" devices on
  * library initilization
  */
-sint device_register(oi_bootstrap *boot, char *window_id, uint flags) {
+int device_register(oi_bootstrap *boot, char *window_id, unsigned int flags) {
     oi_event ev;
 
     // Create the device
@@ -217,7 +217,7 @@ sint device_register(oi_bootstrap *boot, char *window_id, uint flags) {
  *
  * Shutdown a device.
  */
-sint device_destroy(sint index) {
+int device_destroy(unsigned char index) {
     oi_device *dev;
 
     debug("device_destroy");
@@ -266,7 +266,7 @@ sint device_destroy(sint index) {
  * avail/create invokation. This can be repeated as long as the
  * device table is not full.
  */
-void device_moreavail(sint more) {
+void device_moreavail(char more) {
     if(more) {
         more_avail = TRUE;
     }
@@ -286,7 +286,7 @@ void device_moreavail(sint more) {
  *
  * Fetch a device structure given device index.
  */
-oi_device *device_get(sint index) {
+oi_device *device_get(unsigned char index) {
     // Dummy check
     if((index < 1) || (index > num_devices)) {
         // debug("device_get: no device, index %i", index);
@@ -303,15 +303,15 @@ oi_device *device_get(sint index) {
  * @brief Get private managment data
  *
  * @param index device index
- * @param man manager-structure to return identified by the provide codes,
- *    see @ref PProvide
+ * @param manager provide-code (see @ref PProvide) of
+ * manager structure to return
  * @returns pointer to management structure, or NULL if not found
  *
  * Get pointer to one of the private managment structures in
  * a safe way. You'll have to throw in a typecast since we
  * return a void-pointer to make the function versatile.
  */
-void *device_priv(sint index, uint man) {
+void *device_priv(unsigned char index, unsigned int manager) {
 
     // Dummy check
     if(!private[index-1]) {
@@ -320,7 +320,7 @@ void *device_priv(sint index, uint man) {
     }
 
     // Return the manager data
-    switch(man) {
+    switch(manager) {
     case OI_PRO_KEYBOARD:
         return private[index-1]->key;
 
@@ -345,7 +345,7 @@ void *device_priv(sint index, uint man) {
  * make them pump events into the queue.
  */
 inline void device_pumpall() {
-    uint i;
+    unsigned int i;
 
     for(i=0; i<num_devices; i++) {
         // Only pump devices if it's there and enabled!
@@ -364,16 +364,16 @@ inline void device_pumpall() {
  *
  * @param str pointer to window_id string, see @ref PWindow
  * @param tok parameter to parse, see @ref PWindow
- * @returns converted parameter (as an uint)
+ * @returns converted parameter (as an unsigned int)
  *
- * Parse and convert string parameter to an uint. Basically
+ * Parse and convert string parameter to an unsigned int. Basically
  * this is just an advanced atoi-function.
  */
-uint device_windowid(char *str, char tok) {
+unsigned int device_windowid(char *str, char tok) {
     char match[5];
     char *sub;
     int e;
-    uint val;
+    unsigned int val;
 
     memset(match, 0, 5);
 
@@ -415,8 +415,8 @@ uint device_windowid(char *str, char tok) {
  *
  * Enabling/disabling a device will force a full driver resynchronization.
  */
-oi_bool oi_device_enable(uchar index, oi_bool q) {
-    uchar enable;
+oi_bool oi_device_enable(unsigned char index, oi_bool q) {
+    char enable;
 
     // Check that the devices exists
     if(device_get(index) == NULL) {
@@ -472,7 +472,7 @@ oi_bool oi_device_enable(uchar index, oi_bool q) {
  * The pointers you receive may NOT be freed, as
  * they are internal OpenInput library data!
  */
-sint oi_device_info(uchar index, char **name, char **desc, uint *provides) {
+int oi_device_info(unsigned char index, char **name, char **desc, unsigned int *provides) {
     oi_device *dev;
 
     // Get device

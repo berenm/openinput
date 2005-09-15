@@ -34,7 +34,7 @@ void toggle(int *i) {
     *i = 0;
   }
   else {
-    *i = 1;    
+    *i = 1;
   }
 }
 
@@ -59,7 +59,7 @@ void help() {
 void debug_discovery(uint index) {
   char *name;
   char *desc;
-  uint pro;
+  unsigned int pro;
 
   // Fetch info
   oi_device_info(index, &name, &desc, &pro);
@@ -109,86 +109,86 @@ void test(Display *d, Window w, uint scrn) {
 
     // Mouse button up
     else if((ev.type == OI_MOUSEBUTTONUP) ||
-	    (ev.type == OI_MOUSEBUTTONDOWN)) {
+            (ev.type == OI_MOUSEBUTTONDOWN)) {
       printf("--- mouse button state %i at position %i,%i\n",
-	     ev.button.state, ev.button.x, ev.button.y);
+             ev.button.state, ev.button.x, ev.button.y);
     }
-    
+
     // Mouse move
     else if(ev.type == OI_MOUSEMOVE) {
       printf("--- mouse move  abs:%i,%i \t rel:%i,%i\n",
-	     ev.move.x, ev.move.y,
-	     ev.move.relx, ev.move.rely);
+             ev.move.x, ev.move.y,
+             ev.move.relx, ev.move.rely);
     }
 
     // Key down
     else if(ev.type == OI_KEYDOWN) {
       printf("--- key pressed -> %i:'%s'\n", ev.key.keysym.sym,
-	     oi_key_getname(ev.key.keysym.sym));
+             oi_key_getname(ev.key.keysym.sym));
     }
-    
+
     // Key up
     else if(ev.type == OI_KEYUP) {
       printf("--- key release -> %i:'%s'\n", ev.key.keysym.sym,
-	     oi_key_getname(ev.key.keysym.sym));
+             oi_key_getname(ev.key.keysym.sym));
 
       switch(ev.key.keysym.sym) {
       case OIK_H:
-	// Help
-	help();
-	break;
+        // Help
+        help();
+        break;
 
       case OIK_G:
-	// Grab
-	toggle(&sgrab);
-	oi_app_grab(sgrab);
-	printf("*** grab state %i\n", sgrab);
-	break;
+        // Grab
+        toggle(&sgrab);
+        oi_app_grab(sgrab);
+        printf("*** grab state %i\n", sgrab);
+        break;
 
       case OIK_C:
-	// Cursor
-	toggle(&scursor);
-	if(scursor) {
-	  oi_app_cursor(OI_ENABLE);
-	} else {
-	  oi_app_cursor(OI_DISABLE);
-	}
-	printf("*** cursor state %i\n", scursor);
-	break;
-	
+        // Cursor
+        toggle(&scursor);
+        if(scursor) {
+          oi_app_cursor(OI_ENABLE);
+        } else {
+          oi_app_cursor(OI_DISABLE);
+        }
+        printf("*** cursor state %i\n", scursor);
+        break;
+
       case OIK_M:
-	// Print mouse state
-	{
-	  int x,y;
-	  oi_mouse_absolute(0, &x, &y);
-	  printf("*** mouse absolute: %i,%i\n", x, y);
-	  oi_mouse_relative(0, &x, &y);
-	  printf("*** mouse relative: %i,%i\n", x, y);
-	}
-	break;
+        // Print mouse state
+        {
+          int x,y;
+          oi_mouse_absolute(0, &x, &y);
+          printf("*** mouse absolute: %i,%i\n", x, y);
+          oi_mouse_relative(0, &x, &y);
+          printf("*** mouse relative: %i,%i\n", x, y);
+        }
+        break;
 
       case OIK_W:
-	// Warp
-	oi_mouse_warp(0, 10, 10);
-     	printf("*** warped\n");
-	break;
+        // Warp
+        oi_mouse_warp(0, 10, 10);
+        printf("*** warped\n");
+        break;
 
       case OIK_Q:
-	// Quit
-	e = 0;
-     	printf("*** quit!\n");
-	break;
+        // Quit
+        e = 0;
+        printf("*** quit!\n");
+        break;
 
       case OIK_E:
-	// Enable/disable device index 2
-	toggle(&senable);
-	oi_device_enable(2, senable);
-     	printf("*** device 2 state %i\n", senable);
-	break;
+        // Enable/disable device index 2
+        toggle(&senable);
+        oi_device_enable(2, senable);
+        printf("*** device 2 state %i\n", senable);
+        break;
 
       default:
-	// Other
-	break;
+        // Other
+        break;
       }
     }
 
@@ -196,25 +196,25 @@ void test(Display *d, Window w, uint scrn) {
     else {
       switch(ev.type) {
       case OI_ACTIVE:
-	printf("--- active event\n");
-	break;
+        printf("--- active event\n");
+        break;
 
       case OI_RESIZE:
-	printf("--- resize event\n");
-	break;
+        printf("--- resize event\n");
+        break;
 
       case OI_EXPOSE:
-	printf("--- expose event\n");
-	break;
+        printf("--- expose event\n");
+        break;
 
       case OI_DISCOVERY:
-	printf("--- discovery event\n");
-	debug_discovery(ev.discover.device);
-	break;
+        printf("--- discovery event\n");
+        debug_discovery(ev.discover.device);
+        break;
 
       default:
-	printf("--- unhandled event type %i\n", ev.type);
-	break;
+        printf("--- unhandled event type %i\n", ev.type);
+        break;
       }
     }
   }
@@ -231,7 +231,7 @@ int main(int argc, char* argv[]) {
   Display *disp;
   Window win;
   XEvent evt;
-  uint scrn;
+  unsigned int scrn;
   long event_mask;
 
   // Startup
@@ -247,10 +247,10 @@ int main(int argc, char* argv[]) {
   // Open and map window
   scrn = DefaultScreen(disp);
   win = XCreateSimpleWindow(disp, DefaultRootWindow(disp),
-				   50, 50,
-				   200, 200,
-				   0, BlackPixel(disp, scrn),
-				   WhitePixel(disp, scrn));
+                                   50, 50,
+                                   200, 200,
+                                   0, BlackPixel(disp, scrn),
+                                   WhitePixel(disp, scrn));
   XMapWindow(disp, win);
 
   // Wait for map event
@@ -262,7 +262,7 @@ int main(int argc, char* argv[]) {
 
   // Perform the test
   test(disp, win, scrn);
-  
+
   // Close window and connection
   XDestroyWindow(disp, win);
   XCloseDisplay(disp);

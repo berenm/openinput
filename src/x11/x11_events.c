@@ -67,10 +67,10 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
     mouse_move(dev->index, deltax, deltay, TRUE, TRUE);
 
     // Only warp mouse if we're near the edge of the window
-    if((xev->xmotion.x < SX11_FUDGE) ||
-       (xev->xmotion.x > (priv->width - SX11_FUDGE)) ||
-       (xev->xmotion.y < SX11_FUDGE) ||
-       (xev->xmotion.y > (priv->height - SX11_FUDGE))) {
+    if((xev->xmotion.x < DX11_FUDGE) ||
+       (xev->xmotion.x > (priv->width - DX11_FUDGE)) ||
+       (xev->xmotion.y < DX11_FUDGE) ||
+       (xev->xmotion.y > (priv->height - DX11_FUDGE))) {
 
         // Apply the SDL optimization: Events may have accumulated
         while(XCheckTypedEvent(priv->disp, MotionNotify, xev)) {
@@ -93,10 +93,10 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
         // Remove warp-generated motion events
         for ( i=0; i<10; ++i ) {
             XMaskEvent(priv->disp, PointerMotionMask, xev);
-            if((xev->xmotion.x > (priv->lastx - SX11_FUDGE)) &&
-               (xev->xmotion.x < (priv->lastx + SX11_FUDGE)) &&
-               (xev->xmotion.y > (priv->lasty - SX11_FUDGE)) &&
-               (xev->xmotion.y < (priv->lasty + SX11_FUDGE))) {
+            if((xev->xmotion.x > (priv->lastx - DX11_FUDGE)) &&
+               (xev->xmotion.x < (priv->lastx + DX11_FUDGE)) &&
+               (xev->xmotion.y > (priv->lasty - DX11_FUDGE)) &&
+               (xev->xmotion.y < (priv->lasty + DX11_FUDGE))) {
                 break;
             }
         }
@@ -117,7 +117,7 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
  * The block is avoided using a "select attack" on the
  * X-server - this technique was borrowed from SDL. Thanks!
  */
-inline sint x11_pending(Display *d) {
+inline int x11_pending(Display *d) {
     // Flush to pump the X pipeline
     XFlush(d);
 
@@ -160,9 +160,9 @@ inline sint x11_pending(Display *d) {
  * the X server is thrown away. OpenInput has it's internal
  * keyrepeat system if you want repeat-events.
  */
-inline schar x11_keyrepeat(Display *d, XEvent *evt) {
+inline char x11_keyrepeat(Display *d, XEvent *evt) {
     XEvent pev;
-    schar rep;
+    char rep;
 
     rep = FALSE;
 
@@ -172,7 +172,7 @@ inline schar x11_keyrepeat(Display *d, XEvent *evt) {
         // Same key down within threshold
         if((pev.type == KeyPress) &&
            (pev.xkey.keycode == evt->xkey.keycode) &&
-           ((pev.xkey.time - evt->xkey.time) < SX11_REP_THRESHOLD)) {
+           ((pev.xkey.time - evt->xkey.time) < DX11_REP_THRESHOLD)) {
 
             debug("x11_keyrepeat: repeating key detected");
             rep = 1;
@@ -257,7 +257,7 @@ inline void x11_dispatch(oi_device *dev, Display *d) {
     case MotionNotify:
         debug("x11_dispatch: motion_notify");
         // Mouse grabbed and hidden, using relative motion
-        if(((x11_private*)dev->private)->relative == (SX11_GRAB | SX11_HIDE)) {
+        if(((x11_private*)dev->private)->relative == (DX11_GRAB | DX11_HIDE)) {
             x11_relative_mouse(dev, &xev);
         }
         else {

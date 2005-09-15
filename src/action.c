@@ -30,8 +30,8 @@
 #include "internal.h"
 
 // Global state table and count
-static uchar *action_state;
-static sint action_count;
+static char *action_state;
+static int action_count;
 
 // Lookup table for keyboard
 static oi_aclink *action_keyboard[OIK_LAST];
@@ -50,7 +50,7 @@ static oi_aclink *action_joy[2][OIJ_LAST];
  *
  * Must be called on library initialization.
  */
-sint action_init() {
+int action_init() {
     debug("action_init");
 
     // Map is not initialized
@@ -72,10 +72,10 @@ sint action_init() {
  *
  * Free current action map (if any) and install new one.
  */
-sint oi_action_install(oi_actionmap *map, sint num) {
-    sint i;
-    sint j;
-    sint big;
+int oi_action_install(oi_actionmap *map, int num) {
+    int i;
+    int j;
+    unsigned int big;
     oi_aclink *last;
 
     debug("oi_action_install");
@@ -117,7 +117,7 @@ sint oi_action_install(oi_actionmap *map, sint num) {
 
     // Alloc state table and clear it
     action_count = big;
-    action_state = (uchar*)malloc(big);
+    action_state = (char*)malloc(big);
     memset(action_state, 0, big);
 
     /* Parse map and fill the lookup tables
@@ -152,11 +152,11 @@ sint oi_action_install(oi_actionmap *map, sint num) {
         }
 
         // Action is joystick
-        if((j = (sint)oi_joy_getcode(map[i].name)) != OI_JOY_NONE_CODE) {
+        if((j = (int)oi_joy_getcode(map[i].name)) != OI_JOY_NONE_CODE) {
 
             // An axis
-            if(OI_JOY_DECODE_TYPE((uint)j) != OIJ_GEN_BUTTON) {
-                last = action_tail(&action_joy[OI_JOY_TAB_AXES][OI_JOY_DECODE_INDEX((uint)j)], TRUE);
+            if(OI_JOY_DECODE_TYPE((unsigned int)j) != OIJ_GEN_BUTTON) {
+                last = action_tail(&action_joy[OI_JOY_TAB_AXES][OI_JOY_DECODE_INDEX((unsigned int)j)], TRUE);
                 last->action = map[i].actionid;
                 last->device = map[i].device;
 
@@ -165,7 +165,7 @@ sint oi_action_install(oi_actionmap *map, sint num) {
             }
             // A button
             else {
-                last = action_tail(&action_joy[OI_JOY_TAB_BTNS][OI_JOY_DECODE_INDEX((uint)j)], TRUE);
+                last = action_tail(&action_joy[OI_JOY_TAB_BTNS][OI_JOY_DECODE_INDEX((unsigned int)j)], TRUE);
                 last->action = map[i].actionid;
                 last->device = map[i].device;
 
@@ -227,9 +227,9 @@ sint oi_action_install(oi_actionmap *map, sint num) {
  * Check if action map is valid. For example,
  * check that the event name exists
  */
-sint oi_action_validate(oi_actionmap *map) {
-    uint u;
-    int i;
+int oi_action_validate(oi_actionmap *map) {
+    unsigned char u;
+    unsigned int i;
 
     // Simple checks
     if(map == NULL) {
@@ -298,7 +298,7 @@ sint oi_action_validate(oi_actionmap *map) {
  * Obtain pointer to action state table. The structure is internal
  * and must NOT be freed or altered!
  */
-uchar *oi_action_actionstate(sint *num) {
+char *oi_action_actionstate(int *num) {
     if(num != NULL) {
         *num = action_count;
     }
@@ -536,7 +536,7 @@ void action_process(oi_event *evt) {
  */
 void action_clearreal() {
     oi_aclink *link;
-    sint i;
+    unsigned char i;
 
     // Mouse movement
     link = action_mouse[OIP_MOTION];
@@ -568,10 +568,10 @@ void action_clearreal() {
  * by parsing every list entry: Each list entry is the head
  * in a linked list, in which all elements are freed
  */
-void action_cleartable(oi_aclink *tab[], uint num) {
+void action_cleartable(oi_aclink *tab[], int num) {
     oi_aclink *prev;
     oi_aclink *next;
-    uint i;
+    int i;
 
     // Parse array of linked lists
     for(i=0; i<num; i++) {
@@ -597,7 +597,7 @@ void action_cleartable(oi_aclink *tab[], uint num) {
  *
  * Scan linked list, and return tail element
  */
-oi_aclink *action_tail(oi_aclink **head, uint alloc) {
+oi_aclink *action_tail(oi_aclink **head, char alloc) {
     oi_aclink *last;
 
     // Find tail

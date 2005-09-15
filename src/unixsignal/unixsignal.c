@@ -55,7 +55,7 @@ oi_bootstrap unixsignal_bootstrap = {
 };
 
 // Private data is global here (it makes no sense with a private struct)
-static int pendingsignal;
+static char pendingsignal;
 
 /* ******************************************************************** */
 
@@ -70,7 +70,7 @@ static int pendingsignal;
  *
  * Always returns true as this is platform specific.
  */
-sint unixsignal_avail(uint flags) {
+int unixsignal_avail(unsigned int flags) {
     debug("unixsignal_avail");
 
     return TRUE;
@@ -133,7 +133,7 @@ oi_device *unixsignal_device() {
  *
  * Setup the signal handlers for interrupt, terminate and segfault.
  */
-sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
+int unixsignal_init(oi_device *dev, char *window_id, unsigned int flags) {
     debug("unixsignal_init");
 
     // Just to be sure, no signal is pending
@@ -161,7 +161,7 @@ sint unixsignal_init(oi_device *dev, char *window_id, uint flags) {
  * Free device structure and reset signal handlers to
  * the system default.
  */
-sint unixsignal_destroy(oi_device *dev) {
+int unixsignal_destroy(oi_device *dev) {
     debug("unixsignal_destroy");
 
     // Set default handlers
@@ -225,7 +225,7 @@ void unixsignal_process(oi_device *dev) {
  *
  * Reset pending flag.
  */
-sint unixsignal_reset(oi_device *dev) {
+int unixsignal_reset(oi_device *dev) {
     debug("unixsignal_reset");
 
     pendingsignal = FALSE;

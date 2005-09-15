@@ -80,9 +80,9 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Receive/loose focus
     case WM_ACTIVATE:
         {
-            uint minimize;
-            uint gain;
-            uint mask;
+            char minimize;
+            char gain;
+            unsigned int mask;
 
             minimize = HIWORD(wparam);
             gain = !minimize && (LOWORD(wparam) != WA_INACTIVE);
@@ -131,7 +131,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     case WM_KEYUP:
         {
             oi_keysym keysym;
-            uchar state;
+            char state;
 
             state = (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN);
             debug("win32_wndproc: key up/down - down:%u", state);
@@ -151,8 +151,8 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Mouse motion
     case WM_MOUSEMOVE:
         {
-            sshort x;
-            sshort y;
+            int x;
+            int y;
             debug("win32_wndproc: mouse move");
 
             // Did the mouse enter the window?
@@ -211,9 +211,8 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     case WM_MOUSEWHEEL:
         {
             oi_mouse btn;
-
             debug("win32_wndproc: mouse wheel");
-            if((sshort)HIWORD(wparam) > 0) {
+            if((short)HIWORD(wparam) > 0) {
                 btn = OIP_WHEEL_UP;
             }
             else {
@@ -228,8 +227,8 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     case WM_CLOSE:
     case WM_DESTROY:
         {
-            debug("win32_wndproc: close/destroy");
             oi_event ev;
+            debug("win32_wndproc: close/destroy");
             ev.type = OI_QUIT;
             queue_add(&ev);
             PostQuitMessage(0);
@@ -240,8 +239,8 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Erase background
     case WM_ERASEBKGND:
         {
-            debug("win32_wndproc: erase background");
             oi_event ev;
+            debug("win32_wndproc: erase background");
             ev.type = OI_EXPOSE;
             queue_add(&ev);
         }
@@ -251,7 +250,8 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Unhandled event, send to old handler
     default:
         if(private->old_wndproc) {
-            return CallWindowProc(private->old_wndproc, hwnd, msg, wparam, lparam);
+            return CallWindowProc(private->old_wndproc, hwnd, msg,
+                                  wparam, lparam);
         }
         break;
     }
@@ -294,10 +294,10 @@ void win32_trackmouse() {
  * mouse movement events, as the user can't see the cursor.
  * We do this by warping the mouse to the window center
  */
-inline void win32_relative_mouse(uint x, uint y) {
+inline void win32_relative_mouse(int x, int y) {
     POINT cen;
-    sshort rx;
-    sshort ry;
+    int rx;
+    int ry;
 
     // Get center and relative motion
     cen.x = private->width/2;

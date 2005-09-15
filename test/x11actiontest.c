@@ -98,9 +98,9 @@ void test() {
     if(ev.type == OI_ACTION) {
       printf("--- action event\n");
       printf("device: %hhu\nactionid: %u\nstate: %hhu\n",
-	     ev.action.device, ev.action.actionid, ev.action.state);
+             ev.action.device, ev.action.actionid, ev.action.state);
       printf("data1: %i\ndata2: %i\ndata3: %i\n\n",
-	     ev.action.data1, ev.action.data2, ev.action.data3);
+             ev.action.data1, ev.action.data2, ev.action.data3);
     }
   }
 }
@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
   Display *disp;
   Window win;
   XEvent evt;
-  uint scrn;
+  unsigned int scrn;
   long event_mask;
   char csw[100];
   int i;
@@ -130,10 +130,10 @@ int main(int argc, char* argv[]) {
   // Open and map window
   scrn = DefaultScreen(disp);
   win = XCreateSimpleWindow(disp, DefaultRootWindow(disp),
-				   50, 50,
-				   200, 200,
-				   0, BlackPixel(disp, scrn),
-				   WhitePixel(disp, scrn));
+                                   50, 50,
+                                   200, 200,
+                                   0, BlackPixel(disp, scrn),
+                                   WhitePixel(disp, scrn));
   XMapWindow(disp, win);
 
   // Wait for map event
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
   else {
     printf("--- openinput not initialized - test not performed\n");
   }
-  
+
   // Close OI
   i = oi_close();
   printf("--- oi_close, code %i\n\n", i);

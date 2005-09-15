@@ -35,7 +35,7 @@
 #include "internal.h"
 
 // Globals
-static sint oi_running;
+static char oi_running;
 
 /* ******************************************************************** */
 
@@ -61,8 +61,8 @@ static sint oi_running;
  * -# OpenInput enters "initialized mode"
  * -# you're good to go! ;-)
  */
-sint oi_init(char *window_id, uint flags) {
-    sint err;
+int oi_init(char *window_id, unsigned int flags) {
+    int err;
     debug("oi_init");
 
     // Initialize queue and device manager
@@ -105,7 +105,7 @@ sint oi_init(char *window_id, uint flags) {
  * this function to make OpenInput tidy up when your applicaiton
  * closes - it not, you may experience memory leaks and the like.
  */
-sint oi_close() {
+int oi_close() {
     int i;
     int e;
 
@@ -149,7 +149,7 @@ sint oi_close() {
  *
  * See oi_init for more information.
  */
-inline sint oi_runstate() {
+inline char oi_runstate() {
     return oi_running;
 }
 
@@ -165,8 +165,8 @@ inline sint oi_runstate() {
  * with a resolution of 1/1000 second (ms). This can
  * be used for timestamps and alike.
  */
-inline uint oi_getticks() {
-    uint ticks;
+inline unsigned int oi_getticks() {
+    unsigned int ticks;
 
     // We do this the POSIX way
 #ifdef HAVE_GETTIMEOFDAY

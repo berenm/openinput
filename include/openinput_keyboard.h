@@ -329,9 +329,9 @@ typedef enum {
  * Used in keyboard-related events
  */
 typedef struct {
-    uchar scancode;       /**< Hardware scancode */
-    oi_key sym;           /**< Key symbol */
-    uint mod;             /**< Modifier symbol */
+    unsigned char scancode;       /**< Hardware scancode */
+    oi_key sym;                   /**< Key symbol */
+    unsigned int mod;             /**< Modifier symbol */
 } oi_keysym;
 
 

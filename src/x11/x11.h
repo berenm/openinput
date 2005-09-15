@@ -27,28 +27,28 @@
 /* ******************************************************************** */
 
 // Bootstrap entries
-sint x11_avail();
+int x11_avail();
 oi_device *x11_device();
 
 /* ******************************************************************** */
 
 // Device entries
-sint x11_init(oi_device *dev, char *window_id, uint flags);
-sint x11_destroy(oi_device *dev);
+int x11_init(oi_device *dev, char *window_id, unsigned int flags);
+int x11_destroy(oi_device *dev);
 void x11_process(oi_device *dev);
-sint x11_grab(oi_device *dev, sint on);
-sint x11_hidecursor(oi_device *dev, sint on);
-sint x11_warp(oi_device *dev, sint x, sint y);
-sint x11_winsize(oi_device *dev, sint *w, sint *h);
-sint x11_reset(oi_device *dev);
+int x11_grab(oi_device *dev, int on);
+int x11_hidecursor(oi_device *dev, int on);
+int x11_warp(oi_device *dev, int x, int y);
+int x11_winsize(oi_device *dev, int *w, int *h);
+int x11_reset(oi_device *dev);
 
 /* ******************************************************************** */
 
 // Misc local functions
 Cursor x11_mkcursor(Display *d, Window w);
-sint x11_error(Display *d, XErrorEvent *e);
-sint x11_fatal(Display *d);
-inline sint x11_pending(Display *d);
+int x11_error(Display *d, XErrorEvent *e);
+int x11_fatal(Display *d);
+inline int x11_pending(Display *d);
 inline void x11_dispatch(oi_device *dev, Display *d);
 inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
                                 KeyCode kc, oi_keysym *keysym);
@@ -56,7 +56,7 @@ void x11_initkeymap();
 void x11_keystate(oi_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, oi_device *dev);
 inline void x11_relative_mouse(oi_device *dev, XEvent *xev);
-inline schar x11_keyrepeat(Display *d, XEvent *evt);
+inline char x11_keyrepeat(Display *d, XEvent *evt);
 
 /* ******************************************************************** */
 
@@ -73,13 +73,13 @@ typedef struct x11_private {
     Screen *screen;            /**< Screen handle (unused) */
     Cursor cursor;             /**< The invisible cursor */
     Atom wm_delete_window;     /**< Close-window protocol atom */
-    uint mask_lmeta;           /**< Variable mask for key */
-    uint mask_rmeta;           /**< Variable mask for key */
-    uint mask_lalt;            /**< Variable mask for key */
-    uint mask_ralt;            /**< Variable mask for key */
-    uint mask_num;             /**< Variable mask for key */
-    uint mask_altgr;           /**< Variable mask for key */
-    uchar relative;            /**< Relative mouse motion */
+    unsigned int mask_lmeta;   /**< Variable mask for key */
+    unsigned int mask_rmeta;   /**< Variable mask for key */
+    unsigned int mask_lalt;    /**< Variable mask for key */
+    unsigned int mask_ralt;    /**< Variable mask for key */
+    unsigned int mask_num;     /**< Variable mask for key */
+    unsigned int mask_altgr;   /**< Variable mask for key */
+    unsigned char relative;    /**< Relative mouse motion bitmask */
     int lastx;                 /**< Last mouse x positon */
     int lasty;                 /**< Last mouse y position */
     int width;                 /**< Window width */
@@ -92,10 +92,10 @@ typedef struct x11_private {
  * @ingroup DX11
  * @{
  */
-#define SX11_GRAB 1          /**< Grabbed state flag */
-#define SX11_HIDE 2          /**< Hidden state flag */
-#define SX11_FUDGE 8         /**< Mouse fudge factor */
-#define SX11_REP_THRESHOLD 2 /**< Key repeat threshold */
+#define DX11_GRAB 1            /**< Grabbed state flag */
+#define DX11_HIDE 2            /**< Hidden state flag */
+#define DX11_FUDGE 8           /**< Mouse fudge factor */
+#define DX11_REP_THRESHOLD 2   /**< Key repeat threshold */
 /** @} */
 
 /* ******************************************************************** */
