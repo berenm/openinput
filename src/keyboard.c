@@ -319,8 +319,6 @@ void keyboard_dorepeat() {
     unsigned int now;
     int interval;
 
-    return;
-
     // Perform repeating for all keyboards
     for(i=0; i<OI_MAX_DEVICES; i++) {
 

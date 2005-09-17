@@ -1,5 +1,9 @@
 SVN trunk
 
+	* Fix: Enable keyboard repeat generation (remove debug 'return' line)
+
+Version 0.2.1 - 2005-09-16
+
 	* Cleanup: Event structure cleanup
 	* Fix/Change: eliminated numerical types in order to coexist with
 	  the standard library. The renders the API incompatible!
