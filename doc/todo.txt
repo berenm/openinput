@@ -6,10 +6,6 @@ win32 driver/platform
 - test library
 - fix automake (include/noinst/...) in test-dir
 
-library close->reopen
-- does it work?
-- memory leaks
-
 could-be bugs
 - number of concurrently pressed keys limited to 3-5 (hw?)
 - no keyboard focus on fullscreen (even with grab on?)

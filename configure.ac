@@ -59,7 +59,7 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(OpenInput, [doc/doxygen/Doxyfile], [doc/api/])
 
 dnl Default test programs
-TEST_PROGS="keynametest"
+TEST_PROGS="keynametest openclose"
 BUILD_DIRS=""
 BUILD_LIBS=""
 SYSTEM_LIBS=""
@@ -107,9 +107,9 @@ if test x$enable_unixsignal = xyes; then
     have_unixsignal=no
     AC_CHECK_HEADER(signal.h, have_unixsignal=yes)
     if test x$have_unixsignal = xyes; then
-       AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
-       BUILD_DIRS="$BUILD_DIRS unixsignal"
-       BUILD_LIBS="$BUILD_LIBS unixsignal/libunixsignal.la"
+        AC_DEFINE([ENABLE_UNIXSIGNAL], [1], [UNIX signal handler])
+        BUILD_DIRS="$BUILD_DIRS unixsignal"
+        BUILD_LIBS="$BUILD_LIBS unixsignal/libunixsignal.la"
     fi
 fi
 
@@ -137,6 +137,7 @@ if test x$enable_win32 = xyes; then
          AC_DEFINE([ENABLE_WIN32], [1], [Microsoft Windows input driver])
          BUILD_DIRS="$BUILD_DIRS win32"
          BUILD_LIBS="$BUILD_LIBS win32/libwin32.la"
+         TEST_PROGS="$TEST_PROGS win32test"	
 	 SYSTEM_LIBS="$SYSTEM_LIBS -luser32"
      fi
 fi

@@ -1,5 +1,8 @@
 SVN trunk
 
+	* Add: Win32 test program (work in progress)
+	* Cleanup: Automake headers indentation cleanup
+	* Added: Library open-close-open-close test. It works! (tm)
 	* Fix: Enable keyboard repeat generation (remove debug 'return' line)
 
 Version 0.2.1 - 2005-09-16

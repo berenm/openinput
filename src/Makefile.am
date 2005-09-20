@@ -1,3 +1,4 @@
+# The OpenInput library
 DIST_SUBDIRS = \
 	foo \
 	x11 \

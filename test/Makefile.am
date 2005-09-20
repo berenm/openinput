@@ -1,27 +1,43 @@
-TESTS = @TEST_PROGS@
+# Test programs
+TESTS = \
+	@TEST_PROGS@
 
 EXTRA_PROGRAMS = \
-keynametest \
-footest \
-x11test \
-x11actiontest
+	keynametest \
+	footest \
+	x11test \
+	x11actiontest \
+	openclose \
+	win32test
 
-noinst_PROGRAMS = @TEST_PROGS@
-
-footest_SOURCES = \
-footest.c
-
-x11test_SOURCES = \
-x11test.c
-
-x11actiontest_SOURCES = \
-x11actiontest.c
-
-keynametest_SOURCES = \
-keynametest.c
+noinst_PROGRAMS = \
+	@TEST_PROGS@
 
 LDADD = \
-$(top_srcdir)/src/libopeninput.la
+	$(top_srcdir)/src/libopeninput.la
 
 INCLUDES = \
--I$(top_srcdir)/include
+	-I$(top_srcdir)/include
+
+# Foo driver
+footest_SOURCES = \
+	footest.c
+
+# X11 driver
+x11test_SOURCES = \
+	x11test.c
+
+# X11 driver with action mapping
+x11actiontest_SOURCES = \
+	x11actiontest.c
+
+# Mouse and keyboard names
+keynametest_SOURCES = \
+	keynametest.c
+
+# Win32 driver
+win32test_SOURCES = \
+	win32test.c
+
+win32test_LDADD = \
+	-luser32 -lgdi32

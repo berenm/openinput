@@ -1,8 +1,12 @@
-SUBDIRS = src include test
+SUBDIRS = \
+	src \
+	include \
+	test
 
 include scripts/doxygen.am
 
 pkgconfigdir = $(libdir)/pkgconfig
+
 dist_pkgconfig_DATA = openinput.pc
 
 dist-hook:
