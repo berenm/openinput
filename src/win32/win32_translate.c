@@ -270,7 +270,7 @@ void win32_keystate(oi_device *dev) {
  */
 inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
                                   char down, oi_keysym *keysym) {
-    uint vkey;
+    unsigned int vkey;
 
     // Find the virtual key
     switch(wparam) {
@@ -318,7 +318,7 @@ inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lpa
     }
 
     // The rest is trivial
-    keysym->scancode = (uchar)HIWORD(lparam);
+    keysym->scancode = (unsigned char)HIWORD(lparam);
     keysym->sym = win32_keymap[vkey];
     keysym->mod = OIM_NONE;
     return keysym;

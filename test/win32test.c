@@ -29,6 +29,7 @@
 
 // Global vars
 HINSTANCE instance;
+HWND window;
 
 /* ******************************************************************** */
 
@@ -79,8 +80,6 @@ int init_class(HINSTANCE inst) {
 int init_window(HINSTANCE inst, int showcmd) {
     HWND hwnd;
 
-    instance = inst;
-
     // Create the main window.
     hwnd = CreateWindow("MainWClass",
                         "Sample",
@@ -93,6 +92,10 @@ int init_window(HINSTANCE inst, int showcmd) {
                         (HMENU)NULL,
                         inst,
                         (LPVOID)NULL);
+
+    // Store globals
+    instance = inst;
+    window = hwnd;
 
     // Show window, send update or bail
     if(!hwnd) {
