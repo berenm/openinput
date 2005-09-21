@@ -1,5 +1,7 @@
 SVN trunk
 
+	* Fix: Add executable extension (exeext) to tests programs
+	  in configure (fixes win32/mingw test compilation)
 	* Fix: missing win32 driver type name fixes
 	* Add: Win32 test program (work in progress)
 	* Cleanup: Automake headers indentation cleanup

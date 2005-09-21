@@ -59,7 +59,7 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(OpenInput, [doc/doxygen/Doxyfile], [doc/api/])
 
 dnl Default test programs
-TEST_PROGS="keynametest openclose"
+TEST_PROGS="keynametest$EXEEXT openclose$EXEEXT"
 BUILD_DIRS=""
 BUILD_LIBS=""
 SYSTEM_LIBS=""
@@ -80,7 +80,7 @@ if test x$enable_foo = xyes; then
     AC_DEFINE([ENABLE_FOO], [1], [Debug input system])
     BUILD_DIRS="$BUILD_DIRS foo"
     BUILD_LIBS="$BUILD_LIBS foo/libfoo.la"
-    TEST_PROGS="$TEST_PROGS footest"
+    TEST_PROGS="$TEST_PROGS footest$EXEEXT"
 fi
 
 dnl Driver "x11"
@@ -94,7 +94,7 @@ if test x$enable_x11 = xyes; then
         AC_DEFINE([ENABLE_X11], [1], [X11 window system])
         BUILD_DIRS="$BUILD_DIRS x11"
         BUILD_LIBS="$BUILD_LIBS x11/libx11.la"
-        TEST_PROGS="$TEST_PROGS x11test x11actiontest"
+        TEST_PROGS="$TEST_PROGS x11test x11actiontest$EXEEXT"
 	SYSTEM_LIBS="$SYSTEM_LIBS $X_LIBS -lX11 $X_LIBS_EXTRA"
     fi
 fi
@@ -137,7 +137,7 @@ if test x$enable_win32 = xyes; then
          AC_DEFINE([ENABLE_WIN32], [1], [Microsoft Windows input driver])
          BUILD_DIRS="$BUILD_DIRS win32"
          BUILD_LIBS="$BUILD_LIBS win32/libwin32.la"
-         TEST_PROGS="$TEST_PROGS win32test"	
+         TEST_PROGS="$TEST_PROGS win32test$EXEEXT"	
 	 SYSTEM_LIBS="$SYSTEM_LIBS -luser32"
      fi
 fi
