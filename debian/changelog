@@ -1,8 +1,14 @@
+libopeninput (0.2.2-1) unstable; urgency=low
+
+  * New Release 0.2.2
+
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Thu, 22 Sep 2005 03:01:06 +0200
+
 libopeninput (0.2.1svn77) unstable; urgency=low
 
-  * New upsstream release 0.2.0 
+  * New upsstream release 0.2.1
 
- -- Kresten Kjeldgaard <gathond@gathond.dk>  Thu, 15 Sep 2005 15:27:11 +0200
+ -- Kresten Kjeldgaard <gathond@gathond.dk>  Thu, 22 Sep 2005 03:00:48 +0200
 
 libopeninput (0.1.0.svn60-1) unstable; urgency=low
 
