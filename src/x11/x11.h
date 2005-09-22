@@ -27,7 +27,7 @@
 /* ******************************************************************** */
 
 // Bootstrap entries
-int x11_avail();
+int x11_avail(unsigned int flags);
 oi_device *x11_device();
 
 /* ******************************************************************** */
@@ -48,15 +48,15 @@ int x11_reset(oi_device *dev);
 Cursor x11_mkcursor(Display *d, Window w);
 int x11_error(Display *d, XErrorEvent *e);
 int x11_fatal(Display *d);
-inline int x11_pending(Display *d);
-inline void x11_dispatch(oi_device *dev, Display *d);
-inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
+int x11_pending(Display *d);
+void x11_dispatch(oi_device *dev, Display *d);
+oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
                                 KeyCode kc, oi_keysym *keysym);
 void x11_initkeymap();
 void x11_keystate(oi_device *dev, Display *d, char *keyvector);
 void x11_modmasks(Display *d, oi_device *dev);
-inline void x11_relative_mouse(oi_device *dev, XEvent *xev);
-inline char x11_keyrepeat(Display *d, XEvent *evt);
+void x11_relative_mouse(oi_device *dev, XEvent *xev);
+char x11_keyrepeat(Display *d, XEvent *evt);
 
 /* ******************************************************************** */
 

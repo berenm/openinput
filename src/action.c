@@ -645,7 +645,7 @@ oi_aclink *action_tail(oi_aclink **head, char alloc) {
  * state table may need multiple updates for each event.
  * Also, each action event must be posted into the queue.
  */
-inline void action_statepost(oi_event *evt) {
+void action_statepost(oi_event *evt) {
     // Dummy check
     if(evt->type != OI_ACTION) {
         return;

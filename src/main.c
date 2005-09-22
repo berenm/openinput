@@ -25,9 +25,12 @@
 #include "config.h"
 #include <stdio.h>
 #include <time.h>
-#include <sys/time.h>
 
-#ifdef WIN32
+#ifdef HAVE_SYS_TIME_H
+#include <sys/time.h>
+#endif
+
+#ifdef ENABLE_WIN32
 #include <windows.h>
 #endif
 
@@ -149,7 +152,7 @@ int oi_close() {
  *
  * See oi_init for more information.
  */
-inline char oi_runstate() {
+char oi_runstate() {
     return oi_running;
 }
 
@@ -165,7 +168,7 @@ inline char oi_runstate() {
  * with a resolution of 1/1000 second (ms). This can
  * be used for timestamps and alike.
  */
-inline unsigned int oi_getticks() {
+unsigned int oi_getticks() {
     unsigned int ticks;
 
     // We do this the POSIX way
@@ -173,7 +176,7 @@ inline unsigned int oi_getticks() {
     struct timeval now;
     gettimeofday(&now, NULL);
     ticks = now.tv_sec*1000 + now.tv_usec/1000;
-#elif WIN32
+#elif ENABLE_WIN32
     ticks = GetTickCount();
 #endif
 

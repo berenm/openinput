@@ -39,6 +39,9 @@ extern oi_bootstrap unixsignal_bootstrap;
 #ifdef ENABLE_LINUXJOY
 extern oi_bootstrap linuxjoy_bootstrap;
 #endif
+#ifdef ENABLE_WIN32
+extern oi_bootstrap win32_bootstrap;
+#endif
 
 /* ******************************************************************** */
 
@@ -70,6 +73,10 @@ static oi_bootstrap *bootstrap[] = {
 
 #ifdef ENABLE_LINUXJOY
     &linuxjoy_bootstrap,
+#endif
+
+#ifdef ENABLE_WIN32
+    &win32_bootstrap,
 #endif
 
     // Terminate list

@@ -315,7 +315,7 @@ void x11_keystate(oi_device *dev, Display *d, char *keyvec) {
  * deep knowledge of how X keycodes and X keysyms are
  * composed (eg. that X has a different keymaps).
  */
-inline oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
+oi_keysym *x11_translate(Display *d, XKeyEvent *xkey,
                                 KeyCode kc, oi_keysym *keysym) {
     KeySym xsym;
 

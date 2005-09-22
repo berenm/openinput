@@ -166,7 +166,7 @@ void appstate_resize(unsigned char index, int w, int h, char post) {
  *
  * @returns window width (pixels)
  */
-inline int appstate_width() {
+int appstate_width() {
     return win_width;
 }
 
@@ -178,7 +178,7 @@ inline int appstate_width() {
  *
  * @returns window height (pixels)
  */
-inline int appstate_height() {
+int appstate_height() {
     return win_height;
 }
 

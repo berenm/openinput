@@ -344,7 +344,7 @@ void *device_priv(unsigned char index, unsigned int manager) {
  * Run through all devices and process them, ie.
  * make them pump events into the queue.
  */
-inline void device_pumpall() {
+void device_pumpall() {
     unsigned int i;
 
     for(i=0; i<num_devices; i++) {

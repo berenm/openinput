@@ -27,18 +27,18 @@
 /* ******************************************************************** */
 
 // Bootstrap
-sint foo_avail();
-oi_device *foo_device();
+int foo_avail();
+oi_device *foo_device(unsigned int flags);
 
 // Device
-sint foo_init(oi_device *dev, char *window_id, uint flags);
-sint foo_destroy(oi_device *dev);
+int foo_init(oi_device *dev, char *window_id, unsigned int flags);
+int foo_destroy(oi_device *dev);
 void foo_process(oi_device *dev);
-sint foo_grab(oi_device *dev, sint on);
-sint foo_hidecursor(oi_device *dev, sint on);
-sint foo_warp(oi_device *dev, sint x, sint y);
-sint foo_winsize(oi_device *dev, sint *w, sint *h);
-sint foo_reset(oi_device *dev);
+int foo_grab(oi_device *dev, int on);
+int foo_hidecursor(oi_device *dev, int on);
+int foo_warp(oi_device *dev, int x, int y);
+int foo_winsize(oi_device *dev, int *w, int *h);
+int foo_reset(oi_device *dev);
 
 /* ******************************************************************** */
 
@@ -50,10 +50,10 @@ sint foo_reset(oi_device *dev);
  * instance of the device driver.
  */
 typedef struct foo_private {
-    sint grabstatus;   /**< Pointer grabbed or free */
-    sint cursorstatus; /**< Cursor shown of hidden */
-    sint x;            /**< Cursor horizontal position */
-    sint y;            /**< Cursor vertical position */
+    int grabstatus;   /**< Pointer grabbed or free */
+    int cursorstatus; /**< Cursor shown of hidden */
+    int x;            /**< Cursor horizontal position */
+    int y;            /**< Cursor vertical position */
 } foo_private;
 
 /* ******************************************************************** */

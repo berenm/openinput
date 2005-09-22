@@ -21,9 +21,13 @@
 
 /* ******************************************************************** */
 
+// Includes
 #include "openinput.h"
 #include <windows.h>
 #include <stdio.h>
+
+// Platform independent test function
+void platform_test();
 
 /* ******************************************************************** */
 
@@ -38,7 +42,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT msg,
                              WPARAM wparam, LPARAM lparam) {
     // We only want the close/destroy message
     if((msg == WM_CLOSE) || (msg == WM_DESTROY)) {
-        printf("win32test: catched close/destroy\n");
+        fprintf(stderr, "win32test: catched close/destroy\n");
         PostQuitMessage(0);
         return 0;
     }
@@ -62,8 +66,8 @@ int init_class(HINSTANCE inst) {
     wcx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
     wcx.hbrBackground = GetStockObject(WHITE_BRUSH);
-    wcx.lpszMenuName =  "MainMenu";
-    wcx.lpszClassName = "MainWClass";
+    wcx.lpszMenuName =  "OpenInputMenu";
+    wcx.lpszClassName = "OpenInputTest";
     wcx.hIconSm = LoadImage(inst,
                             MAKEINTRESOURCE(5),
                             IMAGE_ICON,
@@ -81,8 +85,8 @@ int init_window(HINSTANCE inst, int showcmd) {
     HWND hwnd;
 
     // Create the main window.
-    hwnd = CreateWindow("MainWClass",
-                        "Sample",
+    hwnd = CreateWindow("OpenInputTest",
+                        "OpenInput Win32 test window",
                         WS_OVERLAPPEDWINDOW,
                         CW_USEDEFAULT,
                         CW_USEDEFAULT,
@@ -110,31 +114,39 @@ int init_window(HINSTANCE inst, int showcmd) {
 /* ******************************************************************** */
 
 // Application entry point.
-int WINAPI WinMain(HINSTANCE inst, HINSTANCE hPrevInstance,
-                   LPSTR lpCmdLine, int showcmd) {
-    MSG msg;
-    BOOL res;
+int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev,
+                   LPSTR cmdline, int showcmd) {
+    char csw[100];
+    int e;
 
-    printf("*** win32test starting\n");
+    fprintf(stderr, "win32test: starting\n");
 
     // Init class and window
     if(!init_class(inst)) {
-        printf("*** class initialization error\n");
+        fprintf(stderr, "win32test: class initialization error\n");
         return FALSE;
     }
     if(!init_window(inst, showcmd)) {
-        printf("*** window creation error\n");
+        fprintf(stderr, "win32test: window creation error\n");
         return FALSE;
     }
 
-    // Message loop
-    while(((res = GetMessage(&msg, (HWND)NULL, 0, 0)) != 0) && (res != -1)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+    // Init OI
+    sprintf(csw, "c:%u s:%u w:%u", 0, 0, (unsigned int)window);
+    printf("win32test: init parameters '%s'\n", csw);
+    e = oi_init(csw, 0);
+    fprintf(stderr, "win32test: oi_init, code %i\n", e);
 
-    printf("*** win32test finished\n");
-    return msg.wParam;
+    // Perform the test
+    platform_test();
+
+    // Close OI
+    e = oi_close();
+    fprintf(stderr, "win32test: oi_close, code %i\n", e);
+
+    // Done
+    fprintf(stderr, "win32test: finished\n");
+    return 0;
 }
 
 /* ******************************************************************** */

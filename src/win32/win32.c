@@ -260,6 +260,7 @@ void win32_process(oi_device *dev) {
 
         // Peekaboo and dispatch messages to the window-procedure
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+            TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
     }

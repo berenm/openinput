@@ -268,7 +268,7 @@ void win32_keystate(oi_device *dev) {
  * OpenInput keysym. We use the win32_keymap table so
  * it's quite fast (constant time).
  */
-inline oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
+oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
                                   char down, oi_keysym *keysym) {
     unsigned int vkey;
 

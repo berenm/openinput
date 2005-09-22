@@ -2,9 +2,10 @@ Loose ends and suggestions for improvements
 -------------------------------------------
 
 win32 driver/platform
-- write test program
-- test library
-- fix automake (include/noinst/...) in test-dir
+- does keyboard work correctly?
+- is the event handling slow?
+- investigate/fix existance trouble of WM_MOUSEWHEEL and
+  MOUSETRACKEVENT which may/may not exist under WinXP (?)
 
 could-be bugs
 - number of concurrently pressed keys limited to 3-5 (hw?)
@@ -16,6 +17,7 @@ ogre integration
 
 documentation
 - manpages (doxygen'ed?)
+- write custom INSTALL file (UNIX, win32, mingw, etc.)
 
 threading
 - is it really needed?

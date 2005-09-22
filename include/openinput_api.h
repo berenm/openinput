@@ -81,14 +81,14 @@ extern DECLSPEC int OICALL oi_key_repeat(int delay,
                                          int interval);
 
 // Get key state table and set num to number of elements (pointer)
-extern DECLSPEC char OICALL *oi_key_keystate(unsigned char index,
-                                                      int *num);
+extern DECLSPEC char * OICALL oi_key_keystate(unsigned char index,
+                                              int *num);
 
 // Return modifier mask (modifier_mask)
 extern DECLSPEC unsigned int OICALL oi_key_modstate(unsigned char index);
 
 // Get name of key (string)
-extern DECLSPEC char OICALL *oi_key_getname(oi_key key);
+extern DECLSPEC char * OICALL oi_key_getname(oi_key key);
 
 // Get key code given name (oi_key)
 extern DECLSPEC oi_key OICALL oi_key_getcode(char *name);
@@ -111,7 +111,7 @@ extern DECLSPEC int OICALL oi_mouse_warp(unsigned char index,
                                          int y);
 
 // Get name of mouse button (string)
-extern DECLSPEC char OICALL *oi_mouse_getname(oi_mouse button);
+extern DECLSPEC char * OICALL oi_mouse_getname(oi_mouse button);
 
 // Get mouse-id given name (oi_mouse)
 extern DECLSPEC oi_mouse OICALL oi_mouse_getcode(char *name);
@@ -131,7 +131,7 @@ extern DECLSPEC unsigned int OICALL oi_joy_absolute(unsigned char index,
                                                     int *second);
 
 // Get name of joystick button/axis (string)
-extern DECLSPEC char OICALL *oi_joy_getname(unsigned int code);
+extern DECLSPEC char * OICALL oi_joy_getname(unsigned int code);
 
 // Get mouse-id given name (oi_mouse)
 extern DECLSPEC unsigned int OICALL oi_joy_getcode(char *name);
@@ -169,7 +169,7 @@ extern DECLSPEC int OICALL oi_action_install(oi_actionmap *map,
 extern DECLSPEC int OICALL oi_action_validate(oi_actionmap *map);
 
 // Get action state table and set num to number of elements (pointer)
-extern DECLSPEC char OICALL *oi_action_actionstate(int *num);
+extern DECLSPEC char * OICALL oi_action_actionstate(int *num);
 
 /* ******************************************************************** */
 

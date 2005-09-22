@@ -24,10 +24,13 @@
 // Includes
 #include "config.h"
 #include <stdio.h>
-#include <unistd.h>
 #include <time.h>
 
-#ifdef WIN32
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+#ifdef ENABLE_WIN32
 #include <windows.h>
 #endif
 
@@ -184,17 +187,26 @@ int oi_events_poll(oi_event *evt) {
  * regular application (ie. not a game with high FPS requirements)
  */
 void oi_events_wait(oi_event *evt) {
-    int found;
-
     // Wait until an event occurs
-    found = 0;
-    while(!found) {
-        // Pump and read
+    while(TRUE) {
+        // Pump events
         oi_events_pump();
 
-        found = queue_peep(evt, 1, ~event_mask, TRUE);
+        // Bail out if event is present
+        if(queue_peep(evt, 1, ~event_mask, TRUE)) {
+            return;
+        }
 
-#ifdef HAVE_NANOSLEEP
+#ifdef WIN32
+        {
+            // Force-pump window events instead of sleeping
+            MSG msg;
+            while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+#elif HAVE_NANOSLEEP
         {
             // Use nanosleep under POSIX
             struct timespec ts;
@@ -202,8 +214,6 @@ void oi_events_wait(oi_event *evt) {
             ts.tv_nsec = OI_SLEEP * 1000000;
             nanosleep(&ts, NULL);
         }
-#elif WIN32
-        Sleep(OI_SLEEP);
 #endif
     }
 }

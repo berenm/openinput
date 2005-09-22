@@ -27,7 +27,7 @@
 /* ******************************************************************** */
 
 // Bootstrap
-int unixsignal_avail();
+int unixsignal_avail(unsigned int flags);
 oi_device *unixsignal_device();
 
 // Device

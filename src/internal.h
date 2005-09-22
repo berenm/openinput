@@ -88,18 +88,18 @@ typedef struct oi_bootstrap {
 /* ******************************************************************** */
 // Special functions
 
-inline char oi_runstate();
+char oi_runstate();
 
-inline unsigned int oi_getticks();
+unsigned int oi_getticks();
 
 /* ******************************************************************** */
 // Internal queue functions
 
 int queue_init();
 
-inline int queue_lock();
+int queue_lock();
 
-inline int queue_unlock();
+int queue_unlock();
 
 int queue_cut(unsigned int where);
 
@@ -124,7 +124,7 @@ int device_register(oi_bootstrap *boot,
 
 oi_device *device_get(unsigned char index);
 
-inline void device_pumpall();
+void device_pumpall();
 
 unsigned int device_windowid(char *str,
                              char tok);
@@ -151,9 +151,9 @@ void appstate_resize(unsigned char index,
                      int h,
                      char post);
 
-inline int appstate_width();
+int appstate_width();
 
-inline int appstate_height();
+int appstate_height();
 
 /* ******************************************************************** */
 // Mouse state
@@ -194,9 +194,9 @@ void keyboard_dorepeat();
 void keyboard_setmodifier(unsigned char index,
                           unsigned int newmod);
 
-inline oi_key keyboard_scangetkey(char *name,
-                                  oi_key first,
-                                  oi_key last);
+oi_key keyboard_scangetkey(char *name,
+                           oi_key first,
+                           oi_key last);
 
 /* ******************************************************************** */
 // Joystick state
@@ -265,7 +265,7 @@ void action_cleartable(struct oi_aclink *tab[],
 struct oi_aclink *action_tail(struct oi_aclink **head,
                               char alloc);
 
-inline void action_statepost(oi_event *evt);
+void action_statepost(oi_event *evt);
 
 /**
  * @ingroup IAction
@@ -286,8 +286,10 @@ typedef struct oi_aclink {
 // Debug macro
 #ifdef DEBUG
 void debug(char *format, ...);
-#else
+#elif __GNUC__
 #define debug(format, args...) ((void)0)
+#else
+void debug(char *format, ...);
 #endif
 
 // Table size helper

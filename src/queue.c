@@ -72,7 +72,7 @@ int queue_init() {
  *
  * Mutual exclusion lock of event queue.
  */
-inline int queue_lock() {
+int queue_lock() {
     //TODO: Implement this
     return OI_ERR_NOT_IMPLEM;
 }
@@ -87,7 +87,7 @@ inline int queue_lock() {
  *
  * Mutual exclusion unlock of event queue.
  */
-inline int queue_unlock() {
+int queue_unlock() {
     //TODO: Implement this
     return OI_ERR_NOT_IMPLEM;
 }

@@ -1,9 +1,22 @@
-SVN trunk
+Version 0.2.2 - 2005-09-22
 
+	* Note: OpenInput now compiles using MSVC (using Codeblocks)
+	* Fix: numerical types for foo-driver
+	* Added: Codeblocks project file (nongnu/OpenInput.cbp)
+	* Fix: Public functions returning char* calling convention fix
+	  (fixes another lame msvc error)
+	* Fix: No functions are declared 'inline' anymore (fixes broken
+	  MSVC compiler C2054 error)
+	* Fix: More text in the README file
+	* Fix: Win32 driver event pumping (wip)
+	* Fix: bootstrap->avail() takes an unsigned int parameter
+	* Fix: Enabled win32 driver in bootstrap
+	* Cleanup: Platform independent part of x11/win32/etc. tests
+	  moved to seperate file 'platform.c'
 	* Fix: Add executable extension (exeext) to tests programs
 	  in configure (fixes win32/mingw test compilation)
 	* Fix: missing win32 driver type name fixes
-	* Add: Win32 test program (work in progress)
+	* Add: Win32 test program (wip)
 	* Cleanup: Automake headers indentation cleanup
 	* Added: Library open-close-open-close test. It works! (tm)
 	* Fix: Enable keyboard repeat generation (remove debug 'return' line)

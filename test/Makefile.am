@@ -25,7 +25,8 @@ footest_SOURCES = \
 
 # X11 driver
 x11test_SOURCES = \
-	x11test.c
+	x11test.c \
+	platform.c
 
 # X11 driver with action mapping
 x11actiontest_SOURCES = \
@@ -37,7 +38,9 @@ keynametest_SOURCES = \
 
 # Win32 driver
 win32test_SOURCES = \
-	win32test.c
+	win32test.c \
+	platform.c
 
 win32test_LDADD = \
-	-luser32 -lgdi32
+	-luser32 -lgdi32 \
+        $(top_srcdir)/src/libopeninput.la

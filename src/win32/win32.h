@@ -27,7 +27,7 @@
 /* ******************************************************************** */
 
 // Bootstrap
-int win32_avail();
+int win32_avail(unsigned int flags);
 oi_device *win32_device();
 
 // Device
@@ -46,13 +46,13 @@ struct win32_private;
 void win32_setdevhook(oi_device *dev);
 void win32_initkeymap();
 void win32_keystate(oi_device *dev);
-inline oi_keysym *win32_translate(struct win32_private *priv,
+oi_keysym *win32_translate(struct win32_private *priv,
                                   WPARAM wparam, LPARAM lparam,
                                   char down, oi_keysym *keysym);
 LONG CALLBACK win32_wndproc(HWND hwnd, unsigned int msg,
                             WPARAM wparam, LPARAM lparam);
 void win32_trackmouse();
-inline void win32_relative_mouse(int x, int y);
+void win32_relative_mouse(int x, int y);
 void win32_movesize();
 
 /* ******************************************************************** */
@@ -95,6 +95,10 @@ typedef struct win32_private {
 #define VK_RBRACKET      0xDD    /**< key_rightbracket */
 #define VK_APOSTROPHE    0xDE    /**< key_quote */
 #define VK_BACKTICK      0xDF    /**< key_backquote */
+
+#ifndef WM_MOUSEWHEEL
+#define WM_MOUSEWHEEL    0x020A  /**< Mouse wheel event */
+#endif
 
 #define DW32_KEYTABLE    256     /**< Keytable size */
 #define DW32_REPKEYMASK  (1<<30) /**< Repeated key bit */

@@ -65,7 +65,7 @@ oi_bootstrap foo_bootstrap = {
  *
  * The foo device driver always exists (if compiled in).
  */
-sint foo_avail(uint flags) {
+int foo_avail(unsigned int flags) {
     debug("foo_avail");
 
     return TRUE;
@@ -139,8 +139,8 @@ oi_device *foo_device() {
  * Initialize the foo test driver - initializes
  * the private structure and other states.
  */
-sint foo_init(oi_device *dev, char *window_id, uint flags) {
-    uint val;
+int foo_init(oi_device *dev, char *window_id, unsigned int flags) {
+    unsigned int val;
     foo_private *priv;
 
     debug("foo_init: window '%s', flags %i", window_id, flags);
@@ -178,7 +178,7 @@ sint foo_init(oi_device *dev, char *window_id, uint flags) {
  *
  * Close down driver freeing any allocated memory.
  */
-sint foo_destroy(oi_device *dev) {
+int foo_destroy(oi_device *dev) {
     debug("foo_destroy");
 
     // Free device
@@ -248,7 +248,7 @@ void foo_process(oi_device *dev) {
  * does not perform any real grabbing. A state is flipped, and
  * in debug-mode, the state change can be verified.
  */
-sint foo_grab(oi_device *dev, sint on) {
+int foo_grab(oi_device *dev, int on) {
     foo_private *priv;
     priv = (foo_private*)dev->private;
     debug("foo_grab: current:%i new:%i", priv->grabstatus, on);
@@ -274,7 +274,7 @@ sint foo_grab(oi_device *dev, sint on) {
  * does not perform any real hide/show of the pointer. A state is flipped,
  * and in debug-mode, the state change can be verified.
  */
-sint foo_hidecursor(oi_device *dev, sint on) {
+int foo_hidecursor(oi_device *dev, int on) {
     foo_private *priv;
     priv = (foo_private*)dev->private;
     debug("foo_hidecursor: current:%i new:%i", priv->cursorstatus, on);
@@ -300,7 +300,7 @@ sint foo_hidecursor(oi_device *dev, sint on) {
  * does not perform any cursor movement. The internal state
  * is changed, and can be verified in debug-mode.
  */
-sint foo_warp(oi_device *dev, sint x, sint y) {
+int foo_warp(oi_device *dev, int x, int y) {
     foo_private *priv;
     priv = (foo_private*)dev->private;
     debug("foo_warp: warp pointer to %i, %i", x, y);
@@ -327,7 +327,7 @@ sint foo_warp(oi_device *dev, sint x, sint y) {
  * does not return the window size. Instead, it returns the
  * virtual mouse pointer coordinate (set using the warp function).
  */
-sint foo_winsize(oi_device *dev, sint *w, sint *h) {
+int foo_winsize(oi_device *dev, int *w, int *h) {
     foo_private *priv;
     priv = (foo_private*)dev->private;
     debug("foo_winsize");
@@ -353,7 +353,7 @@ sint foo_winsize(oi_device *dev, sint *w, sint *h) {
  * Reset/sync the internal states. Since this is
  * a test device, simply just reset the coordinates etc.
  */
-sint foo_reset(oi_device *dev) {
+int foo_reset(oi_device *dev) {
     foo_private *priv;
     priv = (foo_private*)dev->private;
     debug("foo_reset");

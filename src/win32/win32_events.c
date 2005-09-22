@@ -108,7 +108,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Mouse leaves window
     case WM_MOUSELEAVE:
         {
-            debug("win32_wndproc: mouse lease");
+            debug("win32_wndproc: mouse leave");
             appstate_focus(device->index, FALSE, OI_FOCUS_MOUSE, TRUE);
         }
         return 0;
@@ -207,6 +207,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         return 0;
 
 
+#ifdef WM_MOUSEWHEEL
         // Mouse wheel
     case WM_MOUSEWHEEL:
         {
@@ -221,7 +222,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
             mouse_button(device->index, btn, TRUE, TRUE);
         }
         return 0;
-
+#endif
 
         // Close
     case WM_CLOSE:
@@ -270,6 +271,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
  * must enable mouse tracking.
  */
 void win32_trackmouse() {
+#ifdef TRACKMOUSEEVENT
     TRACKMOUSEEVENT tme;
 
     tme.cbSize = sizeof(tme);
@@ -277,6 +279,7 @@ void win32_trackmouse() {
     tme.hwndTrack = private->hwnd;
 
     TrackMouseEvent(&tme);
+#endif
 }
 
 /* ******************************************************************** */
@@ -294,7 +297,7 @@ void win32_trackmouse() {
  * mouse movement events, as the user can't see the cursor.
  * We do this by warping the mouse to the window center
  */
-inline void win32_relative_mouse(int x, int y) {
+void win32_relative_mouse(int x, int y) {
     POINT cen;
     int rx;
     int ry;

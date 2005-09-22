@@ -510,7 +510,7 @@ char *oi_key_getname(oi_key key) {
  *
  * If no name matches, the keycode returned is OIK_UNKNOWN.
  */
-inline oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
+oi_key keyboard_scangetkey(char *name, oi_key first, oi_key last) {
     oi_key k;
 
     for(k=first; k<=last; k++) {

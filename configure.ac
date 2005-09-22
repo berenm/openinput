@@ -4,9 +4,9 @@ AC_PREREQ(2.59)
 dnl Library version
 define(LIBOI_MAJOR_VERSION, 0) # Bump on very huge changes, zero rest
 define(LIBOI_MINOR_VERSION, 2) # Bump on big changes, zero remaining
-define(LIBOI_PATCH_VERSION, 1) # Bump on changes
-define(LIBOI_INFACE_AGE, 0)    # Bump on changes, zero on binary breakage
-define(LIBOI_BINARY_AGE, 0)    # Bump on changes, zero on binary breakage
+define(LIBOI_PATCH_VERSION, 2) # Bump on changes
+define(LIBOI_INFACE_AGE, 1)    # Bump on changes, zero on breakage/add
+define(LIBOI_BINARY_AGE, 1)    # Bump on changes, zero on breakage
 define(LIBOI_VERSION, OI_MAJOR_VERSION.OI_MINOR_VERSION.OI_PATCH_VERSION)
 
 dnl Initialize autoconf
@@ -145,7 +145,14 @@ fi
 dnl Check for libraries and header files
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([limits.h locale.h malloc.h stddef.h stdlib.h string.h])
+AC_CHECK_HEADERS([ \
+	limits.h \
+	locale.h \
+	malloc.h \
+	stddef.h \
+	stdlib.h \
+	string.h \
+	sys/time.h])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -168,7 +175,20 @@ AC_FUNC_SELECT_ARGTYPES
 AC_FUNC_STAT
 AC_FUNC_STRTOD
 AC_FUNC_VPRINTF
-AC_CHECK_FUNCS([gettimeofday isascii memchr memset select strchr strcspn strdup strrchr strspn strstr nanosleep])
+AC_CHECK_FUNCS([ \
+	gettimeofday \
+        isascii \
+	memchr \
+	memset \
+	select \
+	strchr \
+	strcspn \
+	strdup \
+	strrchr \
+	strspn \
+	strstr \
+	nanosleep])
+
 dnl Make variables available
 AC_SUBST(TEST_PROGS)
 AC_SUBST(BUILD_DIRS)
@@ -176,7 +196,7 @@ AC_SUBST(BUILD_LIBS)
 AC_SUBST(SYSTEM_LIBS)
 
 dnl Files to be processed
-AC_CONFIG_FILES([
+AC_CONFIG_FILES([ \
 	openinput.pc \
 	doc/doxygen/Doxyfile \
 	Makefile \

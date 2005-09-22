@@ -57,3 +57,22 @@ void debug(char* format, ...) {
 #endif
 
 /* ******************************************************************** */
+
+#if !defined(DEBUG) && !defined(__GNUC__)
+
+/**
+ * @ingroup IMain
+ * @brief Debug printf-helper, dummy version
+ *
+ * @param format string pointer with printf-formatting
+ * @param ... more arguments (varargs)
+ *
+ * Empty function. We need this since MSVC does not allow for
+ * vararg-style preprocessor macros. MSVC is broken!
+ */
+void debug(char* format, ...) {
+}
+
+#endif
+
+/* ******************************************************************** */

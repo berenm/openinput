@@ -49,7 +49,7 @@
  * the window (using warp) and eating the extra X motion
  * events.
  */
-inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
+void x11_relative_mouse(oi_device *dev, XEvent *xev) {
     x11_private *priv;
     int deltax;
     int deltay;
@@ -117,7 +117,7 @@ inline void x11_relative_mouse(oi_device *dev, XEvent *xev) {
  * The block is avoided using a "select attack" on the
  * X-server - this technique was borrowed from SDL. Thanks!
  */
-inline int x11_pending(Display *d) {
+int x11_pending(Display *d) {
     // Flush to pump the X pipeline
     XFlush(d);
 
@@ -160,7 +160,7 @@ inline int x11_pending(Display *d) {
  * the X server is thrown away. OpenInput has it's internal
  * keyrepeat system if you want repeat-events.
  */
-inline char x11_keyrepeat(Display *d, XEvent *evt) {
+char x11_keyrepeat(Display *d, XEvent *evt) {
     XEvent pev;
     char rep;
 
@@ -203,7 +203,7 @@ inline char x11_keyrepeat(Display *d, XEvent *evt) {
  * For the keyboard events, we first translate the
  * X11 scancode into a OpenInput symbolic key.
  */
-inline void x11_dispatch(oi_device *dev, Display *d) {
+void x11_dispatch(oi_device *dev, Display *d) {
     XEvent xev;
 
     // Fetch the event
