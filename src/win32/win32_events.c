@@ -25,6 +25,7 @@
 #include "config.h"
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <windows.h>
 #include "openinput.h"
 #include "internal.h"
@@ -135,7 +136,9 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
             state = (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN);
             debug("win32_wndproc: key up/down - down:%u", state);
-
+            printf("win32_wndproc: key up/down - down:%u - wp:%u - lp:%u\n",
+                state, (unsigned int)wparam, (unsigned int)lparam);
+            
             // Don't post repeated keys
             if(state && (lparam & DW32_REPKEYMASK)) {
                 return 0;

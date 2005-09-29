@@ -2,7 +2,7 @@ OpenInput
 ------------------------------------------------------------------------
 
 The OpenInput library is intended as a free, easy-to-use, cross-platform
-input handler library. The goal is to provide a SDL-alike interface to
+input handler library. The goal is to provide a SDL-like interface to
 input devices such as keyboards, mice and joysticks while keeping the
 dependencies for the library at a bare minimum.
 

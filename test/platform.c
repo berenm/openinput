@@ -24,6 +24,20 @@
 // Includes
 #include "openinput.h"
 #include <stdio.h>
+#include <stdarg.h>
+
+// Turn on/off debugging
+#define PRN_EVT 0
+#define PRN_KEYUP 1
+#define PRN_KEYDOWN 1
+#define PRN_MOUSEMOVE 0
+#define PRN_MOUSEBUT 0
+#define PRN_DISCEXT 1
+#define PRN_DISC 1
+#define PRN_GRABHIDE 0
+#define PRN_HELP 1
+#define PRN_WINDOW 0
+#define PRN_UNKNOWN 0
 
 /* ******************************************************************** */
 
@@ -39,9 +53,27 @@ static void toggle(int *i) {
 
 /* ******************************************************************** */
 
+// Condiditional printing
+void plprn(int print, char *format, ...) {
+    va_list args;
+
+    // The condition for printing
+    if(!print) {
+        return;
+    }
+
+    fprintf(stderr, "platform: ");
+    va_start(args, format);
+    vfprintf(stderr, format, args);
+    va_end(args);
+    fprintf(stderr, "\n");
+}
+
+/* ******************************************************************** */
+
 // Show some help
 static void help() {
-  printf("platform: x11test help\n");
+  printf("platform: platform independent test help\n");
   printf("h => show this test\n");
   printf("g => toggle grab\n");
   printf("c => toggle cursor\n");
@@ -62,10 +94,8 @@ static void discovery(unsigned char index) {
 
   // Fetch info
   oi_device_info(index, &name, &desc, &pro);
-  printf("platform: device info for device index %u\n", index);
-  printf("    name:     '%s'\n", name);
-  printf("    desc:     '%s'\n", desc);
-  printf("    provides: '0x%X'\n", pro);
+  plprn(PRN_DISCEXT, "discover index:%u name:'%s' desc:'%s' provides:0x%X",
+        index, name, desc, pro);
 }
 
 /* ******************************************************************** */
@@ -91,9 +121,7 @@ void platform_test() {
   while(e) {
     oi_events_wait(&ev);
 
-#ifdef INSANE
-    printf("platform: got event\n");
-#endif
+    plprn(PRN_EVT, "got event");
 
     // Quit
     if(ev.type == OI_QUIT) {
@@ -103,27 +131,26 @@ void platform_test() {
     // Mouse button up
     else if((ev.type == OI_MOUSEBUTTONUP) ||
             (ev.type == OI_MOUSEBUTTONDOWN)) {
-      printf("platform: mouse button state %i at position %i,%i\n",
-             ev.button.state, ev.button.x, ev.button.y);
+              plprn(PRN_MOUSEBUT, "mouse button state %i at position %i,%i",
+                ev.button.state, ev.button.x, ev.button.y);
     }
 
     // Mouse move
     else if(ev.type == OI_MOUSEMOVE) {
-      printf("platform: mouse move  abs:%i,%i \t rel:%i,%i\n",
-             ev.move.x, ev.move.y,
-             ev.move.relx, ev.move.rely);
+              plprn(PRN_MOUSEMOVE, "mouse move  abs:%i,%i \t rel:%i,%i",
+                ev.move.x, ev.move.y, ev.move.relx, ev.move.rely);
     }
 
     // Key down
     else if(ev.type == OI_KEYDOWN) {
-      printf("platform: key pressed -> %i:'%s'\n", ev.key.keysym.sym,
-             oi_key_getname(ev.key.keysym.sym));
+              plprn(PRN_KEYDOWN, "key pressed -> %i:'%s'", ev.key.keysym.sym,
+                oi_key_getname(ev.key.keysym.sym));
     }
 
     // Key up
     else if(ev.type == OI_KEYUP) {
-      printf("platform: key release -> %i:'%s'\n", ev.key.keysym.sym,
-             oi_key_getname(ev.key.keysym.sym));
+        plprn(PRN_KEYUP, "key release -> %i:'%s'", ev.key.keysym.sym,
+              oi_key_getname(ev.key.keysym.sym));
 
       switch(ev.key.keysym.sym) {
       case OIK_H:
@@ -135,7 +162,7 @@ void platform_test() {
         // Grab
         toggle(&sgrab);
         oi_app_grab(sgrab);
-        printf("platform: grab state %i\n", sgrab);
+        plprn(PRN_GRABHIDE, "grab state %i", sgrab);
         break;
 
       case OIK_C:
@@ -146,7 +173,7 @@ void platform_test() {
         } else {
           oi_app_cursor(OI_DISABLE);
         }
-        printf("platform: cursor state %i\n", scursor);
+        plprn(PRN_GRABHIDE, "cursor state %i", scursor);
         break;
 
       case OIK_M:
@@ -154,29 +181,29 @@ void platform_test() {
         {
           int x,y;
           oi_mouse_absolute(0, &x, &y);
-          printf("platform: mouse absolute: %i,%i\n", x, y);
+          plprn(PRN_HELP, "mouse absolute: %i,%i\n", x, y);
           oi_mouse_relative(0, &x, &y);
-          printf("platform: mouse relative: %i,%i\n", x, y);
+          plprn(PRN_HELP, "mouse relative: %i,%i\n", x, y);
         }
         break;
 
       case OIK_W:
         // Warp
         oi_mouse_warp(0, 10, 10);
-        printf("platform: warped\n");
+        plprn(PRN_HELP, "warped");
         break;
 
       case OIK_Q:
         // Quit
         e = 0;
-        printf("platform: quit!\n");
+        plprn(PRN_HELP, "quit");
         break;
 
       case OIK_E:
         // Enable/disable device index 2
         toggle(&senable);
         oi_device_enable(2, senable);
-        printf("platform: device 2 state %i\n", senable);
+        printf("device 2 state %i", senable);
         break;
 
       default:
@@ -189,24 +216,24 @@ void platform_test() {
     else {
       switch(ev.type) {
       case OI_ACTIVE:
-        printf("platform: active event\n");
+        plprn(PRN_WINDOW, "active event");
         break;
 
       case OI_RESIZE:
-        printf("platform: resize event\n");
+        plprn(PRN_WINDOW, "resize event");
         break;
 
       case OI_EXPOSE:
-        printf("platform: expose event\n");
+        plprn(PRN_WINDOW, "expose event");
         break;
 
       case OI_DISCOVERY:
-        printf("platform: discovery event\n");
+        plprn(PRN_DISC, "discovery event");
         discovery(ev.discover.device);
         break;
 
       default:
-        printf("platform: unhandled event type %i\n", ev.type);
+        plprn(PRN_UNKNOWN, "unhandled event type %i", ev.type);
         break;
       }
     }

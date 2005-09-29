@@ -1,3 +1,13 @@
+SVN head
+
+	* Fix: Win32 A-Z and 0-9 now has correct OIK_* value
+	  (reported by discipline)
+	* Fix: Win32 keytable range check on vkey translation
+	  (reported by alphageek)
+	* Fix: Don't copy subversion files in nongnu directory
+	* Fix: Minor platform-independt test changes
+	* Fix: Spelling in README
+	
 Version 0.2.2 - 2005-09-22
 
 	* Note: OpenInput now compiles using MSVC (using Codeblocks)

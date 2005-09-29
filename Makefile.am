@@ -17,4 +17,5 @@ dist-hook:
 	cp ${srcdir}/doc/doxygen/*css ${distdir}/doc/doxygen/
 	cp ${srcdir}/doc/doxygen/*png ${distdir}/doc/doxygen/
 	cp ${srcdir}/doc/doxygen/Doxyfile ${distdir}/doc/doxygen/
-	cp -r ${srcdir}/nongnu ${distdir}/
+	mkdir -p ${distdir}/nongnu
+	cp ${srcdir}/nongnu/* ${distdir}/nongnu/

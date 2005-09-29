@@ -65,7 +65,7 @@ void win32_initkeymap() {
     win32_keymap[VK_SLASH]        = OIK_SLASH;
 
     for(i='0'; i<='9'; i++) {
-        win32_keymap[i] = OIK_0 - '0';
+        win32_keymap[i] = OIK_0 + i - '0';
     }
 
     win32_keymap[VK_SEMICOLON]    = OIK_SEMICOLON;
@@ -78,7 +78,7 @@ void win32_initkeymap() {
     win32_keymap[VK_DELETE]       = OIK_DELETE;
 
     for(i='A'; i<='Z'; i++) {
-        win32_keymap[i] = OIK_A - 'A';
+        win32_keymap[i] = OIK_A + i - 'A';
     }
 
     win32_keymap[VK_NUMPAD0]      = OIK_N_0;
@@ -319,7 +319,15 @@ oi_keysym *win32_translate(win32_private *priv, WPARAM wparam, LPARAM lparam,
 
     // The rest is trivial
     keysym->scancode = (unsigned char)HIWORD(lparam);
-    keysym->sym = win32_keymap[vkey];
+
+    // For some reason, the vkey might be out of range
+    if((vkey < 0) || (vkey >= DW32_KEYTABLE)) {
+        keysym->sym = OIK_UNKNOWN;
+        debug("win32_translate: vkey out of range");
+    }
+    else {
+        keysym->sym = win32_keymap[vkey];
+    }
     keysym->mod = OIM_NONE;
     return keysym;
 }
