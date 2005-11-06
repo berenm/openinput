@@ -140,7 +140,9 @@ void win32_initkeymap() {
     win32_keymap[VK_SNAPSHOT]     = OIK_PRINT;
     win32_keymap[VK_CANCEL]       = OIK_BREAK;
     win32_keymap[VK_APPS]         = OIK_MENU;
+#ifdef VK_SLEEP
     win32_keymap[VK_SLEEP]        = OIK_POWER;
+#endif
 }
 
 /* ******************************************************************** */

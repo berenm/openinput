@@ -81,7 +81,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         // Receive/loose focus
     case WM_ACTIVATE:
         {
-            char minimize;
+            unsigned short minimize;
             char gain;
             unsigned int mask;
 
@@ -107,13 +107,14 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
 
         // Mouse leaves window
+#ifdef WM_MOUSELEAVE
     case WM_MOUSELEAVE:
         {
             debug("win32_wndproc: mouse leave");
             appstate_focus(device->index, FALSE, OI_FOCUS_MOUSE, TRUE);
         }
         return 0;
-
+#endif
 
         // Window moved or resized
     case WM_SIZE:
@@ -183,7 +184,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         {
             debug("win32_wndproc: left mouse button");
             mouse_button(device->index, OIP_BUTTON_LEFT,
-                         msg == WM_LBUTTONDOWN, TRUE);
+                         (char)(msg == WM_LBUTTONDOWN), TRUE);
         }
         return 0;
 
@@ -194,7 +195,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         {
             debug("win32_wndproc: middle mouse button");
             mouse_button(device->index, OIP_BUTTON_MIDDLE,
-                         msg == WM_MBUTTONDOWN, TRUE);
+                         (char)(msg == WM_MBUTTONDOWN), TRUE);
         }
         return 0;
 
@@ -205,7 +206,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         {
             debug("win32_wndproc: right mouse button");
             mouse_button(device->index, OIP_BUTTON_RIGHT,
-                         msg == WM_RBUTTONDOWN, TRUE);
+                         (char)(msg == WM_RBUTTONDOWN), TRUE);
         }
         return 0;
 

@@ -51,7 +51,7 @@ typedef struct oi_privjoy {
  * positon/movement state caching.
  */
 typedef struct oi_privmouse {
-    unsigned int button;                               /**< Button bitmask */
+    oi_mouse button;                                   /**< Button bitmask */
     int absx;                                          /**< Absolute horizontal position */
     int absy;                                          /**< Absolute vertical position */
     int relx;                                          /**< Relative horizontal movement */

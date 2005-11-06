@@ -1,5 +1,8 @@
 SVN head
 
+	* Add: Microsoft Visual Studio 6 project file (in the nongnu dir)
+	* Fix: Lots of int/char/signedness warnings mismatch detected
+          by MSVC and support for older win32 SDK standard
 	* Fix: Win32 A-Z and 0-9 now has correct OIK_* value
 	  (reported by discipline)
 	* Fix: Win32 keytable range check on vkey translation

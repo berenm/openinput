@@ -414,7 +414,7 @@ int oi_mouse_warp(unsigned char index, int x, int y) {
             // If mouse is hidden and grabbed, don't physically move it
             if((oi_app_cursor(OI_QUERY) == OI_DISABLE) &&
                (oi_app_grab(OI_QUERY) == OI_ENABLE)) {
-                mouse_move(x, y, FALSE, FALSE, i);
+                mouse_move(i, x, y, FALSE, FALSE);
             }
 
             // Warp default mouse device - driver must generate motion event!

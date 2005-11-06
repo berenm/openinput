@@ -171,7 +171,11 @@ int win32_init(oi_device *dev, char *window_id, unsigned int flags) {
     }
 
     // Get current window-procedure
+#ifdef GWLP_WNDPROC
     priv->old_wndproc = (WNDPROC)GetWindowLongPtr(priv->hwnd, GWLP_WNDPROC);
+#else
+    priv->old_wndproc = (WNDPROC)GetWindowLong(priv->hwnd, GWL_WNDPROC);
+#endif
     if(!priv->old_wndproc) {
         debug("win32_init: invalid window handle");
         return OI_ERR_NO_DEVICE;
@@ -187,7 +191,11 @@ int win32_init(oi_device *dev, char *window_id, unsigned int flags) {
     win32_trackmouse();
 
     // Lastly, install our own window handle
+#ifdef GWLP_WNDPROC
     SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, (LONG)win32_wndproc);
+#else
+	SetWindowLong(priv->hwnd, GWL_WNDPROC, (LONG)win32_wndproc);
+#endif
     debug("win32_init: initialized");
 
     return OI_ERR_OK;
@@ -220,7 +228,11 @@ int win32_destroy(oi_device *dev) {
         if(priv) {
             // Set old window-procedure
             if(priv->old_wndproc) {
+#ifdef GWLP_WNDPROC
                 SetWindowLongPtr(priv->hwnd, GWLP_WNDPROC, (LONG)priv->old_wndproc);
+#else
+				SetWindowLong(priv->hwnd, GWL_WNDPROC, (LONG)priv->old_wndproc);
+#endif
             }
             free(dev->private);
         }

@@ -51,7 +51,7 @@ struct oi_privjoy;
  * - O: Optional, set to NULL to disable usage
  */
 typedef struct oi_device {
-    int index;                                                        /**< Device index (M,A) */
+    unsigned char index;                                              /**< Device index (M,A) */
     char *name;                                                       /**< Short device name (D,A) */
     char *desc;                                                       /**< Description of device (D,A) */
     unsigned int provides;                                            /**< Provide-flag (D,A) */
@@ -106,7 +106,7 @@ int queue_cut(unsigned int where);
 int queue_add(oi_event *evt);
 
 int queue_peep(oi_event *evts,
-               int num,
+               unsigned int num,
                unsigned int mask,
                char remove);
 

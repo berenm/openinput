@@ -108,7 +108,8 @@ int queue_unlock() {
  * care of a lot of other nice stuff for you.
  */
 int queue_add(oi_event *evt) {
-    int tail, add;
+    unsigned int tail;
+	int add;
 
     //FIXME Generate action events on keyboard/mouse
     if((evt->type == OI_KEYUP) ||
@@ -213,7 +214,7 @@ int queue_cut(unsigned int where) {
  * "remove" paramter is set, the events are cut from the queue
  * using queue_cut.
  */
-int queue_peep(oi_event *evts, int num, unsigned int mask, char remove) {
+int queue_peep(oi_event *evts, unsigned int num, unsigned int mask, char remove) {
     oi_event tmpevt;
     unsigned int here;
     unsigned int copy;

@@ -109,7 +109,7 @@ int oi_init(char *window_id, unsigned int flags) {
  * closes - it not, you may experience memory leaks and the like.
  */
 int oi_close() {
-    int i;
+    unsigned char i;
     int e;
 
     debug("oi_close");

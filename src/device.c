@@ -34,7 +34,7 @@
 static oi_device *devices[OI_MAX_DEVICES];
 static oi_private *private[OI_MAX_DEVICES];
 static char devices_run[OI_MAX_DEVICES];
-static int num_devices;
+static unsigned int num_devices;
 static char more_avail;
 
 // Include the bootstrap table
