@@ -24,9 +24,8 @@
 /* **** NOTE / HOWTO / WHAT IS THIS ****
  *
  * If you do not use a UNIX-based build system on Windows, for example
- * if you use the MSVC compiler, you'll need to copy THIS file
- * into the top-level OpenInput directory and rename that file
- * to "config.h".
+ * if you use the MSVC compiler, you MIGHT need to copy THIS file
+ * into the top-level OpenInput directory.
  *
  * This file contains some very simply build-instructions for the
  * OpenInput library targetted for the Windows platform.
@@ -38,16 +37,17 @@
  * header-file hacks.
  *
  * You could also just install Cygwin or Mingw, after which you
- * have a basic POSIX-compliant system on Windows...
+ * have a basic POSIX-compliant system on Windows so you can
+ * run the standard "configure; make; make install" build process.
  */
 
 /* ******************************************************************** */
 
-/* UNIX signal handler */
-#define ENABLE_UNIXSIGNAL 1
-
 /* Microsoft Windows input driver */
 #define ENABLE_WIN32 1
+
+/* ANSI signal handler */
+/* #undef ENABLE_UNIXSIGNAL 1 */
 
 /* Name of package */
 #define PACKAGE "openinput"

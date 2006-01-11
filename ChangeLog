@@ -1,6 +1,15 @@
 SVN head
 
-	* Add: Microsoft Visual Studio 6 project file (in the nongnu dir)
+	* Fix: Include sys/select.h in x11_events.c, so OI compiles on OS X
+	  (thanks to Richard Smith for reporting this)
+	* Fix: Renamed "win32-config.h" to "config.h" in the nongnu directory
+	  and removed unix-signal driver under Win32. This way no files
+	  needs to be copied/moved when building using MSVC/Codeblocks.
+	* Added: Microsoft Visual Studio 7.0 project files for the library
+          and test programs for win32, located in the "nongnu" directory.
+	  All files contributed by freezama - thanks a lot!
+	* Added: Microsoft Visual Studio 6 project file for the library
+          (in the nongnu dir)
 	* Fix: Lots of int/char/signedness warnings mismatch detected
           by MSVC and support for older win32 SDK standard
 	* Fix: Win32 A-Z and 0-9 now has correct OIK_* value

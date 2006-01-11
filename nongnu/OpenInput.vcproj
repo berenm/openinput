@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="OpenInput"
+	ProjectGUID="{E4C4B47F-5DE7-4112-91D2-56795848F2B7}"
+	SccProjectName=""
+	SccLocalPath="">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Debug_lib|Win32"
+			OutputDirectory=".\$(ConfigurationName)"
+			IntermediateDirectory=".\$(ConfigurationName)"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="./,../src,../include"
+				PreprocessorDefinitions="WIN32,_DEBUG,_LIB"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="5"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile=".\$(ConfigurationName)/OpenInputLibD.pch"
+				AssemblerListingLocation=".\$(ConfigurationName)/"
+				ObjectFile=".\$(ConfigurationName)/"
+				ProgramDataBaseFileName=".\$(ConfigurationName)/"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile=".\$(ConfigurationName)\OpenInputLibD.lib"
+				SuppressStartupBanner="TRUE"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="copy include and lib files to roots"
+				CommandLine="if exist ..\lib\nul goto End1
+mkdir ..\lib;
+:End1
+copy .\$(ConfigurationName)\*.lib ..\lib;
+
+
+
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1031"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release_lib|Win32"
+			OutputDirectory=".\$(ConfigurationName)"
+			IntermediateDirectory=".\$(ConfigurationName)"
+			ConfigurationType="4"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				AdditionalIncludeDirectories="./,../src,../include"
+				PreprocessorDefinitions="WIN32,NDEBUG"
+				StringPooling="TRUE"
+				RuntimeLibrary="4"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile=".\$(ConfigurationName)/OpenInputLib.pch"
+				AssemblerListingLocation=".\$(ConfigurationName)/"
+				ObjectFile=".\$(ConfigurationName)/"
+				ProgramDataBaseFileName=".\$(ConfigurationName)/"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLibrarianTool"
+				OutputFile=".\$(ConfigurationName)/OpenInputLib.lib"
+				SuppressStartupBanner="TRUE"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="copy include and lib files to roots"
+				CommandLine="if exist ..\lib\nul goto End1
+mkdir ..\lib;
+:End1
+copy .\$(ConfigurationName)\*.lib ..\lib;
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+		</Configuration>
+		<Configuration
+			Name="Debug_dll|Win32"
+			OutputDirectory="Debug_dll"
+			IntermediateDirectory="Debug_dll"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="./,../src,../include"
+				PreprocessorDefinitions="WIN32,_DEBUG,_LIB"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="5"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile=".\$(ConfigurationName)/OpenInputLibD.pch"
+				AssemblerListingLocation=".\$(ConfigurationName)/"
+				ObjectFile=".\$(ConfigurationName)/"
+				ProgramDataBaseFileName=".\$(ConfigurationName)/"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				DebugInformationFormat="4"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile=".\$(ConfigurationName)\OpenInputD.dll"
+				ImportLibrary=".\$(ConfigurationName)\OpenInputDllD.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="copy include and lib files to roots"
+				CommandLine="if exist ..\lib\nul goto End1
+mkdir ..\lib;
+:End1
+if exist ..\bin\nul goto End2
+mkdir ..\bin;
+:End2
+copy .\$(ConfigurationName)\*.lib ..\lib;
+copy .\$(ConfigurationName)\*.dll ..\bin;
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1031"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="Release_dll|Win32"
+			OutputDirectory="Release_dll"
+			IntermediateDirectory="Release_dll"
+			ConfigurationType="2"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				InlineFunctionExpansion="2"
+				AdditionalIncludeDirectories="./,../src,../include"
+				PreprocessorDefinitions="WIN32,NDEBUG"
+				StringPooling="TRUE"
+				RuntimeLibrary="4"
+				EnableFunctionLevelLinking="TRUE"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderFile=".\$(ConfigurationName)/OpenInputLib.pch"
+				AssemblerListingLocation=".\$(ConfigurationName)/"
+				ObjectFile=".\$(ConfigurationName)/"
+				ProgramDataBaseFileName=".\$(ConfigurationName)/"
+				WarningLevel="3"
+				SuppressStartupBanner="TRUE"
+				CompileAs="0"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				OutputFile=".\$(ConfigurationName)\OpenInput.dll"
+				ImportLibrary=".\$(ConfigurationName)\OpenInputDll.lib"/>
+			<Tool
+				Name="VCMIDLTool"/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				Description="copy include and lib files to roots"
+				CommandLine="if exist ..\lib\nul goto End1
+mkdir ..\lib;
+:End1
+if exist ..\bin\nul goto End2
+mkdir ..\bin;
+:End2
+copy .\$(ConfigurationName)\*.lib ..\lib;
+copy .\$(ConfigurationName)\*.dll ..\bin;
+"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1033"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			<File
+				RelativePath="..\src\action.c">
+			</File>
+			<File
+				RelativePath="..\src\appstate.c">
+			</File>
+			<File
+				RelativePath="..\src\debug.c">
+			</File>
+			<File
+				RelativePath="..\src\device.c">
+			</File>
+			<File
+				RelativePath="..\src\events.c">
+			</File>
+			<File
+				RelativePath="..\src\joystick.c">
+			</File>
+			<File
+				RelativePath="..\src\keyboard.c">
+			</File>
+			<File
+				RelativePath="..\src\keynames.c">
+			</File>
+			<File
+				RelativePath="..\src\main.c">
+			</File>
+			<File
+				RelativePath="..\src\mouse.c">
+			</File>
+			<File
+				RelativePath="..\src\queue.c">
+			</File>
+			<Filter
+				Name="win32"
+				Filter="">
+				<File
+					RelativePath="..\src\win32\win32.c">
+				</File>
+				<File
+					RelativePath="..\src\win32\win32_events.c">
+				</File>
+				<File
+					RelativePath="..\src\win32\win32_translate.c">
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm">
+			<File
+				RelativePath="..\src\bootstrap.h">
+			</File>
+			<File
+				RelativePath="..\src\internal.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_action.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_api.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_events.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_joystick.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_keyboard.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_mouse.h">
+			</File>
+			<File
+				RelativePath="..\include\openinput_types.h">
+			</File>
+			<File
+				RelativePath="..\src\private.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="Inline Files"
+			Filter="inl">
+		</Filter>
+		<Filter
+			Name="Macro Files"
+			Filter="mcr">
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

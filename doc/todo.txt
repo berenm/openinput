@@ -27,3 +27,6 @@ other-wierd-kind-of-input-device-support ("HID")
 - touchscreen
 - 3d pointer devices
 - see ogre forum links (seeking input on input)
+
+features
+- oi_keysym to "unicode character" translation

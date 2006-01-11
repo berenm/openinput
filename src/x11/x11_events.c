@@ -28,6 +28,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <X11/Xlib.h>
+#include <sys/select.h>
 #include "internal.h"
 #include "x11.h"
 
