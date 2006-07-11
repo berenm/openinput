@@ -81,12 +81,12 @@ typedef enum {
 #define OI_JOY_NUM_AXES      16       /**< Maximum buttons/axes */
 #define OI_JOY_AXIS_MIN     -32768    /**< Minimum axis value */
 #define OI_JOY_AXIS_MAX      326767   /**< Maximum axis value */
-#define OI_JOY_ENCODE_TYPE(t)  (0x0000ffff & (t)) /**< Make the type-part of a joystick code */
-#define OI_JOY_DECODE_TYPE(t)  (0x0000ffff & (t)) /**< Get the type-part of a joystick code */
-#define OI_JOY_ENCODE_INDEX(i) ((0xffff0000 & (i))<<16) /**< Make the index-part of a joystick code */
-#define OI_JOY_DECODE_INDEX(i) ((0xffff0000 & (i))>>16) /**< Get the index-part of a joystick code */
+#define OI_JOY_ENCODE_TYPE(t)  (0x0000ffff & (t))        /**< Make the type-part of a joystick code */
+#define OI_JOY_DECODE_TYPE(t)  (0x0000ffff & (t))        /**< Get the type-part of a joystick code */
+#define OI_JOY_ENCODE_INDEX(i) (0xffff0000 & ((i) <<16)) /**< Make the index-part of a joystick code */
+#define OI_JOY_DECODE_INDEX(i) ((0xffff0000 & (i)) >>16) /**< Get the index-part of a joystick code */
 #define OI_JOY_MAKE_CODE(t,i)  (OI_JOY_ENCODE_TYPE((t)) + OI_JOY_ENCODE_INDEX((i))) /**< Make joystick code given type and index (in that order) */
-#define OI_JOY_NONE_CODE OI_JOY_MAKE_CODE(OIJ_NONE, 0) /**< The 'none' code that never matches */
+#define OI_JOY_NONE_CODE OI_JOY_MAKE_CODE(OIJ_NONE, 0)   /**< The 'none' code that never matches */
 /** @} */
 
 /* ******************************************************************** */

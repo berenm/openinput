@@ -244,11 +244,11 @@ void joystick_button(unsigned char index, unsigned char btn, char down, char pos
     // Calculate button mask
     newbut = priv->button;
     if(down) {
-        type = OI_JOYBUTTONUP;
+        type = OI_JOYBUTTONDOWN;
         newbut |= OI_BUTTON_MASK(btn);
     }
     else {
-        type = OI_JOYBUTTONDOWN;
+        type = OI_JOYBUTTONUP;
         newbut &= ~OI_BUTTON_MASK(btn);
     }
     priv->button = newbut;

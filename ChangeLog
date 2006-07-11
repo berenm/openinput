@@ -1,5 +1,9 @@
 SVN head
 
+	* Fix: Joystick axes are now set properly
+	  (path by Jon Manning, thanks a lot)
+	* Addded: Support for joystick axes and buttons in platform tester
+	  (also contributed by Jon Manning -- thanks again!)
 	* Fix: Include sys/select.h in x11_events.c, so OI compiles on OS X
 	  (thanks to Richard Smith for reporting this)
 	* Fix: Renamed "win32-config.h" to "config.h" in the nongnu directory
