@@ -100,7 +100,7 @@ void keyboard_manage(oi_privkey **key, unsigned int provide) {
  * @brief Update keyboard button state
  *
  * @param index device index
- * @param keysym keyboard symbol structure
+ * @param keysym keyboard symbol structure - copied
  * @param down true (1) on button press, false (0) otherwise
  * @param post true (1) to post event, false (0) otherwise
  *
@@ -109,6 +109,9 @@ void keyboard_manage(oi_privkey **key, unsigned int provide) {
  * The function correctly translates modifier buttons into
  * modifier-masks and handles the lock-button: CapsLock, NumLock
  * and ScrollLock.
+ *
+ * Note that the keysym parameter is copied by this function, so it is
+ * ok to give pointers to a local function variable.
  */
 void keyboard_update(unsigned char index, oi_keysym *keysym, char down, char post) {
     oi_privkey *priv;

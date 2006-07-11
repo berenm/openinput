@@ -18,6 +18,8 @@ ogre integration
 documentation
 - manpages (doxygen'ed?)
 - write custom INSTALL file (UNIX, win32, mingw, etc.)
+- getting started guide
+- manual and design document
 
 threading
 - is it really needed?
@@ -27,6 +29,17 @@ other-wierd-kind-of-input-device-support ("HID")
 - touchscreen
 - 3d pointer devices
 - see ogre forum links (seeking input on input)
+- native Linux device driver
+
+cleanups
+- implement per-driver instance data pointer, which
+  is passed on from the first _avail invokation
+- remove any global data structures
+
+exclusive device drivers
+- allow drivers exclusive provide mode
+  ie. only one joystick driver, keyboard driver, etc.
 
 features
 - oi_keysym to "unicode character" translation
+

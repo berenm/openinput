@@ -42,6 +42,9 @@ extern oi_bootstrap linuxjoy_bootstrap;
 #ifdef ENABLE_WIN32
 extern oi_bootstrap win32_bootstrap;
 #endif
+#ifdef ENABLE_DX9
+extern oi_bootstrap dx9_bootstrap;
+#endif
 
 /* ******************************************************************** */
 
@@ -77,6 +80,10 @@ static oi_bootstrap *bootstrap[] = {
 
 #ifdef ENABLE_WIN32
     &win32_bootstrap,
+#endif
+
+#ifdef ENABLE_DX9
+    &dx9_bootstrap,
 #endif
 
     // Terminate list

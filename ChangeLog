@@ -1,5 +1,7 @@
 SVN head
 
+ 	* Partially added: DirectX (DirectInput) input driver	
+	* Fix: Document whether or not oi_events_poll/wait/pump blocks
 	* Fix: Joystick axes are now set properly
 	  (path by Jon Manning, thanks a lot)
 	* Addded: Support for joystick axes and buttons in platform tester

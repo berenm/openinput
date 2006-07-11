@@ -381,8 +381,9 @@ int linuxjoy_destroy(oi_device *dev) {
  *
  * This is a device interface function.
  *
- * Pump an OI_QUIT event into the queue if a
- * signal is pending.
+ * Read events from the joystick, and inject these
+ * directly into the OI joystick interface. Translation
+ * of buttons, axes etc. is done by OI.
  */
 void linuxjoy_process(oi_device *dev) {
     static struct js_event jse;

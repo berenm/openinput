@@ -4,7 +4,8 @@ DIST_SUBDIRS = \
 	x11 \
 	unixsignal \
 	linuxjoy \
-	win32
+	win32 \
+	dx9
 
 SUBDIRS = \
 	@BUILD_DIRS@

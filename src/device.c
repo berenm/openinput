@@ -165,20 +165,27 @@ int device_register(oi_bootstrap *boot, char *window_id, unsigned int flags) {
         return OI_ERR_NOT_IMPLEM;
     }
 
-    // Fill trivial stuff - must happen before the init()
     devices[num_devices]->index = num_devices+1;
-    devices[num_devices]->name = boot->name;
-    devices[num_devices]->desc = boot->desc;
-    devices[num_devices]->provides = boot->provides;
+
+    // Some drivers are lazy, others are advanced
+    if(!devices[num_devices]->name) {
+        devices[num_devices]->name = boot->name;
+    }
+    if(!devices[num_devices]->desc) {
+        devices[num_devices]->desc = boot->desc;
+    }
+    if(!devices[num_devices]->provides) {
+        devices[num_devices]->provides = boot->provides;
+    }
 
     // Allocate managment data placeholder
     private[num_devices] = (oi_private*)malloc(sizeof(oi_private));
     memset(private[num_devices], 0, sizeof(oi_private));
 
     // Initialize managment data
-    keyboard_manage(&(private[num_devices]->key), boot->provides);
-    mouse_manage(&(private[num_devices]->mouse), boot->provides);
-    joystick_manage(&(private[num_devices]->joy), boot->provides);
+    keyboard_manage(&(private[num_devices]->key), devices[num_devices]->provides);
+    mouse_manage(&(private[num_devices]->mouse), devices[num_devices]->provides);
+    joystick_manage(&(private[num_devices]->joy), devices[num_devices]->provides);
 
     // Ok, initialize the device
     if(devices[num_devices]->init(devices[num_devices], window_id, flags) != OI_ERR_OK) {
@@ -191,9 +198,9 @@ int device_register(oi_bootstrap *boot, char *window_id, unsigned int flags) {
     // Send the discovery event
     ev.type = OI_DISCOVERY;
     ev.discover.device = num_devices+1;
-    ev.discover.name = boot->name;
-    ev.discover.description = boot->desc;
-    ev.discover.provides = boot->provides;
+    ev.discover.name = devices[num_devices]->name;
+    ev.discover.description = devices[num_devices]->desc;
+    ev.discover.provides = devices[num_devices]->provides;
     queue_add(&ev);
 
     // Enable device for event pumping

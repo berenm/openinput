@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<!DOCTYPE Code::Blocks_project_file>
-<Code::Blocks_project_file>
+<!DOCTYPE CodeBlocks_project_file>
+<CodeBlocks_project_file>
 	<FileVersion major="1" minor="1"/>
 	<Project>
 		<Option title="OpenInput DLL"/>
@@ -13,20 +13,26 @@
 				<Option working_dir="..\..\openinput-0.2.1"/>
 				<Option object_output=".objs"/>
 				<Option deps_output=".deps"/>
-				<Option external_deps=""/>
 				<Option type="3"/>
 				<Option compiler="1"/>
 				<Option createStaticLib="1"/>
+				<Compiler>
+					<Add option="/I $INCLUDE"/>
+				</Compiler>
 				<Linker>
 					<Add library="user32.lib"/>
 				</Linker>
 			</Target>
+			<Environment>
+				<Variable name="DXINC" value="%DXSDK_DIR%Include"/>
+			</Environment>
 		</Build>
 		<Compiler>
-			<Add option="-DBUILD_DLL"/>
+			<Add option="/DBUILD_DLL"/>
 			<Add directory="..\include"/>
 			<Add directory="..\src"/>
 			<Add directory="..\"/>
+			<Add directory="..\..\..\..\..\Program Files\Microsoft DirectX 9.0 SDK (August 2005)\Include"/>
 		</Compiler>
 		<Unit filename="..\config.h">
 			<Option compilerVar=""/>
@@ -104,6 +110,24 @@
 			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
+		<Unit filename="..\src\dx9\dx9.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
+		<Unit filename="..\src\dx9\dx9.h">
+			<Option compilerVar=""/>
+			<Option compile="0"/>
+			<Option link="0"/>
+			<Option target="default"/>
+		</Unit>
+		<Unit filename="..\src\dx9\dx9_events.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
+		<Unit filename="..\src\dx9\dx9_translate.c">
+			<Option compilerVar="CC"/>
+			<Option target="default"/>
+		</Unit>
 		<Unit filename="..\src\events.c">
 			<Option compilerVar="CC"/>
 			<Option target="default"/>
@@ -144,10 +168,6 @@
 			<Option compilerVar="CC"/>
 			<Option target="default"/>
 		</Unit>
-		<Unit filename="..\src\unixsignal\unixsignal.c">
-			<Option compilerVar="CC"/>
-			<Option target="default"/>
-		</Unit>
 		<Unit filename="..\src\unixsignal\unixsignal.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>
@@ -173,4 +193,4 @@
 			<Option target="default"/>
 		</Unit>
 	</Project>
-</Code::Blocks_project_file>
+</CodeBlocks_project_file>

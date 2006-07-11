@@ -107,6 +107,7 @@ typedef enum {
 #define OI_ERR_PARAM            6 /**< Invalid parameter */
 #define OI_ERR_NO_NAME          7 /**< No such event name exists */
 #define OI_ERR_INTERNAL         8 /**< Fatal internal error */
+#define OI_ERR_DEV_BEHAVE       9 /**< Device programming error */
 /** @} */
 
 /* ******************************************************************** */

@@ -139,7 +139,7 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
             debug("win32_wndproc: key up/down - down:%u", state);
             printf("win32_wndproc: key up/down - down:%u - wp:%u - lp:%u\n",
                 state, (unsigned int)wparam, (unsigned int)lparam);
-            
+
             // Don't post repeated keys
             if(state && (lparam & DW32_REPKEYMASK)) {
                 return 0;

@@ -118,6 +118,9 @@ int oi_events_add(oi_event *evts, int num) {
  * as both oi_events_poll and oi_events_wait calls the
  * pump-function automatically
  *
+ * This function does NOT block. It returns immediately
+ * whether or not events could be processed.
+ *
  * What happens in this function is:
  * -# Make sure time has elapsed since last call
  * -# Lock the queue
@@ -158,6 +161,9 @@ void oi_events_pump() {
  * @param evt pointer of where to store event
  * @returns true (1) when events are available, false (0) otherwise
  *
+ * This function does NOT block. Despite the name, no polling
+ * actually takes place, and the function returns immediately.
+ *
  * Poll the event queue for events. This is typically the function
  * you want to use in a game, as the function returns immediately.
  * Use the function inside a while()-loop to handle all pending
@@ -181,6 +187,9 @@ int oi_events_poll(oi_event *evt) {
  * @brief Wait for events
  *
  * @param evt pointer of where to store event
+ *
+ * This function BLOCKS. The function will return only
+ * when an event have been processed by OpenInput.
  *
  * For for a single event to appear. This call is blocking, so
  * you probably only want to use this if you're writing a
