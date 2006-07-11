@@ -40,7 +40,7 @@ typedef enum {
     OI_DISABLE                     = 0,    /**< False/disable */
     OI_ENABLE                      = 1,    /**< True/enable */
     OI_QUERY                       = 2     /**< Don't change, return current */
-} oi_bool;
+} oi_bool;                                 /**< Tri-state (bool + query) */
 /** @} */
 
 

@@ -628,7 +628,7 @@ int dx9_reset(oi_device *dev) {
  * @ingroup DDX9
  * @brief Direct Input device enumeration callback
  *
- * @param device input object being enumerated
+ * @param dev_inst input object being enumerated
  * @param pref enumeration private data
  * @return DIENUM_CONTINUE, as we always enumerate everything
  *
@@ -685,7 +685,7 @@ BOOL dx9_devnum(LPCDIDEVICEINSTANCE dev_inst, LPVOID pref) {
  * @ingroup DDX9
  * @brief Direct Input joystick enumeration callback
  *
- * @param obj input object being enumerated
+ * @param obj_inst input object being enumerated
  * @param pref enumeration private data
  * @return DIENUM_CONTINUE, as we always enumerate everything
  *

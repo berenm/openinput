@@ -291,8 +291,8 @@ typedef enum {
     OIK_EURO            = 321, /**< key_euro */
     OIK_UNDO            = 322, /**< key_undo (atari undo key) */
 
-    OIK_LAST                     /**< key_unknown */
-} oi_key;
+    OIK_LAST                   /**< key_unknown */
+} oi_key;                      /**< Definition of keyboard button names */
 /** @} */
 
 

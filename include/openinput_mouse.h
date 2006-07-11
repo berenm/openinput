@@ -51,7 +51,7 @@ typedef enum {
     OIP_WHEEL_DOWN         = 5, /**< mouse_wheel_down */
     OIP_MOTION             = 6, /**< mouse_motion */
     OIP_LAST                    /**< mouse_unknown */
-} oi_mouse;
+} oi_mouse;                     /**< Mouse buttons */
 /** @} */
 
 /**
@@ -63,10 +63,10 @@ typedef enum {
  *
  * @{
  */
-#define OI_BUTTON_MASK(x) (1<<(x))
-#define OI_BUTTON_LEFTMASK      OI_BUTTON_MASK(OIP_BUTTON_LEFT)
-#define OI_BUTTON_MIDMASK       OI_BUTTON_MASK(OIP_BUTTON_MIDDLE)
-#define OI_BUTTON_RIGHTMASK     OI_BUTTON_MASK(OIP_BUTTON_RIGHT)
+#define OI_BUTTON_MASK(x) (1<<(x))                                /**< Button bitmask generator */
+#define OI_BUTTON_LEFTMASK      OI_BUTTON_MASK(OIP_BUTTON_LEFT)   /**< Bitmask for left button */
+#define OI_BUTTON_MIDMASK       OI_BUTTON_MASK(OIP_BUTTON_MIDDLE) /**< Bitmask for middle button */
+#define OI_BUTTON_RIGHTMASK     OI_BUTTON_MASK(OIP_BUTTON_RIGHT)  /**< Bitmask for right button */
 /** @} */
 
 /* ******************************************************************** */
