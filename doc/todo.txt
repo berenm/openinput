@@ -35,6 +35,8 @@ cleanups
 - implement per-driver instance data pointer, which
   is passed on from the first _avail invokation
 - remove any global data structures
+- rename "unixsignal" to "ansisignal" as the signals
+  are a part of the ANSI standard, not UNIX/POSIX.
 
 exclusive device drivers
 - allow drivers exclusive provide mode

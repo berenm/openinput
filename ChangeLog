@@ -1,6 +1,9 @@
 SVN head
 
- 	* Partially added: DirectX (DirectInput) input driver	
+ 	* Partially added: DirectX (DirectInput) input driver
+	* Fix: Updated Doxygen pages and README to report correct homepage
+	  address
+	* Fix: Hack doxygen.m4 so version is not variable names
 	* Fix: Document whether or not oi_events_poll/wait/pump blocks
 	* Fix: Joystick axes are now set properly
 	  (path by Jon Manning, thanks a lot)

@@ -28,14 +28,14 @@ OpenInput is licensed under the GNU Lesser General Public License (LGPL).
 
 See the INSTALL file for installation instructions.
 
-The official subversion repository containing the sources and friends
-for OpenInput can be obtained using the following subversion commands:
+The official OpenInput homepage is located at
 
-	svn co https://makob.dk/svn/libsinp/trunk libsinp
+	http://home.gna.org/openinput
 
-Please note that this repository location is due to change to another
-host (which will also complete the name change from libsinp to
-OpenInput).
+The official Subversion repository containing the sources and friends
+for OpenInput can be obtained using the following subversion command:
+
+	svn co http://svn.gna.org/svn/openinput/trunk openinput
 
 If you feel you deserve commit-priviligies, please send me an email at
 makob@makob.dk. Report bugs to makob@makob.dk.

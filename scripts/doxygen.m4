@@ -186,7 +186,9 @@ AC_SUBST([DX_DOCDIR], [ifelse([$3], [], doxygen-doc, [$3])])
 DX_ENV_APPEND(SRCDIR, $srcdir)
 DX_ENV_APPEND(PROJECT, $DX_PROJECT)
 DX_ENV_APPEND(DOCDIR, $DX_DOCDIR)
-DX_ENV_APPEND(VERSION, $PACKAGE_VERSION)
+DX_ENV_APPEND(VERSION, $OI_VERSION)
+# The VERSION variable above was hacked by Jakob Kjaer
+# as content of PACKAGE_VERSION was not expanded
 
 # Doxygen itself:
 DX_ARG_ABLE(doc, [generate any doxygen documentation],
