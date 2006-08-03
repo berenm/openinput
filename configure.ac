@@ -47,17 +47,6 @@ AM_INIT_AUTOMAKE([openinput], $OI_VERSION)
 AC_CONFIG_HEADERS([config.h])
 ARCHDET
 
-dnl Doxygen
-DX_HTML_FEATURE(ON)
-DX_CHM_FEATURE(OFF)
-DX_CHI_FEATURE(OFF)
-DX_MAN_FEATURE(OFF)
-DX_RTF_FEATURE(OFF)
-DX_XML_FEATURE(OFF)
-DX_PDF_FEATURE(OFF)
-DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN(OpenInput, [doc/doxygen/Doxyfile], [doc/api/])
-
 dnl Default test programs
 TEST_PROGS="keynametest$EXEEXT openclose$EXEEXT"
 BUILD_DIRS=""
@@ -142,6 +131,31 @@ if test x$enable_win32 = xyes; then
      fi
 fi
 
+dnl Check for texi2html
+AC_ARG_WITH(texi2html,
+     AS_HELP_STRING([--with-texi2html], [generate HTML manual with texi2html (default=yes)]),
+     [], with_texi2html=yes)
+if test x$with_texi2html = xyes; then
+     AC_CHECK_PROG([have_texi2html], [texi2html], [yes])
+fi
+AM_CONDITIONAL([ENABLE_TEXI2HTML], [test x$have_texi2html = xyes])
+
+dnl Check for doxygen and required tools
+AC_PATH_PROG(PERL_PATH, [perl])
+AC_PATH_PROG(DOT_PATH, [dot])
+AC_SUBST(PERL_PATH, [`DIRNAME_EXPR($PERL_PATH)`])
+AC_SUBST(DOT_PATH, [`DIRNAME_EXPR($DOT_PATH)`])
+AC_ARG_WITH(doxygen,
+     AS_HELP_STRING([--with-doxygen], [generate API reference with doxygen (default=yes)]),
+     [], with_doxygen=yes)
+if test x$with_doxygen = xyes -a -n "$PERL_PATH"; then
+     AC_CHECK_PROG([have_doxygen], [doxygen], [yes])
+fi
+if test -n "$DOT_PATH"; then
+   AC_SUBST(HAVE_DOT, [YES])
+fi
+AM_CONDITIONAL([ENABLE_DOXYGEN], [test x$have_doxygen = xyes])
+
 dnl Check for libraries and header files
 AC_HEADER_DIRENT
 AC_HEADER_STDC
@@ -197,17 +211,22 @@ AC_SUBST(SYSTEM_LIBS)
 
 dnl Files to be processed
 AC_CONFIG_FILES([ \
-	openinput.pc \
-	doc/doxygen/Doxyfile \
 	Makefile \
+	openinput.pc \
 	include/Makefile \
 	test/Makefile \
+	doc/Makefile \
+	doc/doxygen/Doxyfile \
+	doc/doxygen/Makefile \
+	doc/texi/version.texi \
+	doc/texi/Makefile \
 	src/Makefile \
 	src/foo/Makefile \
 	src/x11/Makefile \
 	src/unixsignal/Makefile \
 	src/linuxjoy/Makefile \
-	src/win32/Makefile])
+	src/win32/Makefile \
+	src/dx9/Makefile])
 
 dnl Special file containinig auto-filled version
 AC_CONFIG_FILES([include/openinput_h_version], \

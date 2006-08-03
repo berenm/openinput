@@ -1,12 +1,15 @@
 SVN head
 
  	* Partially added: DirectX (DirectInput) input driver
+	* Partially added: OpenInput manual (work-in-progress)
+	* Cleanup: Manually detect doxygen, dot, perl and texi2html
+	* Cleanup: Setup build structure for API and manual where
+	  manual control of build process was required.
 	* Fix: Updated Doxygen pages and README to report correct homepage
 	  address
-	* Fix: Hack doxygen.m4 so version is not variable names
 	* Fix: Document whether or not oi_events_poll/wait/pump blocks
 	* Fix: Joystick axes are now set properly
-	  (path by Jon Manning, thanks a lot)
+	  (patch by Jon Manning, thanks a lot)
 	* Addded: Support for joystick axes and buttons in platform tester
 	  (also contributed by Jon Manning -- thanks again!)
 	* Fix: Include sys/select.h in x11_events.c, so OI compiles on OS X

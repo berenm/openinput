@@ -1,7 +1,4 @@
 # OpenInput library headers
-DIST_EXTRA = \
-	openinput_h_version.in
-
 openinputincludedir = \
 	${includedir}/openinput
 

@@ -1,0 +1,19 @@
+@node Top
+@top OpenInput manual
+
+This is the manual for OpenInput (version @value{VERSION}) -- a free
+(libre), cross-platform, portable, easy-to-use input handling library.
+
+@insertcopying
+
+The official OpenInput homepage is located at
+@url{http://home.gna.org/openinput}. There you can download the newest
+version, subscribe to mailinglists and find all sorts of information
+about the OpenInput project. You'll also find the newest version of
+the manual online and the online API reference.
+
+This manual contain the following major sections:
+@menu
+* Introduction::                Introduction to OpenInput
+* The head-on sample::          The hello OpenInput program
+@end menu

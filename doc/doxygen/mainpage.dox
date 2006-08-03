@@ -5,8 +5,8 @@
 
 @section Introduction
 
-This is the API reference documentation for OpenInput, the
-cross-platform, easy-to-use, SDL-like input handling library.
+This is the API reference documentation for OpenInput, the free
+(libre), cross-platform, easy-to-use input handling library.
 
 The API is rougly split into three logical sections:
 @li The @ref Public
@@ -22,7 +22,8 @@ access directly as a user of the library.
 
 You can find the official OpenInput homepage at
 http://home.gna.org/openinput/ on which you can find news,
-download the newest version, visit the forums and get
-help for any problem you may encounter using OpenInput.
+download the newest version, subscribe to the mailinglists,
+search the archives and otherwise get help if you should
+encounter with OpenInput.
 
 */

@@ -1,0 +1,106 @@
+@node The head-on sample
+@chapter The head-on sample
+
+This chapter present the OpenInput equivalent to the Hello World
+program.
+
+@menu
+* Hello OpenInput::                     The hello OpenInput world program
+* Dissection of Hello OpenInput::       A forensic analysis of the program
+@end menu
+
+@node Hello OpenInput
+@section Hello OpenInput
+
+The most trivial usage of OpenInput looks like this:
+
+@example
+#include <stdio.h>
+#include <string.h>
+#include "openinput.h"
+
+int main(int argc, char *argv[])
+@{
+    // Placeholder for the event
+    oi_event ev;
+
+    // Initialise
+    oi_init("c:0 s:0 w:0", OI_FLAG_NOWINDOW);
+
+    // Wait for an event
+    oi_events_wait(&ev);
+
+    // Print something to the screen
+    printf("Hello OpenInput event!\n");
+@}
+@end example
+
+This example won't actually perform anything useful except it will
+initialise OpenInput, and wait forever until an event is received.  To
+inject an event, you will probably have to press @code{CTRL+C} or send
+a signal (using @code{kill}) to the process before you actually
+receive an event. Why this is so in the above will be explained below,
+where we'll dissect the program bit by bit.
+
+@node Dissection of Hello OpenInput
+@section Dissection of Hello OpenInput
+
+The very first part of the program starts like any other C program:
+
+@example
+#include <stdio.h>
+#include <string.h>
+#include "openinput.h"
+
+int main(int argc, char *argv[])
+@end example
+
+These are the include-files and the standard ANSI ``main'' function.
+The only special thing here is the single OpenInput include-file,
+namely @code{#include "openinput.h"}.
+
+@example
+    // Placeholder for the event
+    oi_event ev;
+@end example
+
+In this part, we declare the variable @code{ev} with the type
+@code{oi_event}. If you consulted the header-files for OpenInput you
+would see that the @code{oi_event} is a ``union'' type, that combine
+all other OpenInput event types. In this way, you are able to quickly
+``convert'' the type from the generic union into the specific
+OpenInput event type.
+
+@example
+    // Initialise
+    oi_init("c:0 s:0 w:0", OI_FLAG_NOWINDOW);
+@end example
+
+Here the actual initialisation of OpenInput is carried out. The
+function takes two parameters: The first is a string describing what
+window to hook into, and the other parameter consists of the OR'ed
+flags that modify the general OpenInput behavior. At this point,
+suffice to say that the window-parameter is fully filled (but with 
+invalid id values), and that the provided flag tells OpenInput NOT to
+use the window-parameter.
+
+@example
+    // Wait for an event
+    oi_events_wait(&ev);
+@end example
+
+This is where all the action is. Here, we tell OpenInput to fill an
+event into our previously declared @code{ev} variable, and that
+OpenInput should not return until it has done so.
+
+@example
+
+    // Print something to the screen
+    printf("Hello OpenInput event!\n");
+@end example
+
+This part simply prints a message to the console, so you can see that
+OpenInput has received.
+
+That's more or less all there is about the very first ``Hello
+OpenInput'' program.

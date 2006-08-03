@@ -1,0 +1,2 @@
+@c Version variable is automatically set
+@set VERSION @OI_VERSION@

@@ -1,0 +1,88 @@
+@node Introduction
+@chapter Introduction
+
+This section contain a brief introduction to what OpenInput is, and
+the story behind the creation of the OpenInput project.
+
+@menu
+* What is OpenInput::           Description of what this library does
+* A little history::            How did OpenInput come to be
+@end menu
+
+@node What is OpenInput
+@section What is OpenInput
+
+Let's begin by citing the OpenInput description that has been used
+numerous times before:
+
+@quotation
+The OpenInput library is intended as a free (libre), easy-to-use,
+cross-platform input handler library. The goal is to provide a
+SDL-alike interface to input devices such as keyboards, mice and
+joysticks while keeping the dependencies for the library at a bare
+minimum.
+
+As an user of OpenInput, you will find it very easy to use: All
+functions and data structures are intuitive and fully documented. The
+library has support for both event-based input handling, and for
+state-based events, also known as unbuffered input.
+
+For the developer, the internal design of OpenInput is highly modular:
+The device drivers are decoupled from the library itself, which makes
+it very easy to write additional drivers. The internal API is of
+course also fully documented (as are the device drivers).
+@end quotation
+
+That's what OpenInput is. An input library. The job of OpenInput is to
+hook into the low-level input sources in your operating system,
+collect the input events, process them, and then deliver them to your
+program in a way that is easy to use.
+
+@node A little history
+@section A little history
+
+The OpenInput project was started in June 2005 as the culmination of
+several months of frustration getting Ogre, GLX and SDL to play nicely
+together on Debian GNU/Linux.
+
+At that time my spare-time project was to get some sort of 3D space
+shooter game up and running. Ogre (@url{http://www.ogre3d.org}) was
+the 3D engine of choice, SDL was all there existed for portable input
+handling, and that more or less worked. Except that the Ogre package
+for Debian was set to use GLX (ie. the X Window System GL libraries)
+instead of SDL.
+
+Now, if you try to mix GLX with SDL, you'll find out that they both
+want to have exclusive rights over the screen. Understandably for GLX,
+as that's the sole job of that library. SDL, on the other hand,
+provides a combined input and graphics module. You can have the
+graphics without the input, but not the input without the graphics!
+
+After trying several fixes, the most promising being the undocumented
+SDL environment variable hack, I finally gave up on SDL. SDL is great
+-- don't get me wrong -- but I gave up on making the input module work
+without the graphics module. I started Googling for alternatives, of
+which a few exist (most notably libGII -
+@url{http://www.ibiblio.org/ggicore/packages/libgii.html}), but I
+never found my peace with any of them.
+
+Finally, I decided to write my own input handler library -- how hard
+could this thing be anyway, right?
+
+So, in mid-June, I started ``libsinp'' (library for simple input), and
+made it work with X11 mice and keyboards, modelled heavily after the
+SDL input system (without the graphics dependencies). The project was
+later renamed to OpenInput, the source code was moved to a public
+Subversion server at GNA - @url{https://gna.org} - and a homepage was
+setup at @url{http://dotsrc.org}. The project saw a bit of success, a
+couple of users registered at the forums etc. and everything went
+quite well until I was offered a job as a software engineer at a major
+wireless company. With the new job I just didn't have the time or
+energy to continue working or maintaining OpenInput. The homepage
+lived on, but was eventually defaced, and the project went dead for
+almost a year...
+
+Now, in August 2006, OpenInput is back. I still work as a software
+engineer at the same company, but for some odd reason I now have the
+energy to continue the work on OpenInput in my spare time (to the
+regret of my flat mate and girlfriend).
