@@ -140,6 +140,16 @@ if test x$with_texi2html = xyes; then
 fi
 AM_CONDITIONAL([ENABLE_TEXI2HTML], [test x$have_texi2html = xyes])
 
+dnl Check for dia
+AC_PATH_PROG(DIA_PATH, [dia])
+AC_ARG_WITH(dia,
+     AS_HELP_STRING([--with-dia], [generate PNG diagrams with dia (default=yes)]),
+     [], with_dia=yes)
+if test x$with_dia = xyes; then
+     AC_CHECK_PROG([have_dia], [dia], [yes])
+fi
+AM_CONDITIONAL([ENABLE_DIA], [test x$have_dia = xyes])
+
 dnl Check for doxygen and required tools
 AC_PATH_PROG(PERL_PATH, [perl])
 AC_PATH_PROG(DOT_PATH, [dot])

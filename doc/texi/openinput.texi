@@ -18,8 +18,9 @@ copy of the license is included in the section entitled "GNU Free
 Documentation License".
 @end quotation
 
-The full license can be found at
-@url{http://www.gnu.org/licenses/gpl.txt}.
+The full license can be found online at 
+@url{http://www.gnu.org/licenses/gpl.txt} or within this manual
+at @ref{GNU Free Documentation License}.
 
 @end copying
 
@@ -33,8 +34,13 @@ The full license can be found at
 
 @contents
 
+@c Normal chapters
 @include top.texi
 @include intro.texi
 @include sample.texi
+@include design.texi
+
+@c Appendices
+@include fdl.texi
 
 @bye

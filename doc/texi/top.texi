@@ -16,4 +16,6 @@ This manual contain the following major sections:
 @menu
 * Introduction::                Introduction to OpenInput
 * The head-on sample::          The hello OpenInput program
+* Overall design::              Overview of the OpenInput design
+* Copying this manual::         The license for copying this manual
 @end menu

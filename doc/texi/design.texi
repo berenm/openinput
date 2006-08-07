@@ -1,0 +1,157 @@
+@node Overall design
+@chapter Overall design
+
+This chapter describes the overall design principles that
+OpenInput is built upon.
+
+@menu
+* The layered design::                  The four API layers
+* The general flowchart::               The route that events travel
+* Brief intro to the public API::       Public API introduction
+* Brief intro to the queue API::        Brief introduction to the buffers
+* Brief intro to state managers::       Overview of the state managers
+* Brief intro to device drivers::       Introduction to device driver API
+@end menu
+
+@node The layered design
+@section The layered design
+
+Before I started implementing OpenInput I thought a lot input events
+in general: What did a mouse and a keyboard have in common? How could
+one implement the library on a multitude of platforms without having
+to reinvent the wheel each time? How could action mapping be
+implemented without having to know anything about what kind of event
+was mapping?
+
+The result was that I identified four basic blocks:
+@itemize
+@item A Public API
+@item A queue/event system
+@item State managers for the different types of input devices
+@item Device drivers for the specific operating system/input system
+@end itemize
+
+Each block becomes more and more platform dependent as you move
+downwards (actually, it's only the device drivers that are platform
+dependent). I figured that it should be possible to have very low
+coupling between these four layers which would make the library easy
+to improve upon and most important, maintain.
+
+With these four blocks, the actual processing units in each layer are
+almost a dead giveaway -- the same goes for the processing order of
+events which is described in the next section.
+
+@node The general flowchart
+@section The general flowchart
+
+Events travel through the four layers in OpenInput:
+
+@enumerate
+
+@item (red) In general events are generated in the OpenInput device
+drivers, which are the only parts of the code that are platform
+dependent.  All device drivers generate events that are injected into
+the state managers.
+
+@item (yellow) A state manager exists for all major device classes,
+ie. keyboard, mouse, joystick and application (window) managment.
+Furthermore, a driver helper system exists, that control the device
+drivers themselves. All state managers transfer events into the queue
+subsystem.
+
+@item (blue) The queue/event subsystem is responsible for adding,
+peeking at and cutting events to/from the event queue. When adding
+events to the queue, they are first parsed by the action mapper to
+allow for generation of action events. All events are sent from the
+queue subsystem to the event retrival system, which is the user's
+entrypoint for receiving events.
+
+@item (green) Finally, the events are ready to be fetched by the
+user application through the exposed public API.
+
+@end enumerate
+
+The flow can be depicted as follows:
+
+@html
+<div align="center">
+<img src="general_flowchart.png" alt="General flowchart" />
+<p><i>General flowchart</i></p>
+</div>
+@end html
+
+The following four section will briefly elaborate on the specific
+layers.
+
+@node Brief intro to the public API
+@section Brief intro to the public API
+
+The public API is what the user (you?) sees when he or she uses
+OpenInput. Generally, only a very few API functions are necessary
+to get OpenInput up and running -- that is especially the case if one
+uses the event-based API functions.
+
+If one does not want to use the event based input system, each state
+manager exposes a state based, also known as unbuffered, input
+API. This API allows one to manually look up the state of each button,
+axis, hat etc. in fixed-sized arrays. The state based API event works
+for action mapped events!
+
+@node Brief intro to the queue API
+@section Brief into to the queue API
+
+The event and queue API consists of three subsystems:
+@enumerate
+@item The queue system.@*@*
+The queue subsystem is simply a frontend to a ringbuffer that allows
+for fast insertion, removal, cutting and peeking.@*@*
+
+@item The event API.@*@*
+The event API is actually the main public API. It is here that the
+@code{oi_event_poll()} and @code{oi_event_wait()} functions are
+implemented. These two functions are by all means the most important
+of the whole OpenInput API, as they return the generated events into
+the user's application.@*@*
+
+@item The action mapper.@*@*
+The action mapper is something like a clone between a many-to-many
+linkable flat file database and a state manager. The action mapper
+looks up all events in a table, and checks if an action map exists for
+the given event. If this is the case an action event is generated and
+put on the queue.
+
+@end enumerate
+
+@node Brief intro to state managers
+@section Brief intro to the state managers
+
+A state manager is responsible for tracking the state of all devices,
+exposing the state-based API and to help the device drivers inject
+events into the higher layers. State managers typically also help
+translate buttons, axes, hats etc. from platform specific indices to
+OpenInput indices (using user-supplied tables).
+
+OpenInput has four state managers, one for each input device class:
+@itemize
+@item Keyboard state manager
+@item Mouse state manager
+@item Joystick state manager
+@item Application state manager
+@end itemize
+
+And finally, this layer also contain the driver controller that takes
+care of initialising, pumping and otherwise control the device
+drivers.
+
+@node Brief intro to device drivers
+@section Brief intro to device drivers
+
+The device drivers are the actual event sources. Device drivers
+typically hook into the operating system and, when pumped, queries the
+system for events. The device driver then reads the event and injects
+it into OpenInput with a bit of help from the state managers.
+
+To ease development of new drivers, OpenInput exposes a relatively
+simply yet powerful device driver API that must be implemented by all
+device drivers. Using this API, devices are automatically probed and
+started if the physical device driver exists.

@@ -1,7 +1,7 @@
 SVN head
 
  	* Partially added: DirectX (DirectInput) input driver
-	* Partially added: OpenInput manual (work-in-progress)
+	* Added: OpenInput manual (work-in-progress)
 	* Cleanup: Manually detect doxygen, dot, perl and texi2html
 	* Cleanup: Setup build structure for API and manual where
 	  manual control of build process was required.

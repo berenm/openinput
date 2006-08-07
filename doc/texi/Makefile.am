@@ -4,29 +4,51 @@ dist_noinst_DATA = \
 	version.texi.in \
 	top.texi \
 	intro.texi \
-	sample.texi
+	sample.texi \
+	design.texi \
+	fdl.texi \
+	general_flowchart.dia
+
+MANUALDIR=../manual
+
+# Simple directory target
+.PHONY: manual-dir
+manual-dir:
+	mkdir -p $(MANUALDIR)
 
 # Non-phony texi2html target
-TEXTARG=../manual/index.html
-$(TEXTARG): version.texi
-	mkdir -p ../manual
+if ENABLE_TEXI2HTML
+TEXTARG=$(MANUALDIR)/index.html
+$(TEXTARG): *texi
 	texi2html --Verbose --init-file=xhtml.init \
-		  --output=../manual --sec-nav \
+		  --output=$(MANUALDIR) --sec-nav \
 		  --number --toc-links --top-file=index.html \
 		  --menu --split=chapter openinput.texi
+else
+TEXTARG=
+endif
 
-if ENABLE_TEXI2HTML
-info-local: $(TEXTARG)
+# Non-phony dia target
+if ENABLE_DIA
+$(MANUALDIR)/%.png: %.dia
+	@DIA_PATH@ --export=$(MANUALDIR)/$@ --filter=png $< 
+DIATARG=$(patsubst %.dia,$(MANUALDIR)/%.png,$(wildcard *.dia))
+else
+DIATARG=
+endif
+
+info-local: manual-dir $(DIATARG) $(TEXTARG)
 
 all-local: info-local
 
+
 install-data-local:
 	mkdir -p ${docdir}/manual
-	cp -r ../manual ${docdir}
-endif
+	cp -r $(MANUALDIR) ${docdir}
+
 
 clean-local:
-	rm -rf ../manual
+	rm -rf $(MANUALDIR)
 
 uninstall-local:
 	rm -rf ${docdir}/manual
