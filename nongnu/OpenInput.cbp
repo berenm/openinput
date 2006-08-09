@@ -6,7 +6,7 @@
 		<Option title="OpenInput DLL"/>
 		<Option makefile="Makefile"/>
 		<Option makefile_is_custom="0"/>
-		<Option compiler="1"/>
+		<Option compiler="6"/>
 		<Build>
 			<Target title="default">
 				<Option output="..\openinput.dll"/>
@@ -14,7 +14,7 @@
 				<Option object_output=".objs"/>
 				<Option deps_output=".deps"/>
 				<Option type="3"/>
-				<Option compiler="1"/>
+				<Option compiler="6"/>
 				<Option createStaticLib="1"/>
 				<Compiler>
 					<Add option="/I $INCLUDE"/>
@@ -28,12 +28,23 @@
 			</Environment>
 		</Build>
 		<Compiler>
+			<Add option="/MDd"/>
+			<Add option="/MD"/>
+			<Add option="/MTd"/>
+			<Add option="/W4"/>
+			<Add option="/W3"/>
+			<Add option="/W2"/>
+			<Add option="/W1"/>
+			<Add option="/Zi"/>
 			<Add option="/DBUILD_DLL"/>
 			<Add directory="..\include"/>
 			<Add directory="..\src"/>
 			<Add directory="..\"/>
 			<Add directory="..\..\..\..\..\Program Files\Microsoft DirectX 9.0 SDK (August 2005)\Include"/>
 		</Compiler>
+		<Linker>
+			<Add option="/DEBUG"/>
+		</Linker>
 		<Unit filename="..\config.h">
 			<Option compilerVar=""/>
 			<Option compile="0"/>

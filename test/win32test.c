@@ -119,6 +119,10 @@ int WINAPI WinMain(HINSTANCE inst, HINSTANCE prev,
     char csw[100];
     int e;
 
+    // Disable console buffering so we can see what's going on
+    setbuf(stderr, NULL);
+    setbuf(stdout, NULL);
+
     fprintf(stderr, "win32test: starting\n");
 
     // Init class and window

@@ -214,6 +214,10 @@ void oi_events_wait(oi_event *evt) {
                 TranslateMessage(&msg);
                 DispatchMessage(&msg);
             }
+
+            // Relinquish control as no inputs are pending
+            Sleep(OI_SLEEP);
+            
         }
 #elif HAVE_NANOSLEEP
         {

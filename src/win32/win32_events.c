@@ -137,8 +137,6 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 
             state = (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN);
             debug("win32_wndproc: key up/down - down:%u", state);
-            printf("win32_wndproc: key up/down - down:%u - wp:%u - lp:%u\n",
-                state, (unsigned int)wparam, (unsigned int)lparam);
 
             // Don't post repeated keys
             if(state && (lparam & DW32_REPKEYMASK)) {
@@ -249,20 +247,19 @@ LONG CALLBACK win32_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
             ev.type = OI_EXPOSE;
             queue_add(&ev);
         }
-        return 0;
-
-
-        // Unhandled event, send to old handler
-    default:
-        if(private->old_wndproc) {
-            return CallWindowProc(private->old_wndproc, hwnd, msg,
-                                  wparam, lparam);
-        }
+        // Fall through here to allow standard handler to repaint
         break;
     }
 
-    // The catch-all default handler
-    return DefWindowProc(hwnd, msg, wparam, lparam);
+    // Call old window-proc to handle redraw etc.
+    if(private->old_wndproc) {
+        return CallWindowProc(private->old_wndproc, hwnd, msg,
+                              wparam, lparam);
+    }
+    else {
+        // The catch-all default handler
+        return DefWindowProc(hwnd, msg, wparam, lparam);
+    }
 }
 
 /* ******************************************************************** */
