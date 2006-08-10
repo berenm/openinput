@@ -21,6 +21,9 @@
 
 /* ******************************************************************** */
 
+// We do not use unicode
+#undef UNICODE
+
 // Includes
 #include "openinput.h"
 #include <windows.h>
@@ -66,7 +69,7 @@ int init_class(HINSTANCE inst) {
     wcx.hIcon = LoadIcon(NULL, IDI_APPLICATION);
     wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
     wcx.hbrBackground = GetStockObject(WHITE_BRUSH);
-    wcx.lpszMenuName =  "OpenInputMenu";
+    wcx.lpszMenuName = "OpenInputMenu";
     wcx.lpszClassName = "OpenInputTest";
     wcx.hIconSm = LoadImage(inst,
                             MAKEINTRESOURCE(5),
