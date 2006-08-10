@@ -49,12 +49,13 @@ int dx9_reset(oi_device *dev);
 /* ******************************************************************** */
 
 // Misc local functions
-LPDIENUMDEVICESCALLBACK dx9_devenum;
-LPDIENUMDEVICEOBJECTSCALLBACK dx9_joyenum;
+LPDIENUMDEVICESCALLBACKA dx9_devenum;
+LPDIENUMDEVICEOBJECTSCALLBACKA dx9_joyenum;
 void dx9_keyboard_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int entries);
 void dx9_mouse_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int entries);
 void dx9_joy_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int entries);
-LONG CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+oi_key dx9_translate_key(unsigned int code);
 
 /* ******************************************************************** */
 
@@ -70,7 +71,7 @@ LONG CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 typedef struct dx9_uid {
     GUID guid;                      /**< Unique DI device indentifier */
     unsigned int provides;          /**< OI provides flags */
-    TCHAR *name;                    /**< Device name */
+    char *name;                     /**< Device name */
     struct dx9_uid *next;           /**< Next pointer */
 } dx9_uid;
 
@@ -86,7 +87,7 @@ typedef struct dx9_uid {
  */
 typedef struct dx9_private {
     HWND hwnd;                      /**< Window handle */
-    LPDIRECTINPUTDEVICE8 obj;       /**< The DI object */
+    LPDIRECTINPUTDEVICE8A obj;      /**< The DI object */
     char exclusive;                 /**< Exclusive flag (grabbed+hidden) */
     int height;                     /**< Window height */
     int width;                      /**< Window width */

@@ -68,7 +68,7 @@ static WNDPROC old_wndproc = NULL;
 static char instances = 0;
 
 // The root object
-static LPDIRECTINPUT8A object = NULL;
+static IDirectInput8A *object = NULL;
 
 /* ******************************************************************** */
 
@@ -88,6 +88,8 @@ int dx9_avail(unsigned int flags) {
     HRESULT res;
     LPDIRECTINPUT8 obj;
 
+    debug("dx9_avail");
+
     // Get object and free it again
     res = DirectInput8Create(GetModuleHandle(NULL),
                              DIRECTINPUT_VERSION,
@@ -95,7 +97,10 @@ int dx9_avail(unsigned int flags) {
                              (void**)&obj,
                              NULL);
     if(obj) {
-        IDirectInput_Release(obj);
+        obj->lpVtbl->Release(obj);
+    }
+    if(res != DI_OK) {
+        debug("dx9_avail: direct input not found, result code 0x%08X", res);
     }
 
     return (res == DI_OK);
@@ -140,17 +145,26 @@ oi_device *dx9_device() {
                                  NULL);
 
         if((res != DI_OK) || (object == NULL)) {
+            debug("dx9_device: object creation failed, code 0x%08X", res);
             return NULL;
         }
-        IDirectInput_EnumDevices(object,
-                                 DI8DEVCLASS_ALL,
-                                 dx9_devenum,
-                                 NULL,
-                                 DIEDFL_ALLDEVICES);
+        res = object->lpVtbl->EnumDevices(object,
+                                          DI8DEVCLASS_ALL,
+                                          dx9_devenum,
+                                          NULL,
+                                          DIEDFL_ALLDEVICES);
+
+        if(res != DI_OK) {
+            debug("dx9_device: device enumeration failed, code 0x%08X", res);
+        }
+        else {
+            debug("dx9_device: enumeration succeeded");
+        }        
     }
 
     // Don't continue if there's no device
     if(guid_list == NULL) {
+        debug("dx9_device: device list is empty, aborting");
         return NULL;
     }
 
@@ -193,7 +207,7 @@ oi_device *dx9_device() {
 
     // Override default device settings
     dev->provides = guid_list->provides;
-    dev->name = guid_list->name;
+    dev->name = (char *)guid_list->name;
 
     // Set interface functions
     dev->init = dx9_init;
@@ -281,10 +295,10 @@ int dx9_init(oi_device *dev, char *window_id, unsigned int flags) {
     }
 
     // Create the DI device object
-    res = IDirectInput_CreateDevice(object,
-                                    &guid,
-                                    &(priv->obj),
-                                    NULL);
+    res = object->lpVtbl->CreateDevice(object,
+                                       &guid,
+                                       (LPDIRECTINPUTDEVICE8A*)&(priv->obj),
+                                       NULL);
 
     if((res != DI_OK) || (priv->obj == NULL)) {
         return OI_ERR_NO_DEVICE;
@@ -304,13 +318,13 @@ int dx9_init(oi_device *dev, char *window_id, unsigned int flags) {
 
     // Set data format depending on device type
     if(dev->provides & OI_PRO_KEYBOARD) {
-        IDirectInputDevice_SetDataFormat(priv->obj, &c_dfDIKeyboard);
+        priv->obj->lpVtbl->SetDataFormat(priv->obj, &c_dfDIKeyboard);
     }
     else if(dev->provides & OI_PRO_MOUSE) {
-        IDirectInputDevice_SetDataFormat(priv->obj, &c_dfDIMouse2);
+        priv->obj->lpVtbl->SetDataFormat(priv->obj, &c_dfDIMouse2);
     }
     else if(dev->provides & OI_PRO_JOYSTICK) {
-        IDirectInputDevice_SetDataFormat(priv->obj, &c_dfDIJoystick2);
+        priv->obj->lpVtbl->SetDataFormat(priv->obj, &c_dfDIJoystick2);
     }
 
     // Set buffered input mode
@@ -319,11 +333,11 @@ int dx9_init(oi_device *dev, char *window_id, unsigned int flags) {
     prop.diph.dwObj = 0;
     prop.diph.dwHow = DIPH_DEVICE;
     prop.dwData = DDX9_BUFFER_SIZE;
-    res = IDirectInputDevice_SetProperty(priv->obj,
+    res = priv->obj->lpVtbl->SetProperty(priv->obj,
                                          DIPROP_BUFFERSIZE,
                                          &(prop.diph));
     if(res != DI_OK) {
-        IDirectInputDevice_Release(priv->obj);
+        priv->obj->lpVtbl->Release(priv->obj);
         instances--;
         return OI_ERR_DEV_BEHAVE;
     }
@@ -334,21 +348,22 @@ int dx9_init(oi_device *dev, char *window_id, unsigned int flags) {
 
         // Get number of buttons
         devcaps.dwSize = sizeof(DIDEVCAPS);
-        IDirectInputDevice_GetCapabilities(priv->obj,
+        priv->obj->lpVtbl->GetCapabilities(priv->obj,
                                            &devcaps);
-        dev->joyconfig->buttons = devcaps.dwButtons;
+        dev->joyconfig->buttons = (unsigned char)devcaps.dwButtons;
 
         // Enumerate axes
-        IDirectInputDevice_EnumObjects(priv->obj,
+        priv->obj->lpVtbl->EnumObjects(priv->obj,
                                        dx9_joyenum,
                                        dev,
                                        DIDFT_AXIS);
     }
 
     // Behave nicely and acquire the device
-    IDirectInputObject_SetCooperationLevel(priv->obj,
+    priv->obj->lpVtbl->SetCooperativeLevel(priv->obj,
+                                           priv->hwnd,
                                            DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-    IDirectInputObject_Acquire(priv->obj);
+    priv->obj->lpVtbl->Acquire(priv->obj);
 
     debug("dx9_init: initialized");
 
@@ -381,8 +396,8 @@ int dx9_destroy(oi_device *dev) {
 
         // Private members
         if(priv) {
-            IDirectInputDevice_Unacquire(priv->obj);
-            IDirectInputDevice_Release(priv->obj);
+            priv->obj->lpVtbl->Unacquire(priv->obj);
+            priv->obj->lpVtbl->Release(priv->obj);
             free(priv);
         }
 
@@ -405,7 +420,7 @@ int dx9_destroy(oi_device *dev) {
 #endif
 
             // Free the DI root object and reset driver
-            IDirectInput_Release(object);
+            object->lpVtbl->Release(object);
             object = NULL;
             guid_list = NULL;
         }
@@ -445,21 +460,21 @@ void dx9_process(oi_device *dev) {
         unsigned int entries;
 
         // Poll the device
-        res = IDirectInputDevice_Poll(priv->obj);
+        res = priv->obj->lpVtbl->Poll(priv->obj);
 
         // Collect buffered input
         if(res == DI_OK) {
             entries = DDX9_BUFFER_SIZE;
-            res = IDirectInputDevice_GetDeviceData(priv->obj,
+            res = priv->obj->lpVtbl->GetDeviceData(priv->obj,
                                                    sizeof(DIDEVICEOBJECTDATA),
                                                    data, &entries, 0);
         }
 
         if(res != DI_OK) {
             // Device was lost, try to reacquire and exit
-            res = IDirectInputDevice_Acquire(priv->obj);
+            res = priv->obj->lpVtbl->Acquire(priv->obj);
             while(res == DIERR_INPUTLOST) {
-                res = IDirectInputDevice_Acquire(priv->obj);
+                res = priv->obj->lpVtbl->Acquire(priv->obj);
             }
             return;
         }
@@ -509,13 +524,13 @@ int dx9_grab(oi_device *dev, int on) {
 
     if(on) {
         priv->exclusive = TRUE;
-        IDirectInputDevice_SetCooperationLevel(priv->obj,
+        priv->obj->lpVtbl->SetCooperativeLevel(priv->obj,
                                                priv->hwnd,
                                                DISCL_FOREGROUND | DISCL_EXCLUSIVE);
     }
     else {
         priv->exclusive = FALSE;
-        IDirectInputDevice_SetCooperationLevel(priv->obj,
+        priv->obj->lpVtbl->SetCooperativeLevel(priv->obj,
                                                priv->hwnd,
                                                DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
     }
@@ -635,7 +650,7 @@ int dx9_reset(oi_device *dev) {
  * Direct Input have found an object. We simply store the
  * unique identifier in the linked list and continue.
  */
-BOOL dx9_devnum(LPCDIDEVICEINSTANCE dev_inst, LPVOID pref) {
+BOOL dx9_devnum(LPCDIDEVICEINSTANCEA dev_inst, LPVOID pref) {
     dx9_uid *uid;
 
     debug("dx9_devenum: device '%s' found", dev_inst->tszInstanceName);
@@ -711,7 +726,7 @@ BOOL dx9_objenum(LPCDIDEVICEOBJECTINSTANCE obj_inst, LPVOID pref) {
     range.lMin              = OI_JOY_AXIS_MIN;
     range.lMax              = OI_JOY_AXIS_MAX;
 
-    IDirectInputDevice_SetProperty(priv->obj,
+    priv->obj->lpVtbl->SetProperty(priv->obj,
                                    DIPROP_RANGE,
                                    &range.diph);
 

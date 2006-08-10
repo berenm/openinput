@@ -30,7 +30,7 @@
 #include <unistd.h>
 #endif
 
-#ifdef ENABLE_WIN32
+#if defined(ENABLE_WIN32) || defined(ENABLE_DX9)
 #include <windows.h>
 #endif
 

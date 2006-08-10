@@ -21,6 +21,10 @@
 
 /* ******************************************************************** */
 
+// Required version of Direct Input
+#define DIRECTINPUT_VERSION 0x0800
+#define CINTERFACE
+
 // Includes
 #include "config.h"
 #include "openinput.h"
@@ -63,7 +67,7 @@ void dx9_keyboard_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned in
 
     for(i=0; i<entries; i++) {
         code = data[i].dwOfs;
-        state = data[i].dwData & 0x80;
+        state = (char)data[i].dwData & 0x80;
 
         keysym.sym = dx9_translate_key(code);
         keysym.mod = OIM_NONE;
@@ -104,17 +108,17 @@ void dx9_mouse_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int e
         switch(data[i].dwOfs) {
             case DIMOFS_BUTTON0:
                 // Left button
-                mouse_button(dev->index, OIP_BUTTON_LEFT, (data[i].dwData & 0x80), TRUE);
+                mouse_button(dev->index, OIP_BUTTON_LEFT, ((char)data[i].dwData & 0x80), TRUE);
                 break;
 
             case DIMOFS_BUTTON1:
                 // Middle button
-                mouse_button(dev->index, OIP_BUTTON_MIDDLE, (data[i].dwData & 0x80), TRUE);
+                mouse_button(dev->index, OIP_BUTTON_MIDDLE, ((char)data[i].dwData & 0x80), TRUE);
                 break;
 
             case DIMOFS_BUTTON2:
                 // Right button
-                mouse_button(dev->index, OIP_BUTTON_RIGHT, (data[i].dwData & 0x80), TRUE);
+                mouse_button(dev->index, OIP_BUTTON_RIGHT, ((char)data[i].dwData & 0x80), TRUE);
                 break;
 
             case DIMOFS_X:
@@ -181,9 +185,9 @@ void dx9_mouse_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int e
  * Axis and buttons are two different things, so do
  * a simple check and use the correct state injector.
  */
-void dx9_joystick_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int entries) {
+void dx9_joy_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int entries) {
     dx9_private *priv;
-    int i;
+    unsigned int i;
 
     priv = (dx9_private*)dev->private;
 
@@ -193,15 +197,15 @@ void dx9_joystick_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned in
         if(dev->joyconfig->kind[data[i].dwOfs] == OIJ_GEN_BUTTON) {
             // Button event
             joystick_button(dev->index,
-                            data[i].dwOfs,
-                            (data[i].dwData & 0x80),
+                            (char)data[i].dwOfs,
+                            ((char)data[i].dwData & 0x80),
                             TRUE);
         }
         else {
             // Joystick event - axes are absolute
             joystick_axis(dev->index,
-                          data[i].dwOfs,
-                          data[i].dwData,
+                          (unsigned char)data[i].dwOfs,
+                          (char)data[i].dwData,
                           FALSE,
                           TRUE);
         }
@@ -227,7 +231,7 @@ void dx9_joystick_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned in
  * The events we handle are eaten. Neither the default nor the
  * old application handler is called if we catch an event.
  */
-LONG CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
     // Handle
     switch(msg) {
 
@@ -263,7 +267,7 @@ LONG CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
         case WM_MOVE:
             {
                 debug("win32_wndproc: size/move");
-                dx9_movesize();
+                //dx9_movesize();
             }
             return 0;
 

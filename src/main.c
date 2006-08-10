@@ -30,7 +30,7 @@
 #include <sys/time.h>
 #endif
 
-#ifdef ENABLE_WIN32
+#if defined(ENABLE_WIN32) || defined(ENABLE_DX9)
 #include <windows.h>
 #endif
 
@@ -176,8 +176,10 @@ unsigned int oi_getticks() {
     struct timeval now;
     gettimeofday(&now, NULL);
     ticks = now.tv_sec*1000 + now.tv_usec/1000;
-#elif ENABLE_WIN32
+#else
+#if defined(ENABLE_WIN32) || defined(ENABLE_DX9)
     ticks = GetTickCount();
+#endif
 #endif
 
     return ticks;

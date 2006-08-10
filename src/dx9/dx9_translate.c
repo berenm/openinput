@@ -21,6 +21,10 @@
 
 /* ******************************************************************** */
 
+// Required version of Direct Input
+#define DIRECTINPUT_VERSION 0x0800
+#define CINTERFACE
+
 // Includes
 #include "config.h"
 #include "openinput.h"
