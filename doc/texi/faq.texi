@@ -1,0 +1,13 @@
+@node FAQ
+@chapter FAQ
+
+This chapter contains some of the most frequently asked questions
+(with answers) for OpenInput. If you have a question that's not
+answered here, please do not hesitate to mail us on the
+user mailinglist, see
+@url{http://home.gna.org/openinput/support.shtml}
+for subscription help.
+
+@emph{Since the OpenInput project is quite new, we havn't really
+received any questions yet. Please ask us something on the user
+mailing list!}

@@ -1,0 +1,121 @@
+@node Bootstrapping
+@chapter Bootstrapping
+
+This chapter describes how the library and device bootstrap procedure
+works in OpenInput.
+
+The bootstrap basically consists of 5 stages, namely
+
+@menu
+* Initialise queue and device::     Initialise the queue and device manager systems
+* Device discovery::                Bootstrap and create the devices
+* Device initialisation::           Initialise the devices
+* Initialise state managers::       Initialise the state managers
+* Begin processing::                Enter running state
+@end menu
+
+The graphical illustration of the bootstrap procedure looks like this:
+
+@html
+<div align="center">
+<img src="bootstrap.png" alt="Bootstrap sequence" />
+<p><i>Bootstrap sequence</i></p>
+</div>
+@end html
+
+@c ----------------------------------------------------------------------
+@node Initialise queue and device
+@section Initialise queue and device
+
+To initialise OpenInput, you need to call @code{oi_init()}. This
+function will start the bootstrap procedure.
+
+The first step, or stage as it is usually called in bootstraps,
+is to initialise the queue manager. The queue manager is special
+compared to the other state managers as it is this subsystem that
+makes it possible for device drivers to queue events until they
+can be process by the application.
+
+Directly after the queue initialisation, the device manager is
+initialised. The device manager is responsible for taking care
+of the list of devices to be started, and also takes care of
+the next two stages of the bootstrap sequence.
+
+@c ----------------------------------------------------------------------
+@node Device discovery
+@section Device discovery
+
+The next stage is to perform the device discovery which is also called
+the device bootstrap. This stage is performed by the device manager
+in the @code{device_bootstrap()} function.
+
+The @code{device_bootstrap()} iterates over each device defined in the
+bootstrap table, which is a statically defined table of all
+compiled-in drivers. Each device has it's own bootstrap structure that
+defines the most basic information about that driver, for example the
+name, what kind of inputs the driver can provide, and finally two
+functions: the @code{bootstrap->avail()} function and the
+@code{bootstrap->create()} function.
+
+The first function to be run is the @code{bootstrap->avail()}. This
+function returns @code{TRUE} if the device is available on the system
+and @code{FALSE} otherwise. This function must return immediately.
+
+If and only if the device was available, the
+@code{bootstrap->create()} function is called. This function must
+create and return a pointer to the driver structure that OpenInput
+uses when accessing the device. Note that the
+@code{bootstrap->create()} is not supposed to initialise a device
+driver, but merely create the entry point for it. The actual driver
+initialisation is done in the next step.
+
+If a device driver supports multiple devices it may be necessary to
+perform the avail-create step multiple times for a single bootstrap
+entry--this can be done via the @code{device_moreavail()} function.
+The default is to run the avail-create pair only once per bootstrap
+entry.
+
+When a bootstrap entry has been completed, @code{device_bootstrap()}
+moves on to the next entry and does it all over again.
+
+@c ----------------------------------------------------------------------
+@node Device initialisation
+@section Device initialisation
+
+The next step is also performed by the device manager, but is a bit
+more simple. 
+
+If the driver is available and successfully have created the OpenInput
+device structure, the device manager now fills in a couple of the
+device structure fields and add the driver structure to the list
+of available devices. It then calls the @code{device->init()} function
+to let the driver initialise it's backend.
+
+Finally, a discovery event is created and put on the queue so the
+application will receive information about what devices that are
+present on the system (this can also be done later by using the device
+manager directly).
+
+These steps are run once for all device structures. If a driver
+returned multiple entries in the @code{device_bootstrap()}, the
+initialisation will run multiple times. OpenInput automatically takes
+care of the multiple instances (if the driver has been corretly
+written without the use of static variables of course).
+
+@c ----------------------------------------------------------------------
+@node Initialise state managers
+@section Initialise state managers
+
+The last stage of the actual bootstrap process is to initialise the
+highlevel state managers. Each state manager (usually) contain private
+data structures. Such structures are created in this phase, and sane
+defaults for the state based API functions are also set.
+
+@c ----------------------------------------------------------------------
+@node Begin processing
+@section Begin processing
+
+The final step is to set the @code{oi_running} variable to
+@code{TRUE}. Doing so will allow the state managers to inject events
+into the queue system when they are pumped (processed).
+

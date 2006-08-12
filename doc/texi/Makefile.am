@@ -7,7 +7,12 @@ dist_noinst_DATA = \
 	sample.texi \
 	design.texi \
 	fdl.texi \
-	general_flowchart.dia
+	lgpl.texi \
+	install.texi \
+	faq.texi \
+	bootstrap.texi \
+	general_flowchart.dia \
+	bootstrap.dia
 
 MANUALDIR=../manual
 

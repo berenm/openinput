@@ -2,13 +2,14 @@
 @node Copying this manual
 @appendix Copying this manual
 This appendix contain the full text of the GNU Free Documentation
-License. Please note that this manual does NOT use invariant sections
-nor front- or back cover texts, making it compatible with the
+License (FDL). Please note that this manual does NOT use invariant
+sections nor front- or back cover texts, making it compatible with the
 Debian Free Software Guidelines.
 @menu
 * GNU Free Documentation License::  License for copying this manual.
 @end menu
 @c End text by Jakob Kjaer
+
 
 @node GNU Free Documentation License
 @appendixsec GNU Free Documentation License

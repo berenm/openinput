@@ -11,10 +11,14 @@ rm -f mkinstalldirs acconfig.h stamp-h1
 export WANT_AUTOMAKE='1.6'
 export WANT_AUTOCONF_2_5=1
 
-echo Bootstrapping...
+echo Running libtoolize... && \
 libtoolize && \
+echo Running aclocal... && \
 aclocal -I scripts $ACLOCAL_FLAGS && \
+echo Running autoheader... && \
 autoheader && \
+echo Running autoconf... && \
 autoconf && \
+echo Running automake... && \
 automake --add-missing --gnu
 echo Done

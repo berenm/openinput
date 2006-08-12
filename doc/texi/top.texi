@@ -15,7 +15,16 @@ the manual online and the online API reference.
 This manual contain the following major sections:
 @menu
 * Introduction::                Introduction to OpenInput
+* Installation::                Installation of OpenInput on various platforms
 * The head-on sample::          The hello OpenInput program
 * Overall design::              Overview of the OpenInput design
+* Bootstrapping::               How OpenInput initialises the subsystems
+* FAQ::                         Frequently asked questions and answers
+@end menu
+
+and the following appendices
+
+@menu
 * Copying this manual::         The license for copying this manual
+* Copying the library::         The license for use of and copying the library
 @end menu

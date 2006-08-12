@@ -9,6 +9,7 @@ program.
 * Dissection of Hello OpenInput::       A forensic analysis of the program
 @end menu
 
+@c ----------------------------------------------------------------------
 @node Hello OpenInput
 @section Hello OpenInput
 
@@ -42,6 +43,7 @@ a signal (using @code{kill}) to the process before you actually
 receive an event. Why this is so in the above will be explained below,
 where we'll dissect the program bit by bit.
 
+@c ----------------------------------------------------------------------
 @node Dissection of Hello OpenInput
 @section Dissection of Hello OpenInput
 

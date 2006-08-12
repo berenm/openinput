@@ -13,6 +13,7 @@ OpenInput is built upon.
 * Brief intro to device drivers::       Introduction to device driver API
 @end menu
 
+@c ----------------------------------------------------------------------
 @node The layered design
 @section The layered design
 
@@ -41,6 +42,7 @@ With these four blocks, the actual processing units in each layer are
 almost a dead giveaway -- the same goes for the processing order of
 events which is described in the next section.
 
+@c ----------------------------------------------------------------------
 @node The general flowchart
 @section The general flowchart
 
@@ -83,6 +85,7 @@ The flow can be depicted as follows:
 The following four section will briefly elaborate on the specific
 layers.
 
+@c ----------------------------------------------------------------------
 @node Brief intro to the public API
 @section Brief intro to the public API
 
@@ -97,6 +100,7 @@ API. This API allows one to manually look up the state of each button,
 axis, hat etc. in fixed-sized arrays. The state based API event works
 for action mapped events!
 
+@c ----------------------------------------------------------------------
 @node Brief intro to the queue API
 @section Brief into to the queue API
 
@@ -122,6 +126,7 @@ put on the queue.
 
 @end enumerate
 
+@c ----------------------------------------------------------------------
 @node Brief intro to state managers
 @section Brief intro to the state managers
 
@@ -143,6 +148,7 @@ And finally, this layer also contain the driver controller that takes
 care of initialising, pumping and otherwise control the device
 drivers.
 
+@c ----------------------------------------------------------------------
 @node Brief intro to device drivers
 @section Brief intro to device drivers
 

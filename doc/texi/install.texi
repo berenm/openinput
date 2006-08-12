@@ -1,0 +1,279 @@
+@node Installation
+@chapter Installation
+
+This chapter describes how to install OpenInput for both Windows and
+Linux.
+
+@menu
+* Downloading a release::               How to download an official release
+* Downloading via Subversion::          How to get the latest source via Subversion
+* Linux Installation::                  Linux specific installation
+* Windows with MinGW installation::     Installation under Windows with MinGW
+* Windows with MS Visual C++::          Installation under MSVC++
+* Windows with CodeBlocks::             Installation under CodeBlocks
+* Building from scratch::               What to do with a Subversion checkout
+* Building the documentation::          How to generate the API reference and manual
+@end menu
+
+@c ----------------------------------------------------------------------
+@node Downloading a release
+@section Downloading a release
+
+You can download the latest official OpenInput release from the
+download section on the homepage. The direct link is
+@url{http://home.gna.org/openinput/download.shtml}.
+
+The latest version is clearly marked as such. If you for some odd
+reason would like to download older releases, that is possible aswell.
+
+@c ----------------------------------------------------------------------
+@node Downloading via Subversion
+@section Downloading via Subversion
+
+If you want to live on the edge and follow the day-to-day development
+of OpenInput, you will need to use Subversion.
+
+Subversion is a free (libre) but very powerfull source code and
+version control system. You can read more about it, and even find
+a complete manual, on the official Subversion homepage at
+@url{http://subversion.tigris.org}. The homepage also contain
+information about how to obtain Subversion for a myriad of different
+operating systems (GNU/Linux and Windows included).
+
+Once you have Subversion (``svn'') installed you can checkout the
+latest version (usually called the ``trunk'') of the OpenInput code
+at the following address: @url{svn://svn.gna.org/svn/openinput/trunk}.
+
+If you're using the commandline client, svn, you would do like this:
+@example
+svn co svn://svn.gna.org/svn/openinput/trunk openinput
+@end example
+
+This command will create a directory named @code{openinput}, in which
+the latest and greatest version of the source code, manual, etc. will
+be downloaded to.
+
+When you want to update the source code to the latest version, all you
+need to do is enter the @code{openinput} directory and run the update
+command like this:
+
+@example
+svn update
+@end example
+
+Subversion will then download and patch the source to synchronise your
+checkout of the code with the latest version at the Subversion server.
+
+Note that a Subversion checkout of the code does NOT contain the files
+needed to compile the code (on GNU/*NIX systems at least). You will
+first need to generate these files but fear not as the process is very
+much automated! See @xref{Building from scratch} for how to perform
+this task.
+
+@c ----------------------------------------------------------------------
+@node Linux Installation
+@section Linux Installation
+
+This section assumes that you've downloaded an official release.  To
+compile OpenInput on Linux (or other UNIX-like), you will need the
+following programs installed:
+
+@itemize
+@item tar
+@item gunzip
+@item gcc
+@end itemize
+
+Chances are that you already have these programs installed. Especially
+``tar'' and ``gunzip'' should already be there, as they are usually
+considered part of the base-installation. ``gcc'' is usually also
+installed, otherise, consult your distribution package tool and
+install it (on Debian, do a @code{apt-get install gcc}).
+
+The actual installation of OpenInput starts when you have downloaded
+the OpenInput source tar.gz file (also known as a tarball). With the
+tarball at hand, unpack it using
+
+@example
+tar xvzf openinput-<VERSION>.tar.gz
+@end example
+
+where you replace @code{<VERSION>} with the appropiate version number
+of the file.
+
+When you unpack the installation, tar will automatically create a
+directory named @code{openinput-<VERSION>}. Enter that directory and
+run
+
+@example
+./configure
+make
+make install
+@end example
+
+And that should do the trick. If you want to configure what parts of
+OpenInput that gets compiled in or externally used programs, the
+@code{configure} script is able to take a lot of different parameters
+which can be seen using @code{./configure --help}.
+
+If you want to generate the API reference and/or manual, please see
+@ref{Building the documentation}.
+
+@c ----------------------------------------------------------------------
+@node Windows with MinGW installation
+@section Windows with MinGW installation
+
+This section assumes that you've downloaded an official release.
+
+I case you were wondering, MinGW is the ``Minimalist GNU for
+Windows'', and provides you with a basic set of programs and tools to
+run GNU programs on Windows, which together makes up a great
+development environment.
+
+You can download MinGW at @url{http://www.mingw.org/}. When
+downloading you will need both ``MinGW'' and ``MSYS'' package. Install
+MSYS before MinGW. Both packages come with standard Windows
+installers.
+
+After installation, start up the ``MSYS'' shell (bash), and follow the
+installation instructures as you were running a
+@ref{Linux Installation}!
+
+@c ----------------------------------------------------------------------
+@node Windows with MS Visual C++
+@section Windows with MS Visual C++
+
+The section requires the following programs for Windows:
+@itemize
+@item Microsoft Visual C++ Express 2005
+@item Microsoft Windows Platform SDK
+@item Microsoft DirectX SDK
+@end itemize
+
+Don't forget to check that MSVC++ knows about the library- and include
+paths for both the Platform SDK and DirectX.
+
+When everything is set up, open the MSVC++ ``Solution'' file,
+which is located in
+\@code{openinput-<VERSION>\nongnu\msvcpp2005\openinput\openinput.sln}.
+
+The solution file contain two projects, ``openinput'' which is the
+library itself, and ``win32test'', which is the most basic show-off of
+how to integrate OpenInput in a Win32 environment. Chose to compile
+the entire solution, and the ``OpenInput.dll'' and ``win32test.exe''
+will be created.
+
+Note that the OpenInput library is currently set to include both the
+native ``win32'' and ``dx9'' (DirectX 9) device drivers. The test
+application should be able to handle both.
+
+@c ----------------------------------------------------------------------
+@node Windows with CodeBlocks
+@section Windows with CodeBlocks
+
+The section requires the following programs for Windows:
+@itemize
+@item Code::Blocks
+@item Microsoft Windows Platform SDK
+@item Microsoft DirectX SDK
+@end itemize
+
+@emph{This section needs more work, and the Code::Blocks project file could
+most certainly need some updates.}
+
+A Code::Blocks project file is provided in
+@code{openinput-<VERSION>\nongnu\codeblocks\OpenInput.cbp}. The
+project contain code for both the library itself and a several of the
+test programs, of which ``win32test'' is probably to most interesting.
+
+@c ----------------------------------------------------------------------
+@node Building from scratch
+@section Building from scratch
+
+If you have downloaded the source code via Subversion and intend to
+build the project under a UNIX system such as GNU/Linux or MinGW, you
+will find that there are no @code{Makefile}s or @code{configure}
+script available. These will first have to be generated, and that
+process requires a number of GNU tools (packages), namely
+
+@itemize
+@item libtool
+@item autoconf (version 2.5 or higher)
+@item automake (version 1.6 or higher)
+@item m4
+@end itemize
+
+When these packages have been installed (use your distribution package
+tool for this, for example ``apt-get''), you will need to bootstrap
+the GNU Build System like this:
+@example
+./bootstrap
+@end example
+
+The @code{bootstrap} script will first cleanup any remainments of old
+bootstrap files, and then run the following commands
+@enumerate
+@item libtoolize
+@item aclocal
+@item autoheader
+@item autoconf
+@item automake
+@end enumerate
+in that particular order. The script will print it's status between
+each step, and abort if anything should go wrong.
+
+When the script has completed, your @code{openinput} directory will
+contain a lot of files, of which one of them is the @code{configure}
+script. Using this script, you can now follow the standard
+installation from source procedure described in
+@ref{Linux Installation}.
+
+@c ----------------------------------------------------------------------
+@node Building the documentation
+@section Building the documentation
+
+As you may have found out, OpenInput is heavily documented: The code
+itself is documented using Doxygen, and besides the API reference you
+have this manual, which is written in Texinfo -- see
+@url{} and @url{http://www.gnu.org/software/texinfo/} for more
+information.
+
+Before you can read the API or documentation in HTML (or another
+format, at your option), it will have to be compiled and generated
+first. This requires an extra set of programs, namely
+
+@itemize
+@item Doxygen (see @url{http://www.stack.nl/~dimitri/doxygen})
+@item Graphviz (see @url{http://www.graphviz.org/})
+@end itemize
+
+for the API reference, and
+
+@itemize
+@item Texi2HTML (see @url{http://www.nongnu.org/texi2html/})
+@item Perl (see @url{http://www.perl.org/})
+@item Dia (see @url{http://www.gnome.org/projects/dia/})
+@end itemize
+
+for the manual.
+
+If you use Debian GNU/Linux, installation is easy as deb-packages
+exist for everything.
+
+When the tools have been installed, run the @code{configure} script
+and make sure it successfully detects the programs
+@itemize
+@item texi2html
+@item dia
+@item perl
+@item dot (part of Graphviz)
+@item doxygen
+@end itemize
+
+You can then run @code{make info} to generate the documentation, or
+simply run the default @code{make} target, which will generate
+everything possible, both code and documentation.
+
+The generated documentation will be placed in
+@code{openinput-<VERSION>/doc/api} for the API reference and
+@code{openinput-<VERSION>/manual} for the manual.
