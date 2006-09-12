@@ -10,3 +10,14 @@ gathond@gathond.dk
 Debian package hacker
 
 
+Patch submitters
+------------------------------------------------------------------------
+Jon Manning (joystick axis fix and test/platform joystick support)
+freezama (MSVC project files)
+
+
+Bug reporters
+------------------------------------------------------------------------
+Richard Smith (OSX support in x11 code)
+alphageek (Win32 keytable range check bug)
+discipline (Win32 A-Z and 0-9 had wrong OIK index)

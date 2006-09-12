@@ -7,6 +7,7 @@ program.
 @menu
 * Hello OpenInput::                     The hello OpenInput world program
 * Dissection of Hello OpenInput::       A forensic analysis of the program
+* Makefile include and library paths::  Makefile help for applications that use OpenInput
 @end menu
 
 @c ----------------------------------------------------------------------
@@ -106,3 +107,52 @@ OpenInput has received.
 
 That's more or less all there is about the very first ``Hello
 OpenInput'' program.
+
+@c ----------------------------------------------------------------------
+@node Makefile include and library paths
+@section Makefile include and library paths
+
+This section is strictly speaking not a part of the samples itself,
+but seeks to help you write a Makefile that does not use any hardcoded
+paths for the usage of OpenInput.
+
+OpenInput uses the @code{pkg-config} tool under UNIX systems, that
+return metainformation about installed libraries. After you have run
+@code{make install}, a file named @code{openinput.pc} will be copied
+to the pkg-config data directory (usually under
+@code{/usr/lib/pkgconfig} or @code{/usr/local/lib/pkgconfig}. You can
+then use something like the following when settings up an include
+path:
+
+@example
+CFLAGS = -Imydir/ `pkg-config --cflags openinput`
+@end example
+
+which will run the command @code{pkg-config --cflags openinput} and
+append, which should be something like @code{-I/usr/include/openinput}
+to the variable named @code{CFLAGS}.
+
+Similarly, you probably want to setup both the library search path and
+a list of the libraries to link too. This would look like this:
+
+@example
+LDPATH = `pkg-config --libs-only-L openinput`
+LIBS = `pkg-config --libs-only-l openinput`
+@end example
+
+These will output something like @code{-L/usr/lib} and
+@code{-lopeninput}, respectively.
+
+Finally, in your Makefile target you can use these variables to
+something like this
+
+@example
+all:
+        gcc -o myprog $CFLAGS $LDPATH $LIBS myniceprog.c
+@end example
+
+That will tell gcc to use the OpenInput include path
+@code{/usr/include/openinput}, to search for libraries at
+@code{/usr/lib} and finally to link @code{openinput}.  In this way you
+should end up with an executable named @code{myprog}, that has been
+setup to dynamically link the OpenInput libraries.

@@ -4,9 +4,9 @@ AC_PREREQ(2.59)
 dnl Library version
 define(LIBOI_MAJOR_VERSION, 0) # Bump on very huge changes, zero rest
 define(LIBOI_MINOR_VERSION, 2) # Bump on big changes, zero remaining
-define(LIBOI_PATCH_VERSION, 2) # Bump on changes
-define(LIBOI_INFACE_AGE, 1)    # Bump on changes, zero on breakage/add
-define(LIBOI_BINARY_AGE, 1)    # Bump on changes, zero on breakage
+define(LIBOI_PATCH_VERSION, 3) # Bump on changes
+define(LIBOI_INFACE_AGE, 2)    # Bump on changes, zero on breakage/add
+define(LIBOI_BINARY_AGE, 2)    # Bump on changes, zero on breakage
 define(LIBOI_VERSION, OI_MAJOR_VERSION.OI_MINOR_VERSION.OI_PATCH_VERSION)
 
 dnl Initialize autoconf

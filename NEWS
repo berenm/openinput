@@ -1,16 +1,12 @@
-Breaking news of OpenInput
-------------------------------------------------------------------------
-
-Prepend breaking news at the top of the news-list. All entries must
-follow this form:
-
-day.month.year nick -- Version x.y.z
-    * News item one
-      Continuation of first news item
-    * News item two
-    * Etc.
+News and release history of the Open Input library
 
 ------------------------------------------------------------------------
+
+12.09.2006 makob -- Version 0.2.3
+    * Almost a year since last version!
+    * Major documentation updates and additions
+    * Many bugfixes
+    * Partial DirectInput driver (disabled per default)
 
 22.09.2005 makob -- Version 0.2.2
     * Microsoft Visual C compiler support

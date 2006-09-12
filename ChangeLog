@@ -1,6 +1,6 @@
-SVN head
+Version 0.2.3 - 2006-09-12
 
-	* WIP: DirectX (DirectInput) input driver
+	* Wip: DirectX (DirectInput) input driver
 	* Add: MS Visual C++ 2005 Express solution and project files in
           the nongnu/msvcpp2005 directory have been added
 	* Fix: Use Sleep() in oi_event_wait() to avoid taking 100% CPU

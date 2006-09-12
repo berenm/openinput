@@ -16,5 +16,5 @@ pkgconfigdir = $(libdir)/pkgconfig
 dist_pkgconfig_DATA = openinput.pc
 
 dist-hook:
-	mkdir -p ${distdir}/nongnu
-	cp ${srcdir}/nongnu/* ${distdir}/nongnu/
+	cp -r ${srcdir}/nongnu ${distdir}
+	find ${distdir}/nongnu -name *svn -type d|xargs -l1 rm -rf
