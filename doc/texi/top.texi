@@ -1,22 +1,30 @@
 @node Top
 @top OpenInput manual
 
-This is the manual for OpenInput (version @value{VERSION}) -- a free
-(libre), cross-platform, portable, easy-to-use input handling library.
+This is the manual for OpenInput version @value{VERSION},
+and was generated at @value{UPDATED}.
+
+OpenInput is a free-as-in-speach, cross-platform, portable,
+easy-to-use input handler library.
 
 @insertcopying
 
 The official OpenInput homepage is located at
-@url{http://home.gna.org/openinput}. There you can download the newest
-version, subscribe to mailinglists and find all sorts of information
-about the OpenInput project. You'll also find the newest version of
-the manual online and the online API reference.
+@url{http://home.gna.org/openinput}. Please vist the homepage, where
+you can download the newest version, subscribe to mailinglists and
+find all sorts of information about the OpenInput project.
+
+In particular, the homepage always present the newest version of this
+manual at @url{http://download.gna.org/openinput/manual/} and the API
+reference at @url{http://download.gna.org/openinput/api/html/}.
 
 This manual contain the following major sections:
 @menu
 * Introduction::                Introduction to OpenInput
 * Installation::                Installation of OpenInput on various platforms
 * The head-on sample::          The hello OpenInput program
+* Parsing events::              How to actually accomplish something by parsing the events
+* Hooking into the system::     Describes what's need to make OpenInput generate events
 * Overall design::              Overview of the OpenInput design
 * Bootstrapping::               How OpenInput initialises the subsystems
 * FAQ::                         Frequently asked questions and answers

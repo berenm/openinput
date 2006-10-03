@@ -1,0 +1,86 @@
+@node Hooking into the system
+@chapter Hooking into the system
+
+This section describes perhaps the most complex part of OpenInput,
+namely how to hook OpenInput into your application window.
+
+@menu
+* Hooking concept::             What is window hooking about
+* Window id explained::         The semi-cryptical window_id paramter
+* Windows hooking::             Hooking into native Win32 windows
+* X11 hooking::                 Hooking into X11 windows
+* Non-hook systems::            Systems that doesn't need hooking
+@end menu
+
+@c ----------------------------------------------------------------------
+@node Hooking concept
+@section Hooking concept
+
+Until now we've dealt with the core of OpenInput, which is the event
+handling itself. However, once critical part is missing: The conduit
+from your operating system into OpenInput. This is known as hooking.
+
+Hooking requires you to (manually) obtain the unique identifier
+describing the window, connection, screen (or similar) of the system
+process which OpenInput is to process the events for. How to do this
+depends on the particular platform the program is running on, but is
+usually quite simple (examples below).
+
+With the identifies at hand, you pass this to OpenInput in the
+initialisation function, after which OpenInput is ready to deliver
+events to your application.
+
+@c ----------------------------------------------------------------------
+@node Window id explained
+@section Window id explained
+
+As OpenInput has been designed to work on several platforms, it's
+necessary with a very generic initialisation function to allow
+OpenInput to hook into all possible windowing systems. You pass the
+actual hook to the @code{oi_init()} function which is defined as
+
+@example
+int oi_init(char *window_id,
+            unsigned int flags);
+@end example
+
+The @code{flags} paramter is a simple bitmask of flags you can pass,
+and is not really related to the hooking.
+
+The @code{window_id} paramter is, on the other hand, the hook. The
+paramter is composed as a string to allow maximum flexibility, and
+must have the structure
+
+@example
+"c:CONNECTION s:SCREEN w:WINDOW"
+@end example
+
+where @code{CONNECTION} is the connection handle to the window server,
+@code{SCREEN} is the screen handle and @code{WINDOW} is the window
+handle.
+
+What parameters to use (and what makes sense) depends on the
+particular platform.
+
+All three paramters must be encoded as @code{unsigned int}'s without
+prefixes or suffixes and in radix-10. This is most easily done using
+something like @code{sprintf(windowid, "c:%u s:%u w:%u", con, scr, win)}.
+
+
+@c ----------------------------------------------------------------------
+@node Windows hooking
+@section Windows hooking
+
+Fixme: Please write this section!
+
+@c ----------------------------------------------------------------------
+@node X11 hooking
+@section X11 hooking
+
+Fixme: Please write this section!
+
+@c ----------------------------------------------------------------------
+@node Non-hook systems
+@section Non-hook systems
+
+Fixme: Please write this section!

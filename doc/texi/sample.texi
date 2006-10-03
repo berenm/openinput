@@ -34,6 +34,9 @@ int main(int argc, char *argv[])
 
     // Print something to the screen
     printf("Hello OpenInput event!\n");
+
+    // Cleanup after ourselves
+    oi_close();  
 @}
 @end example
 
@@ -97,7 +100,6 @@ event into our previously declared @code{ev} variable, and that
 OpenInput should not return until it has done so.
 
 @example
-
     // Print something to the screen
     printf("Hello OpenInput event!\n");
 @end example
@@ -105,8 +107,18 @@ OpenInput should not return until it has done so.
 This part simply prints a message to the console, so you can see that
 OpenInput has received.
 
+@example
+    // Cleanup after ourselves
+    oi_close();  
+@end example
+
+This last part makes sure the OpenInput frees all internally
+allocated memory and make sure that the device drivers release
+any operating system resources etc.
+
 That's more or less all there is about the very first ``Hello
-OpenInput'' program.
+OpenInput'' program. It's missing all the important stuff, like
+information on how to parse the message you have just received.
 
 @c ----------------------------------------------------------------------
 @node Makefile include and library paths

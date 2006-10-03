@@ -5,6 +5,8 @@ dist_noinst_DATA = \
 	top.texi \
 	intro.texi \
 	sample.texi \
+	parsing.texi \
+	hooking.texi \
 	design.texi \
 	fdl.texi \
 	lgpl.texi \

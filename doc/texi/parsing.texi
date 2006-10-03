@@ -1,0 +1,373 @@
+@node Parsing events
+@chapter Parsing events
+
+This chapter explains the basics in parsing events from OpenInput.
+
+@menu
+* Hello again::                         The hello OpenInput world program, revisited
+* The event classes::                   What are the different types of events
+* The event structure::                 The composite OpenInput event explained
+* A simple event handler::              An example of a simple event handler
+@end menu
+
+@c ----------------------------------------------------------------------
+@node Hello again
+@section Hello again
+
+Let's briefly revist the Hello OpenInput sample program:
+@example
+int main(int argc, char *argv[])
+@{
+    // Placeholder for the event
+    oi_event ev;
+
+    // Initialise
+    oi_init("c:0 s:0 w:0", OI_FLAG_NOWINDOW);
+
+    // Wait for an event
+    oi_events_wait(&ev);
+
+    // Print something to the screen
+    printf("Hello OpenInput event!\n");
+
+    // Cleanup after ourselves
+    oi_close();  
+@}
+@end example
+
+What's missing in the above example is some kind of handling of the
+structure that OpenInput has filled into your @code{ev} variable.
+Also, you'll most likely not just want to wait for a single event and
+then exit your program, but poll for events (in your game loop or
+whatever) and then handle the events (if any).  We'll give a short
+example of this typical use-case later in this chapter.
+
+But for now, let's assume that all you want to is wait for a single
+event, and then do something with it. That is, we want to examine the
+contents of the @code{ev} variable just after the
+@code{oi_events_wait(&ev)} function call.
+
+@c ----------------------------------------------------------------------
+@node The event classes
+@section The event classes
+
+OpenInput has several types (or classes) of events. To make a short
+story longer (or is it the other way around? :-), let's just list them
+here:
+
+@itemize
+@item OI_KEYUP
+@item OI_KEYDOWN
+@item OI_MOUSEMOVE
+@item OI_MOUSEBUTTONUP
+@item OI_MOUSEBUTTONDOWN
+@item OI_ACTIVE
+@item OI_RESIZE
+@item OI_EXPOSE
+@item OI_QUIT
+@item OI_DISCOVERY
+@item OI_ACTION
+@item OI_JOYAXIS
+@item OI_JOYBUTTONUP
+@item OI_JOYNUTTONDOWN
+@item OI_JOYBALL
+@end itemize
+
+These are the types of events you can receive. As you can see, events
+are tightly coupled to some kind of user-interaction. You will most
+certainly need to investigate the event type each time you receive an
+event from OpenInput. How to do this is explained below.
+
+@c ----------------------------------------------------------------------
+@node The event structure
+@section The event structure
+
+The event type, @code{oi_event}, is a C union typedef that combines
+all the specialised OpenInput event structures into a single
+structure. Using the union type avoids typecasting and allows some
+generic handling of events eventhough the structures are different.
+Yada yada... It all boils down to this: All event structures always
+start like this:
+
+@example
+typedef struct oi_foobar_event
+@{
+    unsigned char type;
+    ...
+    ...
+@} oi_foobar_event;
+@end example
+
+And since the @code{oi_event} union type also starts like that, ie.
+
+@example
+typedef union
+@{
+    unsigned char type;
+    oi_foobar_event foobar;
+    ...
+    ...
+@} oi_event;
+@end example
+
+All events always have the @code{type} field. This type-field will
+always be one of the event types explained in the previous
+section. Now, what does all this mean? Well, it means when you have an
+event variable, you check the @code{type} field and then determine
+what union member to access. It goes like this:
+
+@example
+oi_event(&ev);
+
+switch(ev.type)
+@{
+    case OI_KEYUP:
+        printf("key up symbol: %i \n",
+               ev.key.keysym.sym);
+        break;
+
+    case OI_MOUSEMOVE:
+        printf("mouse move position x: %i y: %i \n",
+               ev.move.x,
+               ev.move.y);
+        break;
+
+    default:
+        printf("some other event type received\n");
+        break;
+@}
+@end example
+
+Aha! So each event type has it's own member in the event variable, and
+all I have to do is check the type so I know what union member to
+access!
+
+For completeness sake, let's put everything into a table that
+shows what event types (ie. the @code{type} field) that matches
+what named structures.
+
+@html
+<div align="center">
+<table border="1" width="90%">
+
+<tr>
+<th>Types</th>
+<th>Structure</th>
+<th>Union name</th>
+<th>Comments</th>
+</tr>
+
+<tr>
+<td>OI_KEYUP<br />OI_KEYDOWN</td>
+<td>oi_keyboard_event</td>
+<td>key</td>
+<td>All keypresses.</td>
+</tr>
+
+<tr>
+<td>OI_MOUSEMOVE</td>
+<td>oi_mousemove_event</td>
+<td>move</td>
+<td>Mouse movement</td>
+</tr>
+
+<tr>
+<td>OI_MOUSEBUTTONUP<br />OI_MOUSEBUTTONDOWN</td>
+<td>oi_mousebutton_event</td>
+<td>button</td>
+<td>Mouse button clicks</td>
+</tr>
+
+<tr>
+<td>OI_ACTIVE</td>
+<td>oi_active_event</td>
+<td>active</td>
+<td>Window focus was lost or gained</td>
+</tr>
+
+<tr>
+<td>OI_RESIZE</td>
+<td>oi_resize_event</td>
+<td>resize</td>
+<td>Window has been resized</td>
+</tr>
+
+<tr>
+<td>OI_EXPOSE</td>
+<td>oi_expose_event</td>
+<td>expose</td>
+<td>Window has is visible and should be redrawn</td>
+</tr>
+
+<tr>
+<td>OI_QUIT</td>
+<td>oi_quit_event</td>
+<td>quit</td>
+<td>Program shutdown has been requested</td>
+</tr>
+
+<tr>
+<td>OI_DISCOVERY</td>
+<td>oi_discovery_event</td>
+<td>discover</td>
+<td>New device has been registered and is ready for use</td>
+
+</tr>
+<tr>
+<td>OI_ACTION</td>
+<td>oi_action_event</td>
+<td>action</td>
+<td>Action mapped event</td>
+</tr>
+
+<tr>
+<td>OI_JOYAXIS</td>
+<td>oi_joyaxis_event</td>
+<td>joyaxis</td>
+<td>Joystick axis (stick/throttle/etc) position has changed</td>
+</tr>
+
+<tr>
+<td>OI_JOYBUTTONUP<br />OI_JOYBUTTONDOWN</td>
+<td>oi_joybutton_event</td>
+<td>joybutton</td>
+<td>Joystick button was clicke.</td>
+</tr>
+
+<tr>
+<td>OI_JOYBALL</td>
+<td>oi_joyball_event</td>
+<td>joyball</td>
+<td>Point-of-view/hat/trackball on joystick has moved</td>
+</tr>
+
+</table>
+</div>
+@end html
+
+For example, this means that if the @code{type} is @code{OI_ACTION},
+you should use the @code{ev.action} union type, which again is defined
+like this:
+
+@example
+typedef struct oi_action_event
+@{
+    unsigned char type;
+    unsigned char device;
+    unsigned int actionid;
+    char state;
+    int data1;
+    int data2;
+    int data3;
+@} oi_action_event;
+@end example
+
+So, to get the device id of the event whose @code{type == OI_ACTION},
+use @code{ev.action.device}.
+
+To find out what the particular structures contain of members, you
+should refer to the API reference, which can be found online at
+@url{http://download.gna.org/openinput/api/html/} -- look up the
+``Event structures'' in the Public API. You can of course also find
+these definitions in the source code -- refer to the file named
+@code{include/openinput_events.h}.
+
+@c ----------------------------------------------------------------------
+@node A simple event handler
+@section A simple event handler
+
+Here's the code for a very, very simple event handler using OpenInput
+that shows how to use some the basic types like mouse, keyboard and
+window events. Note that you'll need initialise OpenInput before you
+can use the code. How to do that will be explained in the next
+chapter. Anyway -- just look at the code below. Pretty simple, right?
+:-)
+
+@example
+void simple_input_handler()
+@{
+    int run;
+    oi_event ev;
+
+    // Run until user wants us to exit
+    printf("start\n");
+    run = 1;
+    while(run)
+    @{
+
+        // Wait for the event
+        oi_events_wait(&ev);
+        printf("got an event!\n");
+
+        // Switch on the type so we know what we're dealing with
+        switch(ev.type)
+        @{
+            case OI_QUIT:
+                // Quit
+                run = 0;
+                printf("quit event, exitting\n");
+                break;
+
+            case OI_MOUSEBUTTONUP:
+            case OI_MOUSEBUTTONDOWN:
+                // Mouse button
+                printf("mouse button state %i at position %i,%i\n",
+                       ev.button.state,
+                       ev.button.x,
+                       ev.button.y);
+                break;
+
+            case OI_MOUSEMOVE:
+                // Mouse movement
+                printf("mouse move - abs: %i,%i - rel: %i,%i\n",
+                       ev.move.x,
+                       ev.move.y,
+                       ev.move.relx,
+                       ev.move.rely);
+                break;
+
+            case OI_KEYDOWN:
+                // Keyboard button down
+                printf("key pressed - sym %i - name '%s'\n",
+                       ev.key.keysym.sym,
+                       oi_key_getname(ev.key.keysym.sym));
+                break;
+
+            case OI_KEYUP:
+                // Keyboard button released
+                printf("key release - sym %i - name '%s'\n",
+                       ev.key.keysym.sym,
+                       oi_key_getname(ev.key.keysym.sym));
+                break;
+
+            case OI_ACTIVE:
+                // Window activated
+                printf("active event\n");
+                break;
+
+            case OI_RESIZE:
+                // Window resized
+                printf("resize event\n");
+                break;
+
+            case OI_EXPOSE:
+                // Window exposed
+                printf("expose event\n");
+                break;
+
+            case OI_DISCOVERY:
+                // New device registered
+                printf("discovery event\n");
+                break;
+
+            default:
+                // Unhandled event
+                printf("unhandled event type %i\n",
+                       ev.type);
+                break;
+        @}
+    @}
+
+    printf("finished\n");
+@}
+@end example

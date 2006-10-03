@@ -5,7 +5,7 @@
 @settitle OpenInput Manual @value{VERSION}
 
 @copying
-Copyright @copyright{} 2006 - Jakob Kjaer <makob@@makob.dk>@*@*
+Copyright @copyright{} 2006 by Jakob Kjaer <makob@@makob.dk>@*@*
 
 This manual is licensed under the GNU FDL:
 
@@ -14,12 +14,9 @@ Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
 any later version published by the Free Software Foundation; with no
 Invariant Sections, no Front-Cover Texts and no Back-Cover Texts.  A
-copy of the license is included in the section entitled "GNU Free
-Documentation License".
+copy of the license is included in the section entitled 
+"@ref{GNU Free Documentation License}".
 @end quotation
-
-The full license can be found online within this manual at
-@ref{GNU Free Documentation License}.
 
 @end copying
 
@@ -38,6 +35,8 @@ The full license can be found online within this manual at
 @include intro.texi
 @include install.texi
 @include sample.texi
+@include parsing.texi
+@include hooking.texi
 @include design.texi
 @include bootstrap.texi
 @include faq.texi
