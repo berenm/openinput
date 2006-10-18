@@ -17,7 +17,7 @@ namely how to hook OpenInput into your application window.
 @section Hooking concept
 
 Until now we've dealt with the core of OpenInput, which is the event
-handling itself. However, once critical part is missing: The conduit
+handling itself. However, one critical part is missing: The conduit
 from your operating system into OpenInput. This is known as hooking.
 
 Hooking requires you to (manually) obtain the unique identifier
@@ -44,20 +44,21 @@ int oi_init(char *window_id,
             unsigned int flags);
 @end example
 
-The @code{flags} paramter is a simple bitmask of flags you can pass,
-and is not really related to the hooking.
+The @code{flags} parameter is a simple bitmask of flags you can pass
+to OpenInput, and is not really related to the hooking. For more
+detail about this paramter, please see the API documentation.
 
-The @code{window_id} paramter is, on the other hand, the hook. The
-paramter is composed as a string to allow maximum flexibility, and
-must have the structure
+The @code{window_id} parameter is, on the other hand, the hook
+itself. The parameter is composed as a zero-terminated string, which
+must be formatted like this
 
 @example
 "c:CONNECTION s:SCREEN w:WINDOW"
 @end example
 
-where @code{CONNECTION} is the connection handle to the window server,
-@code{SCREEN} is the screen handle and @code{WINDOW} is the window
-handle.
+Where the @code{CONNECTION} is the connection handle to the window
+server, @code{SCREEN} is the screen handle and @code{WINDOW} is the
+window handle.
 
 What parameters to use (and what makes sense) depends on the
 particular platform.
@@ -71,16 +72,95 @@ something like @code{sprintf(windowid, "c:%u s:%u w:%u", con, scr, win)}.
 @node Windows hooking
 @section Windows hooking
 
-Fixme: Please write this section!
+Under Windows (native Win32) only the @code{w} parameter is required,
+and must be the window handle. You usually get this handle from the
+return value of @code{CreateWindow()}. For example, your code for
+initialising OpenInput using the Windows hook may look something like
+this:
+
+@example
+HWND hwnd;
+char hook[40];
+
+hwnd = CreateWindow("Hello OpenInput", ..., ...);
+sprintf(hook, "c:0 s:0 w:%u", (unsigned int)hwnd);
+oi_init(hook, 0);
+@end example
+
+What happens above is that you create the main window of your
+application, then you format the hook string for OpenInput using
+@code{sprintf()}, and finally you pass this string on to OpenInput.
+When this is done, OpenInput will be able to fetch all input sent
+by Win32 to your window.
 
 @c ----------------------------------------------------------------------
 @node X11 hooking
 @section X11 hooking
 
-Fixme: Please write this section!
+Hooking into X11 is a bit more tricky than the Win32 example due to
+X11's much more complex (but also much more flexible) design. Remeber
+that X11 is fully network transparent, so here you will more than just
+a window handle.
+
+Under X11 you can pass all three parameters. Let us first declare
+the varibles in which we want to contain the values
+
+@example
+Display *display;
+Window window;
+unsigned int screen;
+char hook[40];
+@end example
+
+To obtain the @code{display} variable, which is similar to a file
+descriptor or network connection handle to the X server, you do
+usually do the following (no error checking done here for brevity):
+
+@example
+display = XOpenDisplay(NULL);
+@end example
+
+The next step (which is acutally optional) is to obtain the screen
+handle. We just use the default screen:
+
+@example
+screen = DefaultScreen(display);
+@end example
+
+And finally, we can obtain the window handle. Like on Win32, we can
+get this value when creating the window:
+
+@example
+window = XCreateSimpleWindow(disp, DefaultRootWindow(disp), ..., ...);
+@end example
+
+Now we have all required variables, but before you initialise
+OpenInput you must wait for X11 to map (create) the window. This step
+has been left out to ease readability, so let's just say that the
+window has been mapped and is now displayed on your local X server
+screen. Then you can initialise OpenInput like on Win32:
+
+@example
+sprintf(hook, "c:%u s:%u w:%u",
+        (unsigned int)display,
+        (unsigned int)screen,
+        (unsigned int)window);
+oi_init(hook, 0);
+@end example
+
+All the parts which were left out can be found in the OpenInput
+@code{x11test.c} file in the @code{test} directory. The file has been
+heavily documented, but to gain a complete understanding of what's
+actually going on, you should look up a X11 tutorial (and API
+reference) on the net. There's tons of these out there!
+
 
 @c ----------------------------------------------------------------------
 @node Non-hook systems
 @section Non-hook systems
 
-Fixme: Please write this section!
+If you're testing OpenInput in a non-windowed environment (like in a
+console), you can just pass @code{NULL}, and OpenInput will not try to
+hook into anything. Alternatively you can pass @code{OI_FLAG_NOWINDOW}
+as the second parameter to @code{oi_init()} to force OpenInput to
+ignore the hook parameter.
