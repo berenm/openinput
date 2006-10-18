@@ -382,6 +382,10 @@ unsigned int device_windowid(char *str, char tok) {
     int e;
     unsigned int val;
 
+    if(!str) {
+        return 0;
+    }
+
     memset(match, 0, 5);
 
     // Set token to find, and scan

@@ -1,4 +1,7 @@
 SVN head
+	* Fix: Remove bogus "win32_movesize" code from DX9 driver
+	  (thanks to Sebastian Bouchard for reporting this)
+	* Fix: Make device_windowid resistant to null-string
 	* Updates to the manual (continuing effort)
 
 Version 0.2.3 - 2006-09-12

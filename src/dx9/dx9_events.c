@@ -215,7 +215,7 @@ void dx9_joy_dispatch(oi_device *dev, DIDEVICEOBJECTDATA *data, unsigned int ent
 /* ******************************************************************** */
 
 /**
- * @ingroup DWin32
+ * @ingroup DDX9
  * @brief The window procedure
  *
  * @param hwnd window handle
@@ -266,7 +266,7 @@ LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
         case WM_SIZE:
         case WM_MOVE:
             {
-                debug("win32_wndproc: size/move");
+                debug("dx9_wndproc: size/move");
                 //dx9_movesize();
             }
             return 0;
@@ -276,7 +276,7 @@ LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
         case WM_DESTROY:
             {
                 oi_event ev;
-                debug("win32_wndproc: close/destroy");
+                debug("dx9_wndproc: close/destroy");
                 ev.type = OI_QUIT;
                 queue_add(&ev);
                 PostQuitMessage(0);
@@ -288,7 +288,7 @@ LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
         case WM_ERASEBKGND:
             {
                 oi_event ev;
-                debug("win32_wndproc: erase background");
+                debug("dx9_wndproc: erase background");
                 ev.type = OI_EXPOSE;
                 queue_add(&ev);
             }
@@ -306,33 +306,4 @@ LRESULT CALLBACK dx9_wndproc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) 
 
     // The catch-all default handler
     return DefWindowProc(hwnd, msg, wparam, lparam);
-}
-
-/* ******************************************************************** */
-
-/**
- * @ingroup DDX9
- * @brief Window was moved or resized
- *
- * When the user moved or resized the window, get the
- * new window sizes.
- */
-void win32_movesize() {
-    /*
-    RECT rc;
-
-    // Store new boundaries for mouse grabbing
-    GetClientRect(private->hwnd, &private->rect);
-
-    // Did anything change?
-    if((private->width == private->rect.right) &&
-       (private->height == private->rect.bottom)) {
-        return;
-    }
-
-    // Update and post event
-    private->width = rc.right;
-    private->height = rc.bottom;
-    appstate_resize(device->index, private->width, private->height, TRUE);
-    */
 }
