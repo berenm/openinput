@@ -126,7 +126,7 @@ oi_device *device_get(unsigned char index);
 
 void device_pumpall();
 
-unsigned int device_windowid(char *str,
+unsigned long device_windowid(char *str,
                              char tok);
 
 int device_destroy(unsigned char index);

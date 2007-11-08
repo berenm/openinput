@@ -87,7 +87,7 @@ void device_bootstrap(char *window_id, unsigned int flags) {
     debug("device_bootstrap");
 
     // Critical error - bootstrap is empty
-    if(!bootstrap || !bootstrap[0]) {
+    if(!bootstrap[0]) {
         return;
     }
     if(num_devices != 0) {
@@ -373,14 +373,15 @@ void device_pumpall() {
  * @param tok parameter to parse, see @ref PWindow
  * @returns converted parameter (as an unsigned int)
  *
- * Parse and convert string parameter to an unsigned int. Basically
+ * Parse and convert string parameter to an unsigned long. Basically
  * this is just an advanced atoi-function.
  */
-unsigned int device_windowid(char *str, char tok) {
+
+unsigned long device_windowid(char *str, char tok) {
     char match[5];
     char *sub;
     int e;
-    unsigned int val;
+    unsigned long val;
 
     if(!str) {
         return 0;
@@ -390,7 +391,7 @@ unsigned int device_windowid(char *str, char tok) {
 
     // Set token to find, and scan
     match[0] = tok;
-    strcat(match, ":%u");
+    strcat(match, ":%lu");
 
     // Find sub-string index (index of tok in str)
     sub = str;

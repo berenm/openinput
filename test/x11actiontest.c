@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
   } while(evt.type != MapNotify);
 
   // Init OI
-  sprintf(csw, "c:%u s:%u w:%u", (uint)disp, (uint)scrn, (uint)win);
+  sprintf(csw, "c:%lu s:%u w:%u", (ulong)disp, (uint)scrn, (uint)win);
   i = oi_init(csw, 0);
   printf("--- oi_init, code %i\n\n", i);
 

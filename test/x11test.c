@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
     } while(evt.type != MapNotify);
 
     // Init OI
-    sprintf(csw, "c:%u s:%u w:%u", (uint)disp, (uint)scrn, (uint)win);
+    sprintf(csw, "c:%lu s:%u w:%u", (ulong)disp, (uint)scrn, (uint)win);
     printf("x11test: init parameter '%s'\n", csw);
     e = oi_init(csw, 0);
     printf("x11test: oi_init, code %i\n", e);
